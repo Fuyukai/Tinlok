@@ -1,0 +1,18 @@
+syntax: glob
+
+# no intellij shit
+.idea/
+.idea/*
+*.iml
+*.ipr
+
+# no build files
+build/
+*/build/
+
+# no gradle stuff, either
+.gradle/
+.gradle/*
+
+# misc personal files
+TODO
