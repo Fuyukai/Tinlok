@@ -13,7 +13,7 @@ package tf.lotte.kste
  * Semantically similar to Java's System namespace. Contains several useful functions for
  * interacting with the current operating system.
  */
-public expect object System {
+public expect object Sys {
     /**
      * Gets an environmental variable named [key].
      */
@@ -28,4 +28,7 @@ public expect object System {
      * Gets the current username of the user running this application.
      */
     public fun getUsername(): String
+
+    /** Information object about the current OS. */
+    public val osInfo: OsInfo
 }

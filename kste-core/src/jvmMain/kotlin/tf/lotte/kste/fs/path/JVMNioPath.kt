@@ -10,10 +10,12 @@
 package tf.lotte.kste.fs.path
 
 import tf.lotte.kste.ByteString
+import tf.lotte.kste.Sys
 import tf.lotte.kste.fs.FilePermission
 import tf.lotte.kste.fs.Stat
 import java.nio.file.Files
 import java.nio.file.LinkOption
+import kotlin.streams.toList
 
 /**
  * Implements [Path] via NIO APIs.
@@ -73,20 +75,34 @@ internal class JVMNioPath(private val pure: PurePath) : Path {
         }
     }
 
-    override fun stat(followSymlinks: Boolean): Stat {
-        TODO("not implemented")
+    override fun stat(followSymlinks: Boolean): Stat? {
+        if (!exists()) return null
+
+        val options = if (followSymlinks) arrayOf() else arrayOf(LinkOption.NOFOLLOW_LINKS)
+
+        val uid =
+            if (Sys.osInfo.isWindows) 0
+            else Files.getAttribute(_nioPath, "unix:uid", *options) as Int
+
+        val gid =
+            if (Sys.osInfo.isWindows) 0
+            else Files.getAttribute(_nioPath, "unix:gid", *options) as Int
+
+        val stMode = Files.getAttribute(_nioPath, "unix:mode", *options) as Int
+        val size = Files.size(_nioPath)
+
+        return Stat(ownerUID = uid, ownerGID = gid, size = size, st_mode = stMode.toUInt())
     }
 
-    override fun listFiles(): List<Path> {
-        TODO("not implemented")
-    }
+    override fun listFiles(): List<Path> =
+        Files.list(_nioPath).map { Paths.fromNioPath(it) }.toList()
 
     override fun removeDirectory() {
-        TODO("not implemented")
+        Files.delete(_nioPath)
     }
 
     override fun unlink() {
-        TODO("not implemented")
+        Files.delete(_nioPath)
     }
 
 }

@@ -17,7 +17,7 @@ import platform.posix.*
 /**
  * Linux-based system methods.
  */
-public actual object System {
+public actual object Sys {
     public actual fun getenv(key: String): String? {
         return platform.posix.getenv(key)?.toKStringFromUtf8()
     }
@@ -28,5 +28,12 @@ public actual object System {
 
     public actual fun getUsername(): String = memScoped {
         getPasswdEntry(getuid())!!.pw_name!!.toKStringFromUtf8()
+    }
+
+    public actual val osInfo: OsInfo = object : OsInfo {
+        override val isPosix: Boolean get() = true
+        override val isWindows: Boolean get() = false
+        override val isLinux: Boolean get() = true
+        override val isMacOs: Boolean get() = false
     }
 }
