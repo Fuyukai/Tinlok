@@ -7,7 +7,7 @@ plugins {
 subprojects {
     apply(plugin = "org.jetbrains.kotlin.multiplatform")
 
-    group = "tf.lotte.kste"
+    group = "tf.lotte.knste"
     version = "1.0.0"
 
     repositories {
@@ -19,23 +19,26 @@ subprojects {
     configure<KotlinMultiplatformExtension> {
         explicitApi = ExplicitApiMode.Strict
 
-        jvm {
-            val main by compilations.getting
-            val test by compilations.getting
-
-            listOf(main, test).forEach {
-                it.kotlinOptions {
-                    jvmTarget = "13"
-                    useIR = true
-                    freeCompilerArgs = listOf("-Xjvm-default=all", "-Xemit-jvm-type-annotations")
-                }
-            }
-        }
-
+        // linux targets
         linuxX64()
+        linuxArm64()
+
+        /* temp disabled
+        // darwin targets
+        macosX64()
+
+        // windows
+        mingwX64()
+        */
 
         sourceSets {
-            val commonMain by getting
+            val commonMain by getting {
+                dependencies {
+                    // required to stop intellij from flipping out
+                    implementation(kotlin("stdlib"))
+                    implementation(kotlin("reflect"))
+                }
+            }
             val commonTest by getting {
                 dependencies {
                     implementation(kotlin("test-common"))
@@ -43,19 +46,10 @@ subprojects {
                 }
             }
 
-            val jvmMain by getting {
-                dependencies {
-                    // prevents weird errors...
-                    implementation(kotlin("reflect"))
-                }
-            }
-
-            val jvmTest by getting {
-                dependencies {
-                    implementation(kotlin("test-junit"))
-                }
-            }
-
+            // linux sourcesets all share a sourceset
+            val linuxMain by creating { dependsOn(commonMain) }
+            val linuxX64Main by getting { dependsOn(linuxMain) }
+            val linuxArm64Main by getting { dependsOn(linuxMain) }
         }
     }
 }

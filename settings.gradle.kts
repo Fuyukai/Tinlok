@@ -7,5 +7,5 @@
  * in the user manual at https://docs.gradle.org/6.5.1/userguide/multi_project_builds.html
  */
 
-rootProject.name = "kste"
-include("kste-core")
+rootProject.name = "knste"
+include("knste-core")
