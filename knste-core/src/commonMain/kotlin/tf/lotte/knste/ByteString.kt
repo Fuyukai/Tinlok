@@ -32,6 +32,9 @@ private constructor(
             return ByteString(ByteStringHolder.stringToByteArray(string))
         }
 
+        internal fun fromUncopied(ba: ByteArray): ByteString =
+            ByteString(ByteStringHolder.fromByteArrayUncopied(ba))
+
         internal fun fromRawHolder(holder: ByteStringHolder): ByteString =
             ByteString(holder)
     }
@@ -95,6 +98,13 @@ private constructor(
         }
 
         return true
+    }
+
+    /**
+     * Unwraps this [ByteString], getting the underlying array.
+     */
+    internal fun unwrap(): ByteArray {
+        return backing.unwrap()
     }
 
     override fun iterator(): Iterator<Byte> {

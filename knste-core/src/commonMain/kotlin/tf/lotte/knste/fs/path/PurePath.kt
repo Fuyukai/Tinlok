@@ -58,6 +58,5 @@ public interface PurePath {
     /**
      * Converts the path within to a Kotlin string. This *will* break if non-unicode paths are used.
      */
-    public fun extremelyUnsafeToKotlinStringPleaseYellAtLangDevIfThisFails(): String
+    public fun unsafeToString(): String
 }
-

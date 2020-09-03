@@ -53,6 +53,10 @@ internal class LinuxByteStringHolder(ba: ByteArray) : Iterable<Byte>  {
         return ba.contains(byte)
     }
 
+    fun unwrap(): ByteArray {
+        return ba
+    }
+
     override fun iterator(): Iterator<Byte> = __Iterator()
     override fun equals(other: Any?): Boolean {
         if (other == null || other !is ByteStringHolder) return false

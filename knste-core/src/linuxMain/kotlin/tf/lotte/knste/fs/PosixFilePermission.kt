@@ -24,17 +24,21 @@ public enum class PosixFilePermission(public val bit: Int) : FilePermission {
     GROUP_READ(S_IRGRP),
     GROUP_WRITE(S_IWGRP),
     GROUP_EXECUTE(S_IXGRP),
+    GROUP_RW(S_IRGRP or S_IWGRP),
     GROUP_RX(S_IRGRP or S_IXGRP),
     GROUP_ALL(S_IRWXG),
 
     ALL_READ(S_IROTH),
     ALL_WRITE(S_IWOTH),
     ALL_EXECUTE(S_IXOTH),
+    ALL_RW(S_IROTH or S_IWOTH),
     ALL_RX(S_IROTH or S_IXOTH),
     OTHER_ALL(S_IRWXO),
 
-    DEFAULT_FILE(OWNER_RW.bit or GROUP_READ.bit or ALL_READ.bit),
-    DEFAULT_DIRECTORY(OWNER_ALL.bit or GROUP_RX.bit or ALL_READ.bit),
+    // 666, usually umasked to 644
+    DEFAULT_FILE(OWNER_RW.bit or GROUP_RW.bit or ALL_RW.bit),
+    // 777, usually umasked to 755
+    DEFAULT_DIRECTORY(OWNER_ALL.bit or GROUP_ALL.bit or OTHER_ALL.bit),
 
     ALL(S_IRWXU or S_IRWXG or S_IRWXO)
     ;

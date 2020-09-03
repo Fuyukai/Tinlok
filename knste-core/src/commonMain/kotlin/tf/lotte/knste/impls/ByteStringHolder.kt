@@ -43,4 +43,10 @@ internal expect class ByteStringHolder private constructor(ba: ByteArray) : Iter
      * Checks if this holder contains the specified byte.
      */
     fun contains(byte: Byte): Boolean
+
+    /**
+     * Gets the backing [ByteArray] for this holder, or a new [ByteArray] with the contents of
+     * this holder.
+     */
+    fun unwrap(): ByteArray
 }

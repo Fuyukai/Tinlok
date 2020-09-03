@@ -16,9 +16,11 @@ import kotlin.contracts.contract
 /**
  * Represents any object that is closeable.
  */
-public expect interface Closeable {
+public interface Closeable {
     /**
      * Closes this resource.
+     *
+     * This method is idempotent; subsequent calls will have no effects.
      */
     public fun close()
 }

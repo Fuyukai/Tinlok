@@ -110,9 +110,9 @@ public class PosixPurePath(rawParts: List<ByteString>) : PurePath {
         return fromByteString(bs)
     }
 
-    override fun extremelyUnsafeToKotlinStringPleaseYellAtLangDevIfThisFails(): String {
+    override fun unsafeToString(): String {
         val joined = rawComponents.join(SLASH)
-        return joined.toByteArray().decodeToString(throwOnInvalidSequence = true)
+        return joined.unwrap().decodeToString(throwOnInvalidSequence = true)
     }
 
     // TODO: Maybe revist this implementation?

@@ -10,15 +10,15 @@
 package tf.lotte.knste.fs
 
 import tf.lotte.knste.fs.path.Path
-import tf.lotte.knste.io.Closeable
-import tf.lotte.knste.io.Seekable
-import tf.lotte.knste.io.StringReadable
-import tf.lotte.knste.io.StringWriteable
+import tf.lotte.knste.io.*
 
 /**
  * Represents a file on the filesystem.
  */
-public interface FilesystemFile : StringReadable, Seekable, StringWriteable, Closeable {
+public interface FilesystemFile : BidirectionalStringStream, Seekable {
+    /** If this file is still open. */
+    public val isOpen: Boolean
+
     /** The path of this file. */
     public val path: Path
 }

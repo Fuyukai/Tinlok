@@ -15,9 +15,9 @@ import kotlinx.cinterop.pointed
 import kotlinx.cinterop.ptr
 import platform.posix.*
 import tf.lotte.knste.ByteString
-import tf.lotte.knste.fs.FilePermission
-import tf.lotte.knste.fs.PosixFilePermission
-import tf.lotte.knste.fs.Stat
+import tf.lotte.knste.fs.*
+import tf.lotte.knste.impls.Syscall
+import tf.lotte.knste.impls.Syscall.stat
 import tf.lotte.knste.readZeroTerminated
 
 /**
@@ -41,27 +41,18 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
     override fun join(other: PurePath): LinuxPath = LinuxPath(pure.join(other))
     override fun join(other: ByteString): LinuxPath = LinuxPath(pure.join(other))
 
-    override fun extremelyUnsafeToKotlinStringPleaseYellAtLangDevIfThisFails(): String {
-        return pure.extremelyUnsafeToKotlinStringPleaseYellAtLangDevIfThisFails()
+    override fun unsafeToString(): String {
+        return pure.unsafeToString()
     }
 
     // == path functionality == //
     override fun exists(): Boolean {
-        val strPath = pure.extremelyUnsafeToKotlinStringPleaseYellAtLangDevIfThisFails()
+        val strPath = pure.unsafeToString()
         return access(strPath, F_OK) != -1
     }
 
     override fun stat(followSymlinks: Boolean): Stat? = memScoped {
-        val strPath = extremelyUnsafeToKotlinStringPleaseYellAtLangDevIfThisFails()
-        val pathStat = alloc<stat>()
-        val res =
-            if (followSymlinks) stat(strPath, pathStat.ptr)
-            else lstat(strPath, pathStat.ptr)
-
-        if (res == -1) {
-            if (errno == ENOENT) return null
-            else TODO("stat errno")
-        }
+        val pathStat = Syscall.stat(this, this@LinuxPath, followSymlinks)
 
         return Stat(
             ownerUID = pathStat.st_uid.toInt(),
@@ -83,9 +74,9 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
         existOk: Boolean,
         vararg permissions: FilePermission
     ) {
-        val path = this.extremelyUnsafeToKotlinStringPleaseYellAtLangDevIfThisFails()
+        val path = this.unsafeToString()
         val permMask = if (permissions.isEmpty()) {
-            0
+            PosixFilePermission.ALL.bit
         } else {
             permissions
                 .filterIsInstance<PosixFilePermission>()
@@ -111,7 +102,7 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
     }
 
     override fun listFiles(): List<Path> {
-        val path = this.extremelyUnsafeToKotlinStringPleaseYellAtLangDevIfThisFails()
+        val path = this.unsafeToString()
         val dir = opendir(path) ?: TODO("opendir failed")
         val items = mutableListOf<Path>()
 
@@ -131,7 +122,7 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
     }
 
     override fun removeDirectory() {
-        val path = this.extremelyUnsafeToKotlinStringPleaseYellAtLangDevIfThisFails()
+        val path = this.unsafeToString()
         val res = rmdir(path)
         if (res != 0) {
             TODO("rmdir errno")
@@ -139,10 +130,14 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
     }
 
     override fun unlink() {
-        val path = this.extremelyUnsafeToKotlinStringPleaseYellAtLangDevIfThisFails()
+        val path = this.unsafeToString()
         val res = unlink(path)
         if (res != 0) {
             TODO("unlink errno")
         }
+    }
+
+    override fun open(vararg modes: FileOpenMode): FilesystemFile {
+        return LinuxSyncFile(this, modes.toSet())
     }
 }

@@ -21,9 +21,4 @@ public interface Readable {
      * A null return means EOF.
      */
     public fun readUpTo(bytes: Long): ByteString?
-
-    /**
-     * Reads all bytes from this object.
-     */
-    public fun readAll(): ByteString
 }

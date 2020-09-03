@@ -10,8 +10,6 @@
 package tf.lotte.knste.io
 
 /**
- * Linux implementation of Closeable.
+ * Represents a half-closeable stream that can have strings read/written from/to it.
  */
-public actual interface Closeable {
-    public actual fun close()
-}
+public interface HalfCloseableStringStream : BidirectionalStringStream, HalfCloseableStream

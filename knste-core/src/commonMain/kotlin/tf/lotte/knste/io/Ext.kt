@@ -16,7 +16,8 @@ import kotlin.contracts.contract
 
 // misc extensions
 /**
- * See Kotlin stdlib use.
+ * Using the specified [Closeable], runs the lambda [block] and automatically closes the object
+ * afterwards.
  */
 @OptIn(ExperimentalContracts::class)
 public inline fun <T: Closeable, R> T.use(block: (T) -> R): R {
