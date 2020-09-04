@@ -30,12 +30,13 @@ internal class LinuxSyncFile(
     private val fd: FD
 
     init {
+
         // initial read/write mode check
         var mode = when {
             openModes.containsAll(listOf(READ, WRITE)) -> O_RDWR
             openModes.contains(READ) -> O_RDONLY
             openModes.contains(WRITE) -> O_WRONLY
-            openModes.contains(APPEND) -> O_APPEND
+            openModes.contains(APPEND) -> O_WRONLY or O_APPEND
             else -> 0
         }
 
@@ -45,7 +46,12 @@ internal class LinuxSyncFile(
             mode = mode or O_CREAT or O_EXCL
         }
 
-        fd = Syscall.open(path.unsafeToString(), mode, permission.bit)
+        // only pass permission bit if O_CREAT is passed
+        fd = if ((mode and O_CREAT) == 0) {
+            Syscall.open(path.unsafeToString(), mode)
+        } else {
+            Syscall.open(path.unsafeToString(), mode, permission.bit)
+        }
     }
 
     // manually handled
