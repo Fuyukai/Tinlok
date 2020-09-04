@@ -36,9 +36,9 @@ public enum class PosixFilePermission(public val bit: Int) : FilePermission {
     OTHER_ALL(S_IRWXO),
 
     // 666, usually umasked to 644
-    DEFAULT_FILE(OWNER_RW.bit or GROUP_RW.bit or ALL_RW.bit),
+    DEFAULT_FILE((S_IRUSR or S_IWUSR) or (S_IRGRP or S_IWGRP) or (S_IROTH or S_IWOTH)),
     // 777, usually umasked to 755
-    DEFAULT_DIRECTORY(OWNER_ALL.bit or GROUP_ALL.bit or OTHER_ALL.bit),
+    DEFAULT_DIRECTORY(S_IRWXU or S_IRWXG or S_IRWXO),
 
     ALL(S_IRWXU or S_IRWXG or S_IRWXO)
     ;
