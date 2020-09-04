@@ -80,7 +80,7 @@ public actual object Paths {
      */
     public actual fun makeTempDirectory(prefix: String): Path {
         // lol at this function literally replacing XXXXXX
-        val template = "/tmp/KNSTE-$prefix-XXXXXX".cstr
+        val template = "/tmp/$prefix-XXXXXX".cstr
         val path = mkdtemp(template) ?: TODO("mkdtemp error")
         val ba = path.readZeroTerminated(PATH_MAX)
         val bs = ByteString.fromByteArray(ba)
