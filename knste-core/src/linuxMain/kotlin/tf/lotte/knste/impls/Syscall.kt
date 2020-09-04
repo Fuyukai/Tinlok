@@ -16,7 +16,7 @@ import platform.posix.*
 import tf.lotte.knste.exc.FileAlreadyExistsException
 import tf.lotte.knste.exc.FileNotFoundException
 import tf.lotte.knste.exc.IOException
-import tf.lotte.knste.fs.path.PurePath
+import tf.lotte.knste.exc.OSException
 import tf.lotte.knste.util.Unsafe
 import kotlin.experimental.ExperimentalTypeInference
 
@@ -86,7 +86,7 @@ public object Syscall {
                 EEXIST -> FileAlreadyExistsException(path)
                 ENOENT -> FileNotFoundException(path)
                 EACCES -> TODO("EACCES")
-                else -> IOException(strerror())
+                else -> OSException(errno, message = strerror())
             }
         }
 
@@ -100,7 +100,7 @@ public object Syscall {
     public fun close(fd: FD) {
         val res = platform.posix.close(fd)
         if (res == ERROR) {
-            throw IOException(strerror())
+            throw OSException(errno, message = strerror())
         }
     }
 
@@ -122,7 +122,10 @@ public object Syscall {
 
         if (count == LONG_ERROR) {
             // TODO: EAGAIN
-            throw IOException(strerror())
+            throw when (errno) {
+                EIO -> IOException(strerror())
+                else -> OSException(errno, message = strerror())
+            }
         }
 
         return count
@@ -152,7 +155,7 @@ public object Syscall {
 
                 // eintr means it didn't write anything, so we can transparently retry
                 if (written == LONG_ERROR && errno != EINTR) {
-                    throw IOException(strerror())
+                    throw OSException(errno, message = strerror())
                 }
 
                 // make sure we actually write all of the bytes we want to write
@@ -174,7 +177,7 @@ public object Syscall {
     public fun lseek(fd: FD, position: Long, whence: Int): Long {
         val res = platform.posix.lseek(fd, position, whence)
         if (res == LONG_ERROR) {
-            throw IOException(strerror())
+            throw OSException(errno, message = strerror())
         }
 
         return res
@@ -200,7 +203,7 @@ public object Syscall {
         if (res == ERROR) {
             throw when (errno) {
                 ENOENT -> FileNotFoundException(path)
-                else -> IOException(strerror())
+                else -> OSException(errno, message = strerror())
             }   
         }
 
@@ -218,7 +221,7 @@ public object Syscall {
             else throw when (errno) {
                 ENOENT -> FileNotFoundException(path)
                 EROFS -> IOException("Filesystem is read-only")  // TODO: Dedicated error?
-                else -> IOException(strerror())
+                else -> OSException(errno, message = strerror())
             }
         }
 
@@ -235,7 +238,7 @@ public object Syscall {
         if (dirfd == null) {
             throw when (errno) {
                 ENOENT -> FileNotFoundException(path)
-                else -> IOException(strerror())
+                else -> OSException(errno, message = strerror())
             }
         }
 
@@ -257,7 +260,7 @@ public object Syscall {
     public fun closedir(dirfd: CValuesRef<DIR>) {
         val res = platform.posix.closedir(dirfd)
         if (res == ERROR) {
-            throw IOException(strerror())
+            throw OSException(errno, message = strerror())
         }
     }
 
@@ -275,7 +278,7 @@ public object Syscall {
             else throw when (errno) {
                 EEXIST -> FileAlreadyExistsException(path)
                 ENOENT -> FileNotFoundException(path)
-                else -> IOException(strerror())
+                else -> OSException(errno, message = strerror())
             }
         }
     }
@@ -289,7 +292,7 @@ public object Syscall {
         if (result == ERROR) {
             throw when (errno) {
                 ENOENT -> FileNotFoundException(path)
-                else -> IOException(strerror())
+                else -> OSException(errno, message = strerror())
             }
         }
     }
@@ -303,7 +306,7 @@ public object Syscall {
         if (result == ERROR) {
             throw when (errno) {
                 ENOENT -> FileNotFoundException(path)
-                else -> IOException(strerror())
+                else -> OSException(errno, message = strerror())
             }
         }
     }
