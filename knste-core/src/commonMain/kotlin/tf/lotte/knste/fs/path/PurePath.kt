@@ -10,6 +10,7 @@
 package tf.lotte.knste.fs.path
 
 import tf.lotte.knste.ByteString
+import tf.lotte.knste.toByteString
 import tf.lotte.knste.util.Unsafe
 
 /**
@@ -55,6 +56,11 @@ public interface PurePath {
      * Joins this path to another [ByteString], returning the combined path.
      */
     public fun join(other: ByteString): PurePath
+
+    /**
+     * Joins this path to another String, returning the combined path.
+     */
+    public fun join(other: String): PurePath = join(other.toByteString())
 
     /**
      * Converts the path within to a Kotlin string. This *will* break if non-unicode paths are used.
