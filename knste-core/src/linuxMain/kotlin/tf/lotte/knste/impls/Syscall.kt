@@ -75,12 +75,8 @@ public object Syscall {
     // == File opening/closing == //
     // region File opening/closing
 
-    /**
-     * Opens a new file descriptor for the path [path].
-     */
     @Unsafe
-    public fun open(path: String, mode: Int, permissions: Int): FD {
-        val fd = retry { platform.posix.open(path, mode, permissions) }
+    private fun openShared(path: String, fd: Int): Int {
         if (fd == ERROR) {
             throw when (errno) {
                 EEXIST -> FileAlreadyExistsException(path)
@@ -91,6 +87,21 @@ public object Syscall {
         }
 
         return fd
+    }
+
+    @Unsafe
+    public fun open(path: String, mode: Int): FD {
+        val fd = retry { platform.posix.open(path, mode) }
+        return openShared(path, fd)
+    }
+
+    /**
+     * Opens a new file descriptor for the path [path].
+     */
+    @Unsafe
+    public fun open(path: String, mode: Int, permissions: Int): FD {
+        val fd = retry { platform.posix.open(path, mode, permissions) }
+        return openShared(path, fd)
     }
 
     /**
@@ -218,6 +229,7 @@ public object Syscall {
         val result = platform.posix.access(path, mode)
         if (result == ERROR) {
             if (errno == EACCES) return false
+            if (errno == ENOENT && mode == F_OK) return false
             else throw when (errno) {
                 ENOENT -> FileNotFoundException(path)
                 EROFS -> IOException("Filesystem is read-only")  // TODO: Dedicated error?
