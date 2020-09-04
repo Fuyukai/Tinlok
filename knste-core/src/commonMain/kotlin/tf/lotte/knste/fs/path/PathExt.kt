@@ -7,7 +7,6 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
-@file:JvmName("PathExt")
 package tf.lotte.knste.fs.path
 
 import tf.lotte.knste.util.Unsafe
