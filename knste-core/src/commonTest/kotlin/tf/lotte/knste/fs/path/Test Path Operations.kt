@@ -8,6 +8,7 @@
  */
 
 @file:Suppress("MemberVisibilityCanBePrivate")
+
 package tf.lotte.knste.fs.path
 
 import tf.lotte.knste.Sys
@@ -44,7 +45,7 @@ class `Test Path Operations` {
      * Tests the recursive delete extension.
      */
     @Test
-    fun `Test recursive delete`()= Paths.makeTempDirectory("knste-test-") {
+    fun `Test recursive delete`() = Paths.makeTempDirectory("knste-test-") {
         val parent = it.join("delete-parent")
         parent.createDirectory(parents = false, existOk = false)
         parent.join("first").apply {

@@ -11,7 +11,8 @@ package tf.lotte.knste
 
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.toKStringFromUtf8
-import platform.posix.*
+import platform.posix.getpid
+import platform.posix.getuid
 
 /**
  * Linux-based system methods.

@@ -215,7 +215,7 @@ public object Syscall {
             throw when (errno) {
                 ENOENT -> FileNotFoundException(path)
                 else -> OSException(errno, message = strerror())
-            }   
+            }
         }
 
         return pathStat

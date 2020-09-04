@@ -71,8 +71,10 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
 
     override fun isDirectory(followSymlinks: Boolean): Boolean =
         stat(followSymlinks)?.isDirectory ?: false
+
     override fun isRegularFile(followSymlinks: Boolean): Boolean =
         stat(followSymlinks)?.isFile ?: false
+
     override fun isLink(): Boolean =
         stat(followSymlinks = false)?.isLink ?: false
 

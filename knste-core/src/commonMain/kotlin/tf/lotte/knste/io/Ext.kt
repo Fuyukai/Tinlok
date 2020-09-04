@@ -20,7 +20,7 @@ import kotlin.contracts.contract
  * afterwards.
  */
 @OptIn(ExperimentalContracts::class)
-public inline fun <T: Closeable, R> T.use(block: (T) -> R): R {
+public inline fun <T : Closeable, R> T.use(block: (T) -> R): R {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
@@ -36,7 +36,7 @@ public inline fun <T: Closeable, R> T.use(block: (T) -> R): R {
  * Peeks no more than the specified number of bytes without advancing the cursor position.
  */
 public fun <T> T.peek(count: Long): ByteString?
-    where T: Readable, T: Seekable {
+    where T : Readable, T : Seekable {
     val cursorBefore = cursorPosition
     val bs = readUpTo(count) ?: return null
     this.seekAbsolute(cursorBefore)

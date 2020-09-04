@@ -9,7 +9,10 @@
 
 package tf.lotte.knste
 
-import kotlinx.cinterop.*
+import kotlinx.cinterop.ByteVar
+import kotlinx.cinterop.CArrayPointer
+import kotlinx.cinterop.get
+import kotlinx.cinterop.readBytes
 
 /**
  * Reads out a Kotlin [ByteArray]

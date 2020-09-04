@@ -30,6 +30,7 @@ internal expect class ByteStringHolder private constructor(ba: ByteArray) : Iter
          */
         internal fun fromByteArrayUncopied(ba: ByteArray): ByteStringHolder
     }
+
     /** The size of this ByteString. */
     val size: Int
 

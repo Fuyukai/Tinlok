@@ -13,7 +13,6 @@ import tf.lotte.knste.b
 import tf.lotte.knste.fs.path.Paths
 import tf.lotte.knste.fs.path.makeTempDirectory
 import tf.lotte.knste.fs.path.open
-import tf.lotte.knste.util.Unsafe
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull

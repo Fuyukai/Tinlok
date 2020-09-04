@@ -9,9 +9,6 @@
 
 package tf.lotte.knste.exc
 
-import tf.lotte.knste.fs.path.PurePath
-import tf.lotte.knste.util.Unsafe
-
 /**
  * Base super class for all I/O exceptions.
  */

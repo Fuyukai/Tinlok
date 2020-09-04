@@ -9,8 +9,6 @@
 
 package tf.lotte.knste
 
-import kotlin.jvm.JvmName
-
 /**
  * Splits a [ByteString] by the specified [delim].
  */

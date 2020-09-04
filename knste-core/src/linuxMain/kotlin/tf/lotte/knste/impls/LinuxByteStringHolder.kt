@@ -12,7 +12,7 @@ package tf.lotte.knste.impls
 /**
  * Linux implementation of the ByteString holder.
  */
-internal class LinuxByteStringHolder(ba: ByteArray) : Iterable<Byte>  {
+internal class LinuxByteStringHolder(ba: ByteArray) : Iterable<Byte> {
     internal companion object {
         internal fun stringToByteArray(s: String): ByteStringHolder {
             return LinuxByteStringHolder(s.encodeToByteArray())
@@ -62,6 +62,7 @@ internal class LinuxByteStringHolder(ba: ByteArray) : Iterable<Byte>  {
         if (other == null || other !is ByteStringHolder) return false
         return other.ba.contentEquals(ba)
     }
+
     override fun hashCode(): Int {
         return ba.contentHashCode()
     }

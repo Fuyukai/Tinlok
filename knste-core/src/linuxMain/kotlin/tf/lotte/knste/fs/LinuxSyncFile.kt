@@ -9,11 +9,10 @@
 
 package tf.lotte.knste.fs
 
-import kotlinx.cinterop.memScoped
 import platform.posix.*
 import tf.lotte.knste.ByteString
-import tf.lotte.knste.fs.path.LinuxPath
 import tf.lotte.knste.fs.StandardOpenModes.*
+import tf.lotte.knste.fs.path.LinuxPath
 import tf.lotte.knste.impls.FD
 import tf.lotte.knste.impls.Syscall
 import tf.lotte.knste.util.Unsafe
