@@ -104,16 +104,36 @@ public class PosixPurePath(rawParts: List<ByteString>) : PurePath {
     override fun join(other: ByteString): PosixPurePath {
         if (other.isEmpty()) return this
 
-        val newComponents = rawComponents.toMutableList()
-        newComponents.add(other)
-        val bs = newComponents.join(SLASH)
+        val toJoin = if (isAbsolute) {
+            // this does a whole bunch of copying..
+            val newComponents = rawComponents.toMutableList()
+
+            // empty first part, means it will add a leading / with the delim.
+            // this is hacky as fuck!
+            newComponents[0] = b("")
+            newComponents.add(other)
+            newComponents
+        } else {
+            val copy = rawComponents.toMutableList()
+            copy.add(other)
+            copy
+        }
+
+        val bs = toJoin.join(SLASH)
         // force a re-parse of the overall path
         return fromByteString(bs)
     }
 
     @Unsafe
     override fun unsafeToString(): String {
-        val joined = rawComponents.join(SLASH)
+        val joined = if (isAbsolute) {
+            val copy = rawComponents.toMutableList()
+            copy[0] = b("")
+            copy.join(SLASH)
+        } else {
+            rawComponents.join(SLASH)
+        }
+
         return joined.unwrap().decodeToString(throwOnInvalidSequence = true)
     }
 
