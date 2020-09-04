@@ -58,6 +58,17 @@ private constructor(
     }
 
     /**
+     * Concatenates two [ByteString] instances, returning a new [ByteString].
+     */
+    public operator fun plus(other: ByteString): ByteString {
+        val unwrapped = backing.unwrap()
+        val unwrapped2 = other.backing.unwrap()
+        val combined = unwrapped + unwrapped2
+        val holder = ByteStringHolder.fromByteArrayUncopied(combined)
+        return ByteString(holder)
+    }
+
+    /**
      * Checks if this [ByteString] contains a specific byte [element].
      */
     public override operator fun contains(element: Byte): Boolean {

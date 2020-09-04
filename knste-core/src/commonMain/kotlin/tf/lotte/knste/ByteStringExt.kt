@@ -61,8 +61,8 @@ public fun ByteString.split(delim: ByteString): List<ByteString> {
 /**
  * Joins an iterable of [ByteString] together with the specified [delim].
  */
-public fun Iterable<ByteString>.join(delim: ByteString): ByteString {
-    val size = delim.size + this.sumBy { it.size }
+public fun Collection<ByteString>.join(delim: ByteString): ByteString {
+    val size = (delim.size * (this.size - 1)) + this.sumBy { it.size }
     val final = ByteArray(size)
     var cursor = 0
 
@@ -76,7 +76,7 @@ public fun Iterable<ByteString>.join(delim: ByteString): ByteString {
 
         // clever check for the last item
         // hasNext() will return false if this is the last one
-        // and we don't want a trailing slash
+        // and we don't want a trailing delimiter
         if (it.hasNext()) {
             for (b in delim) {
                 final[cursor] = b
@@ -85,7 +85,7 @@ public fun Iterable<ByteString>.join(delim: ByteString): ByteString {
         }
     }
 
-    return ByteString.fromByteArray(final)
+    return ByteString.fromUncopied(final)
 }
 
 
