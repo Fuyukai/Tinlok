@@ -51,3 +51,43 @@ public fun PurePath.allParents(): List<PurePath> {
         }
     }
 }
+
+/**
+ * Flattens a Path tree into a listing of [Path].
+ *
+ * This will be ordered in most components to least (so mostly deeply nested to least).
+ */
+public fun Path.flattenTree(): List<Path> {
+    // this descends into every directory without being recursive in itself.
+    // this avoids death by stack overflow
+    val final = mutableListOf<Path>()
+    val pending = ArrayDeque(listDir())
+
+    // examine all items in pending. if it's a directory, add all child items onto pending
+    // if it's not, add it to final
+    // then on the next pass around pending
+    val it = pending.listIterator()
+    for (item in it) {
+        if (item.isDirectory(followSymlinks = false)) {
+            item.listDir().forEach(it::add)
+            final.add(item)
+        } else {
+            final.add(item)
+        }
+    }
+
+    return final.sortedBy { it.rawComponents.size }
+}
+
+/**
+ * Recursively deletes a directory.
+ */
+public fun Path.recursiveDelete() {
+    for (i in flattenTree()) {
+        if (!i.isDirectory(followSymlinks = false)) {
+            i.removeDirectory()
+        } else {
+            i.unlink()
+        }
+    }
+}

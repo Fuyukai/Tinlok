@@ -36,7 +36,7 @@ public interface Path : PurePath {
     /**
      * Checks if this [Path] is a file.
      */
-    public fun isFile(followSymlinks: Boolean = true): Boolean
+    public fun isRegularFile(followSymlinks: Boolean = true): Boolean
 
     /**
      * Checks if this [Path] is a symbolic link.
@@ -63,7 +63,7 @@ public interface Path : PurePath {
     /**
      * Lists the files in this directory.
      */
-    public fun listFiles(): List<Path>
+    public fun listDir(): List<Path>
 
     /**
      * Removes this directory. It must be empty.

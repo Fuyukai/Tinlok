@@ -66,7 +66,7 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
 
     override fun isDirectory(followSymlinks: Boolean): Boolean =
         stat(followSymlinks)?.isDirectory ?: false
-    override fun isFile(followSymlinks: Boolean): Boolean =
+    override fun isRegularFile(followSymlinks: Boolean): Boolean =
         stat(followSymlinks)?.isFile ?: false
     override fun isLink(): Boolean =
         stat(followSymlinks = false)?.isLink ?: false
@@ -99,7 +99,7 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
     }
 
     @OptIn(Unsafe::class)
-    override fun listFiles(): List<Path> {
+    override fun listDir(): List<Path> {
         val path = this.unsafeToString()
         val dir = Syscall.opendir(path)
         val items = mutableListOf<Path>()
