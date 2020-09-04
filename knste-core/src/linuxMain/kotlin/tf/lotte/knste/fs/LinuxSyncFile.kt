@@ -16,10 +16,12 @@ import tf.lotte.knste.fs.path.LinuxPath
 import tf.lotte.knste.fs.StandardOpenModes.*
 import tf.lotte.knste.impls.FD
 import tf.lotte.knste.impls.Syscall
+import tf.lotte.knste.util.Unsafe
 
 /**
  * Linux implementation of a synchronous filesystem file.
  */
+@OptIn(Unsafe::class)
 internal class LinuxSyncFile(
     override val path: LinuxPath,
     openModes: Set<FileOpenMode>,
@@ -43,7 +45,7 @@ internal class LinuxSyncFile(
             mode = mode or O_CREAT or O_EXCL
         }
 
-        fd = Syscall.open(path, mode, permission.bit)
+        fd = Syscall.open(path.unsafeToString(), mode, permission.bit)
     }
 
     // manually handled
@@ -52,24 +54,29 @@ internal class LinuxSyncFile(
     override var isOpen: Boolean = true
         private set
 
+    @OptIn(Unsafe::class)
     override fun close() {
         if (!isOpen) return
         isOpen = false
         Syscall.close(fd)
     }
 
+    @OptIn(Unsafe::class)
     override val cursorPosition: Long
         get() = Syscall.lseek(fd, 0L, SEEK_CUR)
 
+    @OptIn(Unsafe::class)
     override fun seekAbsolute(position: Long) {
         Syscall.lseek(fd, position, SEEK_SET)
     }
 
+    @OptIn(Unsafe::class)
     override fun seekRelative(position: Long) {
         Syscall.lseek(fd, position, SEEK_CUR)
     }
 
     // == reading == //
+    @OptIn(Unsafe::class)
     override fun readUpTo(bytes: Long): ByteString? {
         if (!isOpen) TODO("Not open")
 
@@ -85,6 +92,7 @@ internal class LinuxSyncFile(
     }
 
     // == writing == //
+    @OptIn(Unsafe::class)
     override fun writeAll(bs: ByteString) {
         val ba = bs.unwrap()
         Syscall.write(fd, ba, ba.size)

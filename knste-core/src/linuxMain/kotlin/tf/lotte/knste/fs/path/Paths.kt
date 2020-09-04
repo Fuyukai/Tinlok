@@ -78,7 +78,7 @@ public actual object Paths {
     /**
      * Creates a new temporary directory, returning its [Path].
      */
-    public actual fun unsafeMakeTempDirectory(prefix: String): Path {
+    public actual fun makeTempDirectory(prefix: String): Path {
         // lol at this function literally replacing XXXXXX
         val template = "/tmp/KNSTE-$prefix-XXXXXX".cstr
         val path = mkdtemp(template) ?: TODO("mkdtemp error")

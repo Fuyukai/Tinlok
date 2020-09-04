@@ -10,14 +10,16 @@
 @file:JvmName("PathExt")
 package tf.lotte.knste.fs.path
 
+import tf.lotte.knste.util.Unsafe
 import kotlin.jvm.JvmName
 
 /**
  * Creates a new temporary directory and calls the provided lambda with its path. The
  * directory will be automatically deleted when the lambda returns.
  */
+@OptIn(Unsafe::class)
 public fun <R> Paths.makeTempDirectory(block: (Path) -> R): R {
-    val dir = unsafeMakeTempDirectory()
+    val dir = makeTempDirectory()
     try {
         dir.createDirectory(parents = false)
         return block(dir)

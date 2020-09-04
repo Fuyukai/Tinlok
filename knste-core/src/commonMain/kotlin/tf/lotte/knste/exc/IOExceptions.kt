@@ -10,6 +10,7 @@
 package tf.lotte.knste.exc
 
 import tf.lotte.knste.fs.path.PurePath
+import tf.lotte.knste.util.Unsafe
 
 /**
  * Base super class for all I/O exceptions.
@@ -22,13 +23,13 @@ public open class IOException(
  * Thrown when a file already exists on a creation attempt.
  */
 public open class FileAlreadyExistsException(
-    public val path: PurePath, cause: Throwable? = null
-) : IOException(path.unsafeToString(), cause)
+    public val path: String, cause: Throwable? = null
+) : IOException(path, cause)
 
 /**
  * Thrown when a file *doesn't* exist.
  */
 public open class FileNotFoundException(
-    public val path: PurePath, cause: Throwable? = null
-) : IOException(path.unsafeToString(), cause)
+    public val path: String, cause: Throwable? = null
+) : IOException(path, cause)
 

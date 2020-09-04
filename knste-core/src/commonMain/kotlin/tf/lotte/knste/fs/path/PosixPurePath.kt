@@ -10,6 +10,7 @@
 package tf.lotte.knste.fs.path
 
 import tf.lotte.knste.*
+import tf.lotte.knste.util.Unsafe
 
 /**
  * A pure path that uses POSIX semantics. You probably don't want to use this class directly.
@@ -110,6 +111,7 @@ public class PosixPurePath(rawParts: List<ByteString>) : PurePath {
         return fromByteString(bs)
     }
 
+    @Unsafe
     override fun unsafeToString(): String {
         val joined = rawComponents.join(SLASH)
         return joined.unwrap().decodeToString(throwOnInvalidSequence = true)

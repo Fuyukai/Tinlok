@@ -9,16 +9,14 @@
 
 package tf.lotte.knste.fs.path
 
-import kotlinx.cinterop.alloc
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.pointed
-import kotlinx.cinterop.ptr
-import platform.posix.*
+import platform.posix.F_OK
 import tf.lotte.knste.ByteString
 import tf.lotte.knste.fs.*
 import tf.lotte.knste.impls.Syscall
-import tf.lotte.knste.impls.Syscall.stat
 import tf.lotte.knste.readZeroTerminated
+import tf.lotte.knste.util.Unsafe
 
 /**
  * Linux-based implementation of a [Path]. Wraps a [PosixPurePath].
@@ -41,18 +39,22 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
     override fun join(other: PurePath): LinuxPath = LinuxPath(pure.join(other))
     override fun join(other: ByteString): LinuxPath = LinuxPath(pure.join(other))
 
+    @Unsafe
     override fun unsafeToString(): String {
         return pure.unsafeToString()
     }
 
     // == path functionality == //
+    @OptIn(Unsafe::class)
     override fun exists(): Boolean {
         val strPath = pure.unsafeToString()
-        return access(strPath, F_OK) != -1
+        return Syscall.access(strPath, F_OK)
     }
 
+    @OptIn(Unsafe::class)
     override fun stat(followSymlinks: Boolean): Stat? = memScoped {
-        val pathStat = Syscall.stat(this, this@LinuxPath, followSymlinks)
+        val strPath = pure.unsafeToString()
+        val pathStat = Syscall.stat(this, strPath, followSymlinks)
 
         return Stat(
             ownerUID = pathStat.st_uid.toInt(),
@@ -69,6 +71,7 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
     override fun isLink(): Boolean =
         stat(followSymlinks = false)?.isLink ?: false
 
+    @OptIn(Unsafe::class)
     override fun createDirectory(
         parents: Boolean,
         existOk: Boolean,
@@ -92,23 +95,18 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
             }
         }
 
-        val res = mkdir(path, permMask)
-        if (res != 0) {
-            // if it exists, we're all good
-            if (errno == EEXIST && existOk) return
-            // if not, handle errno
-            TODO("mkdir errno")
-        }
+        Syscall.mkdir(path, permMask, existOk)
     }
 
+    @OptIn(Unsafe::class)
     override fun listFiles(): List<Path> {
         val path = this.unsafeToString()
-        val dir = opendir(path) ?: TODO("opendir failed")
+        val dir = Syscall.opendir(path)
         val items = mutableListOf<Path>()
 
         try {
             while (true) {
-                val next = readdir(dir) ?: break
+                val next = Syscall.readdir(dir) ?: break
                 val item = next.pointed
                 val name = item.d_name.readZeroTerminated(256)
                 val bs = ByteString.fromByteArray(name)
@@ -117,24 +115,20 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
 
             return items
         } finally {
-            closedir(dir)
+            Syscall.closedir(dir)
         }
     }
 
+    @OptIn(Unsafe::class)
     override fun removeDirectory() {
         val path = this.unsafeToString()
-        val res = rmdir(path)
-        if (res != 0) {
-            TODO("rmdir errno")
-        }
+        Syscall.rmdir(path)
     }
 
+    @OptIn(Unsafe::class)
     override fun unlink() {
         val path = this.unsafeToString()
-        val res = unlink(path)
-        if (res != 0) {
-            TODO("unlink errno")
-        }
+        Syscall.unlink(path)
     }
 
     override fun open(vararg modes: FileOpenMode): FilesystemFile {

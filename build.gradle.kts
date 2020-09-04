@@ -50,6 +50,13 @@ subprojects {
             val linuxMain by creating { dependsOn(commonMain) }
             val linuxX64Main by getting { dependsOn(linuxMain) }
             val linuxArm64Main by getting { dependsOn(linuxMain) }
+
+            all {
+                languageSettings.apply {
+                    useExperimentalAnnotation("kotlin.RequiresOptIn")
+                    //useExperimentalAnnotation("tf.lotte.knste.util.Unsafe")
+                }
+            }
         }
     }
 }

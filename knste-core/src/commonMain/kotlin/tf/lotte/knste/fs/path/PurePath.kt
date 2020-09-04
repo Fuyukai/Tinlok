@@ -10,6 +10,7 @@
 package tf.lotte.knste.fs.path
 
 import tf.lotte.knste.ByteString
+import tf.lotte.knste.util.Unsafe
 
 /**
  * A path to a file or folder on the filesystem. All PurePath (and instances) are immutable.
@@ -58,5 +59,6 @@ public interface PurePath {
     /**
      * Converts the path within to a Kotlin string. This *will* break if non-unicode paths are used.
      */
+    @Unsafe
     public fun unsafeToString(): String
 }

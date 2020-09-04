@@ -10,6 +10,7 @@
 package tf.lotte.knste.fs.path
 
 import tf.lotte.knste.ByteString
+import tf.lotte.knste.util.Unsafe
 
 /**
  * Helper factory object for creating new [Path] and [PurePath] objects.
@@ -51,5 +52,6 @@ public expect object Paths {
     /**
      * Creates a new temporary directory and returns its path.
      */
-    public fun unsafeMakeTempDirectory(prefix: String = "kotlin----"): Path
+    @Unsafe
+    public fun makeTempDirectory(prefix: String = "kotlin----"): Path
 }
