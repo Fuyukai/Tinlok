@@ -13,6 +13,7 @@ import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.pointed
 import platform.posix.F_OK
 import tf.lotte.knste.ByteString
+import tf.lotte.knste.b
 import tf.lotte.knste.fs.*
 import tf.lotte.knste.impls.Syscall
 import tf.lotte.knste.readZeroTerminated
@@ -42,6 +43,10 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
     @Unsafe
     override fun unsafeToString(): String {
         return pure.unsafeToString()
+    }
+
+    override fun toString(): String {
+        return pure.toString()
     }
 
     // == path functionality == //
@@ -104,12 +109,21 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
         val dir = Syscall.opendir(path)
         val items = mutableListOf<Path>()
 
+        val dot = b(".")
+        val dotdot = b("..")
+
         try {
             while (true) {
                 val next = Syscall.readdir(dir) ?: break
                 val item = next.pointed
                 val name = item.d_name.readZeroTerminated(256)
                 val bs = ByteString.fromByteArray(name)
+
+                // skip dot entries (this dir)
+                // skip dotdot entries (up a dir)
+                if (bs == dot) continue
+                if (bs == dotdot) continue
+
                 items.add(join(bs))
             }
 
@@ -131,7 +145,8 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
         Syscall.unlink(path)
     }
 
-    override fun open(vararg modes: FileOpenMode): FilesystemFile {
+    @Unsafe
+    override fun unsafeOpen(vararg modes: FileOpenMode): FilesystemFile {
         return LinuxSyncFile(this, modes.toSet())
     }
 }
