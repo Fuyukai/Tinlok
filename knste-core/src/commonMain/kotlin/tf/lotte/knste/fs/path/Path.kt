@@ -12,6 +12,8 @@ package tf.lotte.knste.fs.path
 
 import tf.lotte.knste.ByteString
 import tf.lotte.knste.fs.*
+import tf.lotte.knste.toByteString
+import tf.lotte.knste.util.Unsafe
 
 /**
  * Similar to [PurePath], but can perform I/O operations.
@@ -21,6 +23,7 @@ public interface Path : PurePath {
     public override val parent: Path
     public override fun join(other: PurePath): Path
     public override fun join(other: ByteString): Path
+    public override fun join(other: String): Path = join(other.toByteString())
 
     // == query operators == //
     /**
@@ -78,5 +81,6 @@ public interface Path : PurePath {
     /**
      * Opens this path for I/O operations, using the specified [modes].
      */
-    public fun open(vararg modes: FileOpenMode): FilesystemFile
+    @Unsafe
+    public fun unsafeOpen(vararg modes: FileOpenMode): FilesystemFile
 }
