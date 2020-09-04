@@ -20,6 +20,8 @@ class `Test Posix Path` {
     @Test
     fun `Test parents`() {
         val etc = PosixPurePath.fromString("/etc")
+        assertTrue(etc.isAbsolute)
+
         val path = PosixPurePath.fromString("/etc/passwd")
 
         assertEquals(path.parent, etc)

@@ -47,4 +47,18 @@ class `Test ByteString` {
         assertEquals(split.first(), bs)
     }
 
+    @Test
+    fun `Test ByteString join`() {
+        val items = listOf(b("one"), b("two"), b("three"))
+        val expected = b("one two three")
+
+        val joined = items.join(b(" "))
+        assertEquals(joined, expected)
+
+        // join with a larger delim, to ensure its all good
+        val expectedTwo = b("one  two  three")
+        val joinedTwo = items.join(b("  "))
+        assertEquals(joinedTwo, expectedTwo)
+    }
+
 }
