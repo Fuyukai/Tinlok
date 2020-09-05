@@ -52,7 +52,6 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
         return Syscall.access(strPath, F_OK)
     }
 
-
     @OptIn(Unsafe::class)
     public fun stat(followSymlinks: Boolean): Stat = memScoped {
         val strPath = pure.unsafeToString()
@@ -86,6 +85,13 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
         statSafe(followSymlinks = false)?.isLink ?: false
 
     override fun size(): Long = stat(followSymlinks = false).size
+
+    @Unsafe
+    override fun resolve(strict: Boolean): Path {
+        if (!strict) TODO("Pure-Kotlin resolving")
+        val realPath = memScoped { Syscall.realpath(this, pure.unsafeToString()) }
+        return LinuxPath(PosixPurePath.fromByteString(realPath))
+    }
 
     @OptIn(Unsafe::class)
     override fun createDirectory(

@@ -10,6 +10,7 @@
 
 package tf.lotte.knste.fs.path
 
+import tf.lotte.knste.exc.FileNotFoundException
 import tf.lotte.knste.ByteString
 import tf.lotte.knste.fs.FileOpenMode
 import tf.lotte.knste.fs.FilePermission
@@ -53,6 +54,15 @@ public interface Path : PurePath {
      * Gets the size of this file.
      */
     public fun size(): Long
+
+    // See: pathlib.Path.resolve()
+    /**
+     * Resolves a path into an absolute path.
+     *
+     * If [strict] is true, the path must exist and [FileNotFoundException] will be raised if it
+     * is not. If [strict] is false, the path will be resolved as far as possible.
+     */
+    public fun resolve(strict: Boolean = false): Path
 
     /**
      * Gets the owner username for this file, or null if this file doesn't have an owner (some

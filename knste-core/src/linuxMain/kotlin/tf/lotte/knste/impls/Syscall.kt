@@ -13,10 +13,12 @@ package tf.lotte.knste.impls
 
 import kotlinx.cinterop.*
 import platform.posix.*
+import tf.lotte.knste.ByteString
 import tf.lotte.knste.exc.FileAlreadyExistsException
 import tf.lotte.knste.exc.FileNotFoundException
 import tf.lotte.knste.exc.IOException
 import tf.lotte.knste.exc.OSException
+import tf.lotte.knste.readZeroTerminated
 import tf.lotte.knste.util.Unsafe
 import kotlin.experimental.ExperimentalTypeInference
 
@@ -321,6 +323,25 @@ public object Syscall {
                 else -> OSException(errno, message = strerror())
             }
         }
+    }
+
+    /**
+     * Fully resolves a path into an absolute path.
+     */
+    @Suppress("FoldInitializerAndIfToElvis")
+    @Unsafe
+    public fun realpath(alloc: NativePlacement, path: String): ByteString {
+        val buffer = alloc.allocArray<ByteVar>(PATH_MAX)
+        val res = realpath(path, buffer)
+        if (res == null) {
+            throw when (errno) {
+                ENOENT -> FileNotFoundException(path)
+                else -> OSException(errno, message = strerror())
+            }
+        }
+
+        val ba = res.readZeroTerminated()
+        return ByteString.fromRawHolder(ByteStringHolder.fromByteArrayUncopied(ba))
     }
 
     // == Misc == //
