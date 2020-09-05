@@ -9,9 +9,11 @@
 
 package tf.lotte.knste.fs.path
 
+import tf.lotte.knste.ByteString
 import tf.lotte.knste.fs.FilesystemFile
 import tf.lotte.knste.fs.StandardOpenModes
 import tf.lotte.knste.io.use
+import tf.lotte.knste.toByteString
 import tf.lotte.knste.util.Unsafe
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
@@ -110,10 +112,28 @@ public fun Path.recursiveDelete() {
  * automatically closed when the lambda exits.
  */
 @OptIn(Unsafe::class, ExperimentalContracts::class)
-public fun <R> Path.open(vararg modes: StandardOpenModes, block: (FilesystemFile) -> R): R {
+public inline fun <R> Path.open(vararg modes: StandardOpenModes, block: (FilesystemFile) -> R): R {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
 
     return unsafeOpen(*modes).use(block)
+}
+
+/**
+ * Writes the specified [ByteString] [bs] to the file represented by this [Path]. The file will be
+ * created if it doesn't exist.
+ */
+public fun Path.writeBytes(bs: ByteString) {
+    open(StandardOpenModes.WRITE, StandardOpenModes.CREATE) {
+        it.writeAll(bs)
+    }
+}
+
+/**
+ * Writes the specified [String] [str] to the file represented by this [Path]. The file will be
+ * created if it doesn't exist.
+ */
+public fun Path.writeString(str: String) {
+    writeBytes(str.toByteString())
 }
