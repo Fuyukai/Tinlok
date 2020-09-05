@@ -93,7 +93,7 @@ public interface Path : PurePath {
     public fun removeDirectory()
 
     /**
-     * Deletes this file or symbol link.
+     * Deletes this file or symbolic link.
      */
     public fun unlink()
 

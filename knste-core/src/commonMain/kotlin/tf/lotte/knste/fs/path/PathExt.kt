@@ -9,16 +9,16 @@
 
 package tf.lotte.knste.fs.path
 
-import tf.lotte.knste.ByteString
+import tf.lotte.knste.*
 import tf.lotte.knste.fs.FilesystemFile
 import tf.lotte.knste.fs.StandardOpenModes
 import tf.lotte.knste.io.use
-import tf.lotte.knste.toByteString
 import tf.lotte.knste.util.Unsafe
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
+// == Paths extensions == //
 /**
  * Creates a new temporary directory and calls the provided lambda with its path. The
  * directory will be automatically deleted when the lambda returns.
@@ -37,10 +37,19 @@ public fun <R> Paths.makeTempDirectory(prefix: String, block: (Path) -> R): R {
     }
 }
 
+// == PurePath extensions == //
+/**
+ * Helper operator function for fluent API usage.
+ */
 public operator fun PurePath.div(other: PurePath): PurePath = join(other)
 
 /**
- * Recursively gets all of the parents of this Path.
+ * Helper operator function for fluent API usage.
+ */
+public operator fun Path.div(other: PurePath): Path = join(other)
+
+/**
+ * Gets all of the parents of this Path.
  */
 public fun PurePath.allParents(): List<PurePath> {
     // no parent
@@ -61,6 +70,50 @@ public fun PurePath.allParents(): List<PurePath> {
     }
 }
 
+// https://docs.python.org/3/library/pathlib.html#pathlib.PurePath.suffix
+/**
+ * Gets the file extension of the name of this file, if any. (``file.tar.gz`` -> ``gz``)
+ */
+public val PurePath.rawSuffix: ByteString?
+    get() {
+        if (!rawName.contains('.'.toByte())) return null
+        val idx = rawName.lastIndexOf('.'.toByte())
+        return rawName.substring(idx + 1)
+    }
+
+/**
+ * Gets the file extension of the name of this file, if any. (``file.tar.gz`` -> ``gz``)
+ */
+public val PurePath.suffix: String?
+    get() {
+        return rawSuffix?.decode()
+    }
+
+// https://docs.python.org/3/library/pathlib.html#pathlib.PurePath.suffixes
+/**
+ * Gets all the file extensions of the name of this file, if any.
+ */
+public val PurePath.rawSuffixes: List<ByteString>
+    get() {
+        if (!rawName.contains('.'.toByte())) return emptyList()
+        val split = rawName.split(b("."))
+        return split.drop(1)
+    }
+
+/**
+ * Gets all the file extensions of the name of this file, if any.
+ */
+public val PurePath.suffixes: List<String>
+    get() {
+        // copy to avoid repeated decoding on default impls
+        val nam = name
+
+        if (!nam.contains('.')) return emptyList()
+        val split = nam.split('.')
+        return split.drop(1)
+    }
+
+// == Path extensions == //
 /**
  * Flattens a Path tree into a listing of [Path].
  *

@@ -57,6 +57,13 @@ public fun ByteString.split(delim: ByteString): List<ByteString> {
 }
 
 /**
+ * Creates a substring of the specified range.
+ */
+public fun ByteString.substring(start: Int, end: Int = size): ByteString {
+    return ByteString.fromUncopied(unwrap().copyOfRange(start, end))
+}
+
+/**
  * Joins an iterable of [ByteString] together with the specified [delim].
  */
 public fun Collection<ByteString>.join(delim: ByteString): ByteString {
