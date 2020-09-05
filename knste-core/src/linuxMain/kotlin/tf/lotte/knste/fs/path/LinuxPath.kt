@@ -15,6 +15,7 @@ import kotlinx.cinterop.toKString
 import platform.posix.F_OK
 import tf.lotte.knste.ByteString
 import tf.lotte.knste.b
+import tf.lotte.knste.exc.FileNotFoundException
 import tf.lotte.knste.fs.*
 import tf.lotte.knste.impls.Syscall
 import tf.lotte.knste.readZeroTerminated
@@ -23,6 +24,7 @@ import tf.lotte.knste.util.Unsafe
 /**
  * Linux-based implementation of a [Path]. Wraps a [PosixPurePath].
  */
+@OptIn(ExperimentalUnsignedTypes::class)
 internal class LinuxPath(private val pure: PosixPurePath) : Path {
     companion object {
         const val S_IFMT = 61440U
@@ -57,8 +59,9 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
         return Syscall.access(strPath, F_OK)
     }
 
+
     @OptIn(Unsafe::class)
-    override fun stat(followSymlinks: Boolean): Stat? = memScoped {
+    public fun stat(followSymlinks: Boolean): Stat = memScoped {
         val strPath = pure.unsafeToString()
         val pathStat = Syscall.stat(this, strPath, followSymlinks)
 
@@ -81,13 +84,15 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
     }
 
     override fun isDirectory(followSymlinks: Boolean): Boolean =
-        stat(followSymlinks)?.isDirectory ?: false
+        statSafe(followSymlinks)?.isDirectory ?: false
 
     override fun isRegularFile(followSymlinks: Boolean): Boolean =
-        stat(followSymlinks)?.isFile ?: false
+        statSafe(followSymlinks)?.isFile ?: false
 
     override fun isLink(): Boolean =
-        stat(followSymlinks = false)?.isLink ?: false
+        statSafe(followSymlinks = false)?.isLink ?: false
+
+    override fun size(): Long = stat(followSymlinks = false).size
 
     @OptIn(Unsafe::class)
     override fun createDirectory(
@@ -162,4 +167,12 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
     override fun unsafeOpen(vararg modes: FileOpenMode): FilesystemFile {
         return LinuxSyncFile(this, modes.toSet())
     }
+}
+
+/**
+ * Helper function for safe stat.
+ */
+private inline fun LinuxPath.statSafe(followSymlinks: Boolean): Stat? {
+    return try { stat(followSymlinks) }
+    catch (e: FileNotFoundException) { null }
 }

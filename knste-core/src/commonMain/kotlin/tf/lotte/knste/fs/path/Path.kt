@@ -50,11 +50,9 @@ public interface Path : PurePath {
     public fun isLink(): Boolean
 
     /**
-     * Gets the ``stat`` output for this Path, or null if it doesn't exist.
-     *
-     * This API is low-level and not recommended for usage.
+     * Gets the size of this file.
      */
-    public fun stat(followSymlinks: Boolean = true): Stat?
+    public fun size(): Long
 
     /**
      * Gets the owner username for this file, or null if this file doesn't have an owner (some

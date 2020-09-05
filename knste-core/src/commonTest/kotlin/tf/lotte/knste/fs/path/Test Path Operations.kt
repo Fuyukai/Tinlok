@@ -13,6 +13,7 @@ package tf.lotte.knste.fs.path
 
 import tf.lotte.knste.Sys
 import tf.lotte.knste.exc.OSException
+import tf.lotte.knste.fs.StandardOpenModes
 import tf.lotte.knste.util.Unsafe
 import kotlin.test.*
 
@@ -21,6 +22,13 @@ import kotlin.test.*
  */
 @OptIn(Unsafe::class)
 class `Test Path Operations` {
+    /**
+     * "Touch"es (creates empty) a file.
+     */
+    private fun Path.touch() {
+        open(StandardOpenModes.CREATE, StandardOpenModes.WRITE) {}
+    }
+
     /**
      * Tests creating directories.
      */
@@ -33,11 +41,46 @@ class `Test Path Operations` {
         assertTrue(newPath.isDirectory())
     }
 
+    /**
+     * Tests the owner() function.
+     */
     @Test
     fun `Test owner`() = Paths.makeTempDirectory("knste-test-") {
         val username = Sys.getUsername()
         assertEquals(it.owner(), username)
     }
+
+
+    /**
+     * Tests getting certain stat() info about a file.
+     */
+    @Test
+    fun `Test stat`() = Paths.makeTempDirectory("knste-test-") {
+        assertTrue(it.isDirectory())
+        assertFalse(it.isRegularFile())
+
+        run {
+            val file = it.join("file")
+            assertFalse(file.isRegularFile())
+
+            file.touch()
+            assertTrue(file.exists())
+            assertTrue(file.isRegularFile())
+            assertEquals(file.size(), 0L)
+
+            file.unlink()
+            assertFalse(file.isRegularFile())
+        }
+
+        run {
+            val file = it.join("file2")
+
+            file.writeString("abcdef")
+            assertTrue(file.exists())
+            assertEquals(file.size(), 6)
+        }
+    }
+
 
     /**
      * Tests the recursive delete extension.
