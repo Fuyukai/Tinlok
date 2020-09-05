@@ -13,8 +13,10 @@ package tf.lotte.knste.io
  * Represents an object that is seekable - you can change the cursor position as needed.
  */
 public interface Seekable {
-    /** The current cursor position. */
-    public val cursorPosition: Long
+    /**
+     * Gets the current cursor position.
+     */
+    public fun cursor(): Long
 
     /**
      * Changes the current cursor position of this Seekable.

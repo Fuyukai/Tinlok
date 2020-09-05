@@ -9,6 +9,7 @@
 
 package tf.lotte.knste.fs
 
+import tf.lotte.knste.ByteString
 import tf.lotte.knste.fs.path.Path
 import tf.lotte.knste.io.BidirectionalStringStream
 import tf.lotte.knste.io.Seekable
@@ -22,4 +23,9 @@ public interface FilesystemFile : BidirectionalStringStream, Seekable {
 
     /** The path of this file. */
     public val path: Path
+
+    /**
+     * Reads all of the bytes of this file.
+     */
+    public fun readAll(): ByteString
 }

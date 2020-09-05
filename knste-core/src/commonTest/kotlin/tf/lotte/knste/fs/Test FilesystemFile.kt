@@ -13,6 +13,8 @@ import tf.lotte.knste.b
 import tf.lotte.knste.fs.path.Paths
 import tf.lotte.knste.fs.path.makeTempDirectory
 import tf.lotte.knste.fs.path.open
+import tf.lotte.knste.fs.path.writeBytes
+import tf.lotte.knste.substring
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -34,12 +36,22 @@ class `Test FilesystemFile` {
             file.close()
         }
 
-        val data = path.open(StandardOpenModes.READ) { file ->
-            file.readUpTo(1024)
+        run {
+            val data = path.open(StandardOpenModes.READ) { file ->
+                file.readUpTo(1024)
+            }
+
+            assertNotNull(data)
+            assertEquals(data, toWrite)
         }
 
-        assertNotNull(data)
-        assertEquals(data, toWrite)
+        run {
+            val data = path.open(StandardOpenModes.READ) { file ->
+                file.readAll()
+            }
+
+            assertEquals(data, toWrite)
+        }
     }
 
     @Test
@@ -66,7 +78,28 @@ class `Test FilesystemFile` {
 
         assertNotNull(data)
         assertEquals(data, combined)
+    }
 
+    @Test
+    fun `Test seek`() = Paths.makeTempDirectory("knste-test-") {
+        val path = it.join("test.txt")
+        val toWrite = b("Every word is getting longer, the mosquitoes are getting louder.")
+
+        val part1 = toWrite.substring(0, 29)
+        val part2 = toWrite.substring(29)
+
+        path.writeBytes(toWrite)
+
+        path.open(StandardOpenModes.READ) { file ->
+            file.seekAbsolute(29L)
+            val data1 = file.readAll()
+            assertEquals(data1, part2)
+
+            file.seekAbsolute(0L)
+            val data2 = file.readUpTo(29)
+            assertNotNull(data2)
+            assertEquals(data2, part1)
+        }
     }
 
 }

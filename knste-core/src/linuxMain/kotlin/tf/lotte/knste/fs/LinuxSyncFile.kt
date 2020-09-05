@@ -11,6 +11,7 @@ package tf.lotte.knste.fs
 
 import platform.posix.*
 import tf.lotte.knste.ByteString
+import tf.lotte.knste.exc.ClosedException
 import tf.lotte.knste.fs.StandardOpenModes.*
 import tf.lotte.knste.fs.path.LinuxPath
 import tf.lotte.knste.impls.FD
@@ -67,23 +68,27 @@ internal class LinuxSyncFile(
     }
 
     @OptIn(Unsafe::class)
-    override val cursorPosition: Long
-        get() = Syscall.lseek(fd, 0L, SEEK_CUR)
+    override fun cursor(): Long {
+        if (!isOpen) throw ClosedException("This file is closed")
+        return Syscall.lseek(fd, 0L, SEEK_CUR)
+    }
 
     @OptIn(Unsafe::class)
     override fun seekAbsolute(position: Long) {
+        if (!isOpen) throw ClosedException("This file is closed")
         Syscall.lseek(fd, position, SEEK_SET)
     }
 
     @OptIn(Unsafe::class)
     override fun seekRelative(position: Long) {
+        if (!isOpen) throw ClosedException("This file is closed")
         Syscall.lseek(fd, position, SEEK_CUR)
     }
 
     // == reading == //
     @OptIn(Unsafe::class)
     override fun readUpTo(bytes: Long): ByteString? {
-        if (!isOpen) TODO("Not open")
+        if (!isOpen) throw ClosedException("This file is closed")
 
         val ba = ByteArray(bytes.toInt())
         val cnt = Syscall.read(fd, ba, bytes.toInt())
@@ -96,9 +101,36 @@ internal class LinuxSyncFile(
         return ByteString.fromUncopied(ba.copyOfRange(0, cnt.toInt()))
     }
 
+    @OptIn(Unsafe::class)
+    override fun readAll(): ByteString {
+        val size = path.size() - cursor()
+        if (size >= Syscall.IO_MAX) {
+            throw UnsupportedOperationException("File is too big to read in one go currently")
+        }
+
+        val sizeInt = size.toInt()
+        val buf = ByteArray(sizeInt)
+        val cnt = Syscall.read(fd, buf, sizeInt)
+
+        // TODO: We can avoid this mess on the sad path by reading in chunks
+        return ByteString.fromUncopied(if (cnt == buf.size.toLong()) {
+            buf
+        } else {
+            // ugh
+            if (cnt > buf.size) error("What the fuck?")
+            else {
+                // gotta make a copy...
+                // not ideal!
+                buf.copyOfRange(0, cnt.toInt())
+            }
+        })
+    }
+
     // == writing == //
     @OptIn(Unsafe::class)
     override fun writeAll(bs: ByteString) {
+        if (!isOpen) throw ClosedException("This file is closed")
+
         val ba = bs.unwrap()
         Syscall.write(fd, ba, ba.size)
     }

@@ -37,7 +37,7 @@ public inline fun <T : Closeable, R> T.use(block: (T) -> R): R {
  */
 public fun <T> T.peek(count: Long): ByteString?
     where T : Readable, T : Seekable {
-    val cursorBefore = cursorPosition
+    val cursorBefore = cursor()
     val bs = readUpTo(count) ?: return null
     this.seekAbsolute(cursorBefore)
     return bs

@@ -121,19 +121,22 @@ public object Syscall {
 
     // == Generic Linux I/O == //
     // region Linux I/O
+    /** The maximum size for most I/O functions. */
+    public const val IO_MAX: Int = 0x7ffff000
+
     /**
      * Reads up to [count] bytes from file descriptor [fd] into the buffer [buf].
      */
     @Unsafe
     public fun read(fd: FD, buf: ByteArray, count: Int): Long {
-        assert(count <= 0x7ffff000) { "Count is too high!" }
+        assert(count <= IO_MAX) { "Count is too high!" }
         assert(buf.size >= count) { "Buffer is too small!" }
 
-        val count = buf.usePinned {
+        val readCount = buf.usePinned {
             retry { read(fd, it.addressOf(0), count.toULong()) }
         }
 
-        if (count == LONG_ERROR) {
+        if (readCount == LONG_ERROR) {
             // TODO: EAGAIN
             throw when (errno) {
                 EIO -> IOException(strerror())
@@ -141,7 +144,7 @@ public object Syscall {
             }
         }
 
-        return count
+        return readCount
     }
 
     /**
@@ -152,7 +155,7 @@ public object Syscall {
      */
     @Unsafe
     public fun write(fd: FD, from: ByteArray, size: Int): Long {
-        assert(size <= 0x7ffff000) { "Count is too high!" }
+        assert(size <= IO_MAX) { "Count is too high!" }
         assert(from.size >= size) { "Buffer is too small!" }
 
         // number of bytes we have successfully written as returned from write()
@@ -340,7 +343,7 @@ public object Syscall {
             }
         }
 
-        val ba = res.readZeroTerminated()
+        val ba = res.readZeroTerminated(PATH_MAX)
         return ByteString.fromRawHolder(ByteStringHolder.fromByteArrayUncopied(ba))
     }
 
