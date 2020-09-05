@@ -26,13 +26,6 @@ import tf.lotte.knste.util.Unsafe
  */
 @OptIn(ExperimentalUnsignedTypes::class)
 internal class LinuxPath(private val pure: PosixPurePath) : Path {
-    companion object {
-        const val S_IFMT = 61440U
-        const val S_ISDIR = 16384U
-        const val S_ISLNK = 40960U
-        const val S_ISREG = 32768U
-    }
-
     // == purepath functionality == //
     override val isAbsolute: Boolean by pure::isAbsolute
     override val parent: LinuxPath get() = LinuxPath(pure.parent)
