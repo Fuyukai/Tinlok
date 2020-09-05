@@ -10,9 +10,13 @@
 package tf.lotte.knste
 
 import kotlinx.cinterop.memScoped
+import kotlinx.cinterop.toKString
 import kotlinx.cinterop.toKStringFromUtf8
 import platform.posix.getpid
+import platform.posix.getpwuid
 import platform.posix.getuid
+import tf.lotte.knste.impls.Syscall
+import tf.lotte.knste.util.Unsafe
 
 /**
  * Linux-based system methods.
@@ -26,8 +30,10 @@ public actual object Sys {
         return getpid()
     }
 
-    public actual fun getUsername(): String = memScoped {
-        getPasswdEntry(getuid())!!.pw_name!!.toKStringFromUtf8()
+    @OptIn(Unsafe::class)
+    public actual fun getUsername(): String? = memScoped {
+        val passwd = Syscall.getpwuid_r(this, getuid())
+        return passwd?.pw_name?.toKString()
     }
 
     public actual val osInfo: OsInfo = object : OsInfo {

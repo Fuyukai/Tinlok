@@ -11,6 +11,7 @@ package tf.lotte.knste.fs.path
 
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.pointed
+import kotlinx.cinterop.toKString
 import platform.posix.F_OK
 import tf.lotte.knste.ByteString
 import tf.lotte.knste.b
@@ -67,6 +68,16 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
             size = pathStat.st_size,
             st_mode = pathStat.st_mode
         )
+    }
+
+    @OptIn(Unsafe::class)
+    override fun owner(followSymlinks: Boolean): String? = memScoped {
+        val strPath = pure.unsafeToString()
+        val stat = Syscall.stat(this, strPath, followSymlinks)
+        val uid = stat.st_uid
+        val passwd = Syscall.getpwuid_r(this, uid)
+
+        passwd?.pw_name?.toKString()
     }
 
     override fun isDirectory(followSymlinks: Boolean): Boolean =

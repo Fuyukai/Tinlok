@@ -322,4 +322,29 @@ public object Syscall {
             }
         }
     }
+
+    // == Misc == //
+    // region Misc
+
+    /**
+     * Gets a [passwd] entry for the specified uid.
+     */
+    @Unsafe
+    public fun getpwuid_r(alloc: NativePlacement, uid: UInt): passwd? {
+        val passwd = alloc.alloc<passwd>()
+        val starResult = alloc.allocPointerTo<passwd>()
+
+        var bufSize = sysconf(_SC_GETPW_R_SIZE_MAX)
+        if (bufSize == -1L) bufSize = 16384
+        val buffer = alloc.allocArray<ByteVar>(bufSize)
+
+        val res = getpwuid_r(uid, passwd.ptr, buffer, bufSize.toULong(), starResult.ptr)
+        if (starResult.value == null) {
+            throw OSException(errno, message = Syscall.strerror())
+        }
+
+        return passwd
+    }
+
+    // endregion
 }

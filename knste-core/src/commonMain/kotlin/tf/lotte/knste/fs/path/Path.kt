@@ -40,7 +40,7 @@ public interface Path : PurePath {
     public fun isDirectory(followSymlinks: Boolean = true): Boolean
 
     /**
-     * Checks if this [Path] is a file.
+     * Checks if this [Path] is a regular file.
      */
     public fun isRegularFile(followSymlinks: Boolean = true): Boolean
 
@@ -51,8 +51,16 @@ public interface Path : PurePath {
 
     /**
      * Gets the ``stat`` output for this Path, or null if it doesn't exist.
+     *
+     * This API is low-level and not recommended for usage.
      */
-    public fun stat(followSymlinks: Boolean): Stat?
+    public fun stat(followSymlinks: Boolean = true): Stat?
+
+    /**
+     * Gets the owner username for this file, or null if this file doesn't have an owner (some
+     * filesystems or virtual filesystems).
+     */
+    public fun owner(followSymlinks: Boolean = true): String?
 
     // == modification operators == //
     /**

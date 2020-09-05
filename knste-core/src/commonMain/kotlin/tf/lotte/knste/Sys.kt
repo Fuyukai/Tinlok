@@ -27,7 +27,7 @@ public expect object Sys {
     /**
      * Gets the current username of the user running this application.
      */
-    public fun getUsername(): String
+    public fun getUsername(): String?
 
     /** Information object about the current OS. */
     public val osInfo: OsInfo

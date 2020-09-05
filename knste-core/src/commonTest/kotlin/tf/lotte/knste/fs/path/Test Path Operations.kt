@@ -14,10 +14,7 @@ package tf.lotte.knste.fs.path
 import tf.lotte.knste.Sys
 import tf.lotte.knste.exc.OSException
 import tf.lotte.knste.util.Unsafe
-import kotlin.test.Test
-import kotlin.test.assertFailsWith
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 /**
  * Tests path modification operators.
@@ -37,8 +34,9 @@ class `Test Path Operations` {
     }
 
     @Test
-    fun `Test uid`() = Paths.makeTempDirectory("knste-test-") {
+    fun `Test owner`() = Paths.makeTempDirectory("knste-test-") {
         val username = Sys.getUsername()
+        assertEquals(it.owner(), username)
     }
 
     /**
