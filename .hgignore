@@ -14,5 +14,9 @@ build/
 .gradle/
 .gradle/*
 
+# sphinx stuff
+docs/.venv
+docs/_build
+
 # misc personal files
 TODO

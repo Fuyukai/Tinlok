@@ -4,7 +4,7 @@ plugins {
     id("org.jetbrains.kotlin.multiplatform").version("1.4.0").apply(false)
 }
 
-subprojects {
+configure(subprojects.filter { !it.name.startsWith("meta-") }) {
     apply(plugin = "org.jetbrains.kotlin.multiplatform")
 
     group = "tf.lotte.knste"
