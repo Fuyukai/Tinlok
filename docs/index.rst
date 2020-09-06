@@ -1,19 +1,26 @@
-.. KNSTE documentation master file, created by
-   sphinx-quickstart on Sat Sep  5 18:31:39 2020.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+Kotlin/Native STandard library Extensions
+=========================================
 
-Welcome to KNSTE's documentation!
-=================================
+KNSTE is a library providing the missing 75% of the Kotlin/Native Desktop standard library.
+
+KNSTE focuses on **usability** and **correctness**, *not* simplicity. Computers are complicated
+and we don't pretend otherwise, but KNSTE tries to make that complication as easy to use as
+possible.
+
+Vital statistics:
+
+* Supported operating systems:
+
+  - Linux (AMD64, AArch64)
+  - MacOS (AMD64)
+  - Windows (AMD64)
+  - With your help, others!
+
+* Dually licensed under the LGPL 3.0 (or later) and the MPL 2.0
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :maxdepth: 3
+   :caption: Documentation contents:
 
+   contents/index.rst
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

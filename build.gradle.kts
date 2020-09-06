@@ -1,11 +1,14 @@
 import org.jetbrains.kotlin.gradle.dsl.*
+import org.jetbrains.dokka.gradle.DokkaTask
 
 plugins {
     id("org.jetbrains.kotlin.multiplatform").version("1.4.0").apply(false)
+    id("org.jetbrains.dokka").version("1.4.0").apply(false)
 }
 
-configure(subprojects.filter { !it.name.startsWith("meta-") }) {
+subprojects {
     apply(plugin = "org.jetbrains.kotlin.multiplatform")
+    apply(plugin = "org.jetbrains.dokka")
 
     group = "tf.lotte.knste"
     version = "1.0.0"
@@ -56,6 +59,16 @@ configure(subprojects.filter { !it.name.startsWith("meta-") }) {
                     useExperimentalAnnotation("kotlin.RequiresOptIn")
                     //useExperimentalAnnotation("tf.lotte.knste.util.Unsafe")
                 }
+            }
+        }
+    }
+
+    tasks.named<DokkaTask>("dokkaHtml") {
+        outputDirectory.set(buildDir.resolve("dokka"))
+
+        dokkaSourceSets {
+            configureEach {
+                includeNonPublic.set(true)
             }
         }
     }
