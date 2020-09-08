@@ -76,9 +76,9 @@ public fun PurePath.allParents(): List<PurePath> {
  */
 public val PurePath.rawSuffix: ByteString?
     get() {
-        if (!rawName.contains('.'.toByte())) return null
         val idx = rawName.lastIndexOf('.'.toByte())
-        return rawName.substring(idx + 1)
+        return if (idx <= -1) null
+        else rawName.substring(idx + 1)
     }
 
 /**
