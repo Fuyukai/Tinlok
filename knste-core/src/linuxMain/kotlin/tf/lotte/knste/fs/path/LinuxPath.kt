@@ -149,6 +149,16 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
         }
     }
 
+    @Unsafe
+    override fun rename(path: PurePath): Path {
+        Syscall.rename(unsafeToString(), path.unsafeToString())
+        return path._ensureLinuxPath()
+    }
+
+    override fun copy(path: PurePath): Path {
+        TODO()
+    }
+
     @OptIn(Unsafe::class)
     override fun removeDirectory() {
         val path = this.unsafeToString()
@@ -173,4 +183,10 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
 private inline fun LinuxPath.statSafe(followSymlinks: Boolean): Stat? {
     return try { stat(followSymlinks) }
     catch (e: FileNotFoundException) { null }
+}
+
+private inline fun PurePath._ensureLinuxPath(): LinuxPath {
+    if (this is LinuxPath) return this
+    if (this !is PosixPurePath) error("Not a POSIX path!")
+    return LinuxPath(this)
 }

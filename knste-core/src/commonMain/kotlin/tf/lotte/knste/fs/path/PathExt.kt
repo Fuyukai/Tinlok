@@ -66,7 +66,7 @@ public operator fun PurePath.div(other: ByteString): PurePath = join(other)
 /**
  * Helper operator function for fluent API usage.
  */
-public operator fun Path.div(other: ByteString): PurePath = join(other)
+public operator fun Path.div(other: ByteString): Path = join(other)
 
 /**
  * Joins this path to another String, returning the combined path.
@@ -76,7 +76,7 @@ public fun PurePath.join(other: String): PurePath = join(other.toByteString())
 /**
  * Joins this path to another String, returning the combined path.
  */
-public fun Path.join(other: String): PurePath = join(other.toByteString())
+public fun Path.join(other: String): Path = join(other.toByteString())
 
 /**
  * Helper operator function for fluent API usage.
@@ -86,7 +86,7 @@ public operator fun PurePath.div(other: String): PurePath = join(other)
 /**
  * Helper operator function for fluent API usage.
  */
-public operator fun Path.div(other: String): PurePath = join(other)
+public operator fun Path.div(other: String): Path = join(other)
 
 /**
  * Gets all of the parents of this Path.
@@ -182,6 +182,7 @@ public fun Path.flattenTree(): List<Path> {
     return final.sortedByDescending { it.rawComponents.size }
 }
 
+// todo cache the stat usages in flattenTree maybe?
 /**
  * Recursively deletes a directory.
  */
@@ -198,6 +199,14 @@ public fun Path.recursiveDelete() {
     }
 
     this.removeDirectory()
+}
+
+/**
+ * Helper function that deletes a directory or a file with the right call.
+ */
+public fun Path.delete() {
+    if (isDirectory(followSymlinks = false)) recursiveDelete()
+    else unlink()
 }
 
 /**

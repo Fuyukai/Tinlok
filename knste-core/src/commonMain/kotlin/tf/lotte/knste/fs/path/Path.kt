@@ -11,12 +11,9 @@
 package tf.lotte.knste.fs.path
 
 import tf.lotte.knste.exc.FileNotFoundException
-import tf.lotte.knste.ByteString
 import tf.lotte.knste.fs.FileOpenMode
 import tf.lotte.knste.fs.FilePermission
 import tf.lotte.knste.fs.FilesystemFile
-import tf.lotte.knste.fs.Stat
-import tf.lotte.knste.toByteString
 import tf.lotte.knste.util.Unsafe
 
 /**
@@ -86,6 +83,23 @@ public interface Path : PurePath {
     public fun listDir(): List<Path>
 
     /**
+     * Moves the file or folder at this path to the new path [path], returning the new path.
+     *
+     * This function is marked as unsafe as it can fail on some systems when moving between
+     * filesystems.
+     */
+    @Unsafe
+    public fun rename(path: PurePath): Path
+
+    /**
+     * Copies this file at this path to the new path [Path], returning the new path.
+     *
+     * For copying empty directories, use [createDirectory]. For copying directories recursively,
+     * see [tf.lotte.knste.fs.path.recursiveCopy].
+     */
+    public fun copy(path: PurePath): Path
+
+    /**
      * Removes this directory. It must be empty.
      */
     public fun removeDirectory()
@@ -97,6 +111,9 @@ public interface Path : PurePath {
 
     /**
      * Opens this path for I/O operations, using the specified [modes].
+     *
+     * This function is marked as unsafe as it can leak open files. See the safe
+     * [tf.lotte.knste.fs.path.open] instead.
      */
     @Unsafe
     public fun unsafeOpen(vararg modes: FileOpenMode): FilesystemFile

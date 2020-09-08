@@ -13,9 +13,9 @@ import tf.lotte.knste.*
 import tf.lotte.knste.util.Unsafe
 
 /**
- * A pure path that uses POSIX semantics. You probably don't want to use this class directly.
+ * A pure path that uses POSIX semantics.
  */
-public class PosixPurePath(rawParts: List<ByteString>) : PurePath {
+public open class PosixPurePath(rawParts: List<ByteString>) : PurePath {
     public companion object {
         private val SLASH = b("/")
         private val DOT = b(".")
@@ -99,29 +99,6 @@ public class PosixPurePath(rawParts: List<ByteString>) : PurePath {
         else {
             PosixPurePath(rawComponents + other.rawComponents)
         }
-    }
-
-    override fun join(other: ByteString): PosixPurePath {
-        if (other.isEmpty()) return this
-
-        val toJoin = if (isAbsolute) {
-            // this does a whole bunch of copying..
-            val newComponents = rawComponents.toMutableList()
-
-            // empty first part, means it will add a leading / with the delim.
-            // this is hacky as fuck!
-            newComponents[0] = b("")
-            newComponents.add(other)
-            newComponents
-        } else {
-            val copy = rawComponents.toMutableList()
-            copy.add(other)
-            copy
-        }
-
-        val bs = toJoin.join(SLASH)
-        // force a re-parse of the overall path
-        return fromByteString(bs)
     }
 
     @Unsafe

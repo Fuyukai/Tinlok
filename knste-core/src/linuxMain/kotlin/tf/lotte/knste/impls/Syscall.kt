@@ -38,6 +38,10 @@ public object Syscall {
     public const val ERROR: Int = -1
     public const val LONG_ERROR: Long = -1L
 
+    private inline val Int.isError: Boolean get() = this == ERROR
+    private inline val Long.isError: Boolean get() = this == LONG_ERROR
+    private inline val CPointer<*>?.isError: Boolean get() = this == null
+
     // See: https://www.python.org/dev/peps/pep-0475/#rationale
     // Not completely the same, but similar justification.
 
@@ -79,7 +83,7 @@ public object Syscall {
 
     @Unsafe
     private fun openShared(path: String, fd: Int): Int {
-        if (fd == ERROR) {
+        if (fd.isError) {
             throw when (errno) {
                 EEXIST -> FileAlreadyExistsException(path)
                 ENOENT -> FileNotFoundException(path)
@@ -112,7 +116,7 @@ public object Syscall {
     @Unsafe
     public fun close(fd: FD) {
         val res = platform.posix.close(fd)
-        if (res == ERROR) {
+        if (res.isError) {
             throw OSException(errno, message = strerror())
         }
     }
@@ -136,7 +140,7 @@ public object Syscall {
             retry { read(fd, it.addressOf(0), count.toULong()) }
         }
 
-        if (readCount == LONG_ERROR) {
+        if (readCount.isError) {
             // TODO: EAGAIN
             throw when (errno) {
                 EIO -> IOException(strerror())
@@ -170,7 +174,7 @@ public object Syscall {
                 )
 
                 // eintr means it didn't write anything, so we can transparently retry
-                if (written == LONG_ERROR && errno != EINTR) {
+                if (written.isError && errno != EINTR) {
                     throw OSException(errno, message = strerror())
                 }
 
@@ -192,7 +196,7 @@ public object Syscall {
     @Unsafe
     public fun lseek(fd: FD, position: Long, whence: Int): Long {
         val res = platform.posix.lseek(fd, position, whence)
-        if (res == LONG_ERROR) {
+        if (res.isError) {
             throw OSException(errno, message = strerror())
         }
 
@@ -216,7 +220,7 @@ public object Syscall {
             if (followSymlinks) stat(path, pathStat.ptr)
             else lstat(path, pathStat.ptr)
 
-        if (res == ERROR) {
+        if (res.isError) {
             throw when (errno) {
                 ENOENT -> FileNotFoundException(path)
                 else -> OSException(errno, message = strerror())
@@ -232,7 +236,7 @@ public object Syscall {
     @Unsafe
     public fun access(path: String, mode: Int): Boolean {
         val result = platform.posix.access(path, mode)
-        if (result == ERROR) {
+        if (result.isError) {
             if (errno == EACCES) return false
             if (errno == ENOENT && mode == F_OK) return false
             else throw when (errno) {
@@ -276,7 +280,7 @@ public object Syscall {
     @Unsafe
     public fun closedir(dirfd: CValuesRef<DIR>) {
         val res = platform.posix.closedir(dirfd)
-        if (res == ERROR) {
+        if (res.isError) {
             throw OSException(errno, message = strerror())
         }
     }
@@ -290,7 +294,7 @@ public object Syscall {
     @Unsafe
     public fun mkdir(path: String, mode: UInt, existOk: Boolean) {
         val result = mkdir(path, mode)
-        if (result == ERROR) {
+        if (result.isError) {
             if (errno == EEXIST && existOk) return
             else throw when (errno) {
                 EEXIST -> FileAlreadyExistsException(path)
@@ -306,7 +310,7 @@ public object Syscall {
     @Unsafe
     public fun rmdir(path: String) {
         val result = platform.posix.rmdir(path)
-        if (result == ERROR) {
+        if (result.isError) {
             throw when (errno) {
                 ENOENT -> FileNotFoundException(path)
                 else -> OSException(errno, message = strerror())
@@ -320,7 +324,7 @@ public object Syscall {
     @Unsafe
     public fun unlink(path: String) {
         val result = platform.posix.unlink(path)
-        if (result == ERROR) {
+        if (result.isError) {
             throw when (errno) {
                 ENOENT -> FileNotFoundException(path)
                 else -> OSException(errno, message = strerror())
@@ -345,6 +349,21 @@ public object Syscall {
 
         val ba = res.readZeroTerminated(PATH_MAX)
         return ByteString.fromRawHolder(ByteStringHolder.fromByteArrayUncopied(ba))
+    }
+
+    /**
+     * Renames a file or directory.
+     */
+    @Unsafe
+    public fun rename(from: String, to: String) {
+        val res = platform.posix.rename(from, to)
+        // TODO: figure out error for ENOENT...
+        if (res == ERROR) {
+            throw when (errno) {
+                EEXIST, ENOTEMPTY -> FileAlreadyExistsException(to)
+                else -> OSException(errno, message = strerror())
+            }
+        }
     }
 
     // == Misc == //

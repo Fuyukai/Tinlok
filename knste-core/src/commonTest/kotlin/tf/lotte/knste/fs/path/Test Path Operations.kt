@@ -101,4 +101,27 @@ class `Test Path Operations` {
         assertFalse(parent.exists())
     }
 
+    /**
+     * Tests renaming.
+     */
+    @Unsafe
+    @Test
+    fun `Test rename`() = Paths.makeTempDirectory("knste-test-") {
+        val first = it.join("test1.txt")
+        val second = it.join("test2.txt")
+
+        first.touch()
+        first.rename(second)
+
+        assertFalse(first.exists())
+        assertTrue(second.exists())
+
+        second.delete()
+        first.createDirectory(parents = false, existOk = false)
+        first.rename(second)
+
+        assertFalse(first.exists())
+        assertTrue(second.isDirectory(followSymlinks = false))
+    }
+
 }
