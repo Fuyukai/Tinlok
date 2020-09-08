@@ -14,7 +14,7 @@ import tf.lotte.knste.toByteString
 import tf.lotte.knste.util.Unsafe
 
 /**
- * A path to a file or folder on the filesystem. All PurePath (and instances) are immutable.
+ * A path to a file or folder on the filesystem. All PurePaths are immutable.
  *
  * Pure path objects provide path-handling operations which don’t actually access a filesystem.
  */
@@ -51,16 +51,6 @@ public interface PurePath {
      * concatenated onto the end of this path.
      */
     public fun join(other: PurePath): PurePath
-
-    /**
-     * Joins this path to another [ByteString], returning the combined path.
-     */
-    public fun join(other: ByteString): PurePath
-
-    /**
-     * Joins this path to another String, returning the combined path.
-     */
-    public fun join(other: String): PurePath = join(other.toByteString())
 
     /**
      * Converts the path within to a Kotlin string. This *will* break if non-unicode paths are used.

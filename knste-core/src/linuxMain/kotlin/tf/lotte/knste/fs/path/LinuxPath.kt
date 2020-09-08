@@ -34,7 +34,6 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
     override val rawName: ByteString by pure::rawName
     override val name: String by pure::name
     override fun join(other: PurePath): LinuxPath = LinuxPath(pure.join(other))
-    override fun join(other: ByteString): LinuxPath = LinuxPath(pure.join(other))
 
     @Unsafe
     override fun unsafeToString(): String {

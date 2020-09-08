@@ -49,6 +49,46 @@ public operator fun PurePath.div(other: PurePath): PurePath = join(other)
 public operator fun Path.div(other: PurePath): Path = join(other)
 
 /**
+ * Joins this pure path to another [ByteString], returning the combined path.
+ */
+public fun PurePath.join(other: ByteString): PurePath = join(Paths.purePath(other))
+
+/**
+ * Joins this path to another [ByteString], returning the combined path.
+ */
+public fun Path.join(other: ByteString): Path = join(Paths.purePath(other))
+
+/**
+ * Helper operator function for fluent API usage.
+ */
+public operator fun PurePath.div(other: ByteString): PurePath = join(other)
+
+/**
+ * Helper operator function for fluent API usage.
+ */
+public operator fun Path.div(other: ByteString): PurePath = join(other)
+
+/**
+ * Joins this path to another String, returning the combined path.
+ */
+public fun PurePath.join(other: String): PurePath = join(other.toByteString())
+
+/**
+ * Joins this path to another String, returning the combined path.
+ */
+public fun Path.join(other: String): PurePath = join(other.toByteString())
+
+/**
+ * Helper operator function for fluent API usage.
+ */
+public operator fun PurePath.div(other: String): PurePath = join(other)
+
+/**
+ * Helper operator function for fluent API usage.
+ */
+public operator fun Path.div(other: String): PurePath = join(other)
+
+/**
  * Gets all of the parents of this Path.
  */
 public fun PurePath.allParents(): List<PurePath> {
