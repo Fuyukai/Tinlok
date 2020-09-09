@@ -25,11 +25,8 @@ public sealed class IPAddress {
     /** The version number for this address (e.g. 4 for IPv4, 6 for IPv6) */
     public abstract val version: Int
 
-    /** If this is an IP version 4 address. */
-    public abstract val isIpv4: Boolean
-
-    /** If this is an IP version 6 address. */
-    public abstract val isIpv6: Boolean
+    /** The address family for this IP address. */
+    public abstract val family: AddressFamily
 
     // TODO: Other attributes that other languages have but aren't needed for a prototype right now.
 }
@@ -40,13 +37,11 @@ public sealed class IPAddress {
 public class IPv4Address
 private constructor(private val rawRepresentation: UInt) : IPAddress() {
     override val version: Int = IP_VERSION_4
-    override val isIpv4: Boolean get() = true
-    override val isIpv6: Boolean get() = false
+    override val family: AddressFamily get() = AddressFamily.AF_INET
 }
 
 public class IPv6Address
 private constructor(private val lower: ULong, private val upper: ULong) : IPAddress() {
     override val version: Int = IP_VERSION_6
-    override val isIpv4: Boolean = false
-    override val isIpv6: Boolean = false
+    override val family: AddressFamily get() = AddressFamily.AF_INET6
 }
