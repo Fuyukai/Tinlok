@@ -20,8 +20,8 @@ import tf.lotte.knste.ByteString
 import tf.lotte.knste.b
 import tf.lotte.knste.exc.FileNotFoundException
 import tf.lotte.knste.fs.*
-import tf.lotte.knste.impls.Syscall
-import tf.lotte.knste.readZeroTerminated
+import tf.lotte.knste.system.Syscall
+import tf.lotte.knste.system.readZeroTerminated
 import tf.lotte.knste.util.Unsafe
 
 /**

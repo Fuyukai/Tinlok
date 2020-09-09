@@ -14,8 +14,8 @@ import tf.lotte.knste.ByteString
 import tf.lotte.knste.exc.ClosedException
 import tf.lotte.knste.fs.StandardOpenModes.*
 import tf.lotte.knste.fs.path.LinuxPath
-import tf.lotte.knste.impls.FD
-import tf.lotte.knste.impls.Syscall
+import tf.lotte.knste.system.FD
+import tf.lotte.knste.system.Syscall
 import tf.lotte.knste.util.Unsafe
 
 /**
@@ -27,6 +27,7 @@ internal class LinuxSyncFile(
     openModes: Set<FileOpenMode>,
     permission: PosixFilePermission = PosixFilePermission.DEFAULT_FILE
 ) : FilesystemFile {
+    /** The underlying file descriptor for this file. */
     private val fd: FD
 
     init {

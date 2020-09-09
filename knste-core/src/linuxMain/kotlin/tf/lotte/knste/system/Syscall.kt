@@ -9,7 +9,7 @@
 
 @file:Suppress("MemberVisibilityCanBePrivate")
 
-package tf.lotte.knste.impls
+package tf.lotte.knste.system
 
 import kotlinx.cinterop.*
 import platform.posix.*
@@ -18,8 +18,6 @@ import tf.lotte.knste.exc.FileAlreadyExistsException
 import tf.lotte.knste.exc.FileNotFoundException
 import tf.lotte.knste.exc.IOException
 import tf.lotte.knste.exc.OSException
-import tf.lotte.knste.ptrTo
-import tf.lotte.knste.readZeroTerminated
 import tf.lotte.knste.util.Unsafe
 import kotlin.experimental.ExperimentalTypeInference
 
@@ -406,7 +404,7 @@ public object Syscall {
         }
 
         val ba = res.readZeroTerminated(PATH_MAX)
-        return ByteString.fromRawHolder(ByteStringHolder.fromByteArrayUncopied(ba))
+        return ByteString.fromUncopied(ba)
     }
 
     /**

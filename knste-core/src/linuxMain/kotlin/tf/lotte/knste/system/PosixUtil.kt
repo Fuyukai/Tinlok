@@ -7,7 +7,7 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
-package tf.lotte.knste
+package tf.lotte.knste.system
 
 import kotlinx.cinterop.*
 import tf.lotte.knste.util.Unsafe
@@ -41,6 +41,9 @@ public fun CArrayPointer<ByteVar>.readZeroTerminated(maxSize: Int): ByteArray {
     return readBytes(length)
 }
 
+/**
+ * Creates a pointer to a pinned Long.
+ */
 public fun NativePlacement.ptrTo(value: Pinned<Long>): CPointer<LongVar> {
     val var_ = alloc<LongVar>()
     var_.value = value.get()
