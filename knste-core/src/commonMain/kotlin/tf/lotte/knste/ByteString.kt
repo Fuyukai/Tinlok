@@ -9,7 +9,9 @@
 
 package tf.lotte.knste
 
-import tf.lotte.knste.impls.ByteStringHolder
+import tf.lotte.knste.types.bytestring.ByteArrayByteStringHolder
+import tf.lotte.knste.types.bytestring.ByteStringHolder
+
 
 /**
  * Represents an immutable string of singular bytes.
@@ -23,20 +25,25 @@ private constructor(
          * Creates a new [ByteString] from a [ByteArray].
          */
         public fun fromByteArray(ba: ByteArray): ByteString =
-            ByteString(ByteStringHolder.fromByteArray(ba))
+            ByteString(ByteArrayByteStringHolder(ba.copyOf()))
 
         /**
-         * Creates a new [ByteString] from a [ByteArray]
+         * Creates a new [ByteString] from a [String].
          */
         public fun fromString(string: String): ByteString {
-            return ByteString(ByteStringHolder.stringToByteArray(string))
+            return ByteString(ByteArrayByteStringHolder(string.encodeToByteArray()))
         }
 
+        /**
+         * Creates a new [ByteString] from a [ByteArray], without copying it.
+         */
         internal fun fromUncopied(ba: ByteArray): ByteString =
-            ByteString(ByteStringHolder.fromByteArrayUncopied(ba))
+            ByteString(ByteArrayByteStringHolder(ba))
 
-        internal fun fromRawHolder(holder: ByteStringHolder): ByteString =
-            ByteString(holder)
+        /**
+         * Creates
+         */
+        internal fun fromRawHolder(holder: ByteStringHolder): ByteString = ByteString(holder)
     }
 
     /** The size of this ByteString. */
@@ -61,11 +68,7 @@ private constructor(
      * Concatenates two [ByteString] instances, returning a new [ByteString].
      */
     public operator fun plus(other: ByteString): ByteString {
-        val unwrapped = backing.unwrap()
-        val unwrapped2 = other.backing.unwrap()
-        val combined = unwrapped + unwrapped2
-        val holder = ByteStringHolder.fromByteArrayUncopied(combined)
-        return ByteString(holder)
+        return ByteString(backing.concatenate(other.unwrap()))
     }
 
     /**
