@@ -33,4 +33,13 @@ public class ByteArrayByteStringHolder(private val ba: ByteArray) : ByteStringHo
     override fun concatenate(other: ByteArray): ByteStringHolder {
         return ByteArrayByteStringHolder(ba + other)
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (other == null || other !is ByteStringHolder) return false
+        return ba.contentEquals(other.unwrap())
+    }
+
+    override fun hashCode(): Int {
+        return ba.contentHashCode()
+    }
 }
