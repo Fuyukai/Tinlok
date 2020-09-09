@@ -24,7 +24,7 @@ import kotlin.contracts.contract
  * directory will be automatically deleted when the lambda returns.
  */
 @OptIn(Unsafe::class, ExperimentalContracts::class)
-public fun <R> Paths.makeTempDirectory(prefix: String, block: (Path) -> R): R {
+public inline fun <R> Paths.makeTempDirectory(prefix: String, block: (Path) -> R): R {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
