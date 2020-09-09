@@ -18,6 +18,7 @@ import tf.lotte.knste.exc.FileAlreadyExistsException
 import tf.lotte.knste.exc.FileNotFoundException
 import tf.lotte.knste.exc.IOException
 import tf.lotte.knste.exc.OSException
+import tf.lotte.knste.ptrTo
 import tf.lotte.knste.readZeroTerminated
 import tf.lotte.knste.util.Unsafe
 import kotlin.experimental.ExperimentalTypeInference
@@ -188,6 +189,38 @@ public object Syscall {
         }
 
         return totalWritten.toLong()
+    }
+
+    /**
+     * Writes [size] bytes from the FD [from] into the FD [to] starting from the offset [offset].
+     */
+    @Unsafe
+    public fun sendfile(to: FD, from: FD, size: ULong, offset: Long = 0): ULong = memScoped {
+        var totalWritten = 0UL
+        // retry loop to ensure we write ALL of the data
+        while (true) {
+            // i don't know if this ptr needs to be pinned, but i'm doing it to be safe.
+            val longValue = totalWritten.toLong()  // off_t
+                val written = longValue.usePinned {
+                    platform.linux.sendfile(
+                        to, from,
+                        ptrTo(it),
+                        (size - totalWritten)
+                    )
+                }
+
+            if (written.isError && errno != EINTR) {
+                throw OSException(errno, message = strerror())
+            }
+
+            // always safe conversion
+            totalWritten += written.toULong()
+            if (totalWritten >= size) {
+                break
+            }
+        }
+
+        return totalWritten
     }
 
     /**

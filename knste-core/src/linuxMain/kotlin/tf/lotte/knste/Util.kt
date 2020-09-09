@@ -9,14 +9,13 @@
 
 package tf.lotte.knste
 
-import kotlinx.cinterop.ByteVar
-import kotlinx.cinterop.CArrayPointer
-import kotlinx.cinterop.get
-import kotlinx.cinterop.readBytes
+import kotlinx.cinterop.*
+import tf.lotte.knste.util.Unsafe
 
 /**
- * Reads out a Kotlin [ByteArray]
+ * Reads out a Kotlin [ByteArray] from a [CArrayPointer].
  */
+@Unsafe
 public fun CArrayPointer<ByteVar>.readZeroTerminated(): ByteArray {
     var length = 0
     while (true) {
@@ -31,6 +30,7 @@ public fun CArrayPointer<ByteVar>.readZeroTerminated(): ByteArray {
  * Reads out a Kotlin [ByteArray] from a [CArrayPointer], with maximum size [maxSize] to avoid
  * buffer overflows.
  */
+@Unsafe
 public fun CArrayPointer<ByteVar>.readZeroTerminated(maxSize: Int): ByteArray {
     var length = 0
     while (true) {
@@ -39,4 +39,10 @@ public fun CArrayPointer<ByteVar>.readZeroTerminated(maxSize: Int): ByteArray {
         else break
     }
     return readBytes(length)
+}
+
+public fun NativePlacement.ptrTo(value: Pinned<Long>): CPointer<LongVar> {
+    val var_ = alloc<LongVar>()
+    var_.value = value.get()
+    return var_.ptr
 }
