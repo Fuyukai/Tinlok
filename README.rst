@@ -18,12 +18,19 @@ KNSTE adds or is planning to contain the following modules and features:
  - Path helpers (inspired by Python's ``pathlib``)
  - Filesystem I/O
  - Network I/O
- - (Planned) Time/Date based on std::chrono
+ - (Planned) Subprocessing
+ - (Planned) Time/Date based on java.time
  - (Planned) Hashes (Blake2)
  - (Planned) Compression/decompression (zlib, gzip, lzma)
 
 - ``knste-async`` (Planned)
  - Suspending I/O extensions using ``kotlinx.coroutines``
+
+- ``knste-tls`` (Planned)
+ - TLS extensions to networking I/O (sync and async)
+
+- ``knste-crypto`` (Planned)
+ - Libsodium-based cryptography library
 
 Why?
 ====
