@@ -13,7 +13,6 @@ import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.toKString
 import kotlinx.cinterop.toKStringFromUtf8
 import platform.posix.getpid
-import platform.posix.getpwuid
 import platform.posix.getuid
 import tf.lotte.knste.system.Syscall
 import tf.lotte.knste.util.Unsafe

@@ -196,8 +196,11 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
  * Helper function for safe stat.
  */
 private inline fun LinuxPath.statSafe(followSymlinks: Boolean): Stat? {
-    return try { stat(followSymlinks) }
-    catch (e: FileNotFoundException) { null }
+    return try {
+        stat(followSymlinks)
+    } catch (e: FileNotFoundException) {
+        null
+    }
 }
 
 private inline fun PurePath.ensureLinuxPath(): LinuxPath {

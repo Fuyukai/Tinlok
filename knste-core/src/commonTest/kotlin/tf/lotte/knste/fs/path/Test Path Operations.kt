@@ -12,10 +12,12 @@
 package tf.lotte.knste.fs.path
 
 import tf.lotte.knste.Sys
-import tf.lotte.knste.exc.OSException
 import tf.lotte.knste.fs.StandardOpenModes
 import tf.lotte.knste.util.Unsafe
-import kotlin.test.*
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 /**
  * Tests path modification operators.

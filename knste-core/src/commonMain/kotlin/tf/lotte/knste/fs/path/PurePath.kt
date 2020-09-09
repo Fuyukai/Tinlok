@@ -10,7 +10,6 @@
 package tf.lotte.knste.fs.path
 
 import tf.lotte.knste.ByteString
-import tf.lotte.knste.toByteString
 import tf.lotte.knste.util.Unsafe
 
 /**

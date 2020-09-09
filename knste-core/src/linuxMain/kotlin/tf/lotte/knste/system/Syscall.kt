@@ -224,13 +224,13 @@ public object Syscall {
         while (true) {
             // i don't know if this ptr needs to be pinned, but i'm doing it to be safe.
             val longValue = totalWritten.toLong()  // off_t
-                val written = longValue.usePinned {
-                    platform.linux.sendfile(
-                        to, from,
-                        ptrTo(it),
-                        (size - totalWritten)
-                    )
-                }
+            val written = longValue.usePinned {
+                platform.linux.sendfile(
+                    to, from,
+                    ptrTo(it),
+                    (size - totalWritten)
+                )
+            }
 
             if (written.isError && errno != EINTR) {
                 throw OSException(errno, message = strerror())
