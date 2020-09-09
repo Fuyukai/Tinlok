@@ -33,6 +33,8 @@ internal typealias FD = Int
  *
  * This is preferred over regular libc calls as it throws exceptions appropriately. This object
  * is very foot-gunny, but assertions are provided for basic sanity checks.
+ *
+ * Public extensions (ones not a direct mapping to libc) are prefixed with two underscores.
  */
 @OptIn(ExperimentalTypeInference::class, ExperimentalUnsignedTypes::class)
 public object Syscall {
@@ -119,6 +121,29 @@ public object Syscall {
         val res = platform.posix.close(fd)
         if (res.isError) {
             throw OSException(errno, message = strerror())
+        }
+    }
+
+    /**
+     * Closes all of the specified file descriptors. This is guaranteed to call close(2) on all,
+     * but will only raise an error for the first failed fd.
+     *
+     * This is an extension to libc.
+     */
+    @Unsafe
+    public fun __closeall(vararg fds: FD) {
+        var isErrored = false
+        var lastErrno = 0
+        for (fd in fds) {
+            val res = platform.posix.close(fd)
+            if (res.isError && !isErrored) {
+                isErrored = true
+                lastErrno = errno
+            }
+        }
+
+        if (isErrored) {
+            throw OSException(errno = lastErrno, message = strerror())
         }
     }
 

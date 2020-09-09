@@ -239,3 +239,16 @@ public fun Path.writeBytes(bs: ByteString) {
 public fun Path.writeString(str: String) {
     writeBytes(str.toByteString())
 }
+
+/**
+ * Reads all of the bytes from the file represented by this Path.
+ */
+public fun Path.readAllBytes(): ByteString =
+    open(StandardOpenModes.READ) {
+        it.readAll()
+    }
+
+/**
+ * Reads all of the bytes from the file represented by this Path, and decode it into a [String].
+ */
+public fun Path.readAllString(): String = readAllBytes().decode()

@@ -9,8 +9,11 @@
 
 package tf.lotte.knste.fs.path
 
+import tf.lotte.knste.exc.OSException
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
 
 /**
  * Tests various extensions to [PurePath] and [Path].
@@ -24,5 +27,24 @@ class `Test Path Extensions` {
         val path = Paths.purePath("file.tar.gz")
         assertEquals(path.suffix, "gz")
         assertEquals(path.suffixes, listOf("tar", "gz"))
+    }
+
+    /**
+     * Tests the recursive delete extension.
+     */
+    @Test
+    fun `Test recursive delete`() = Paths.makeTempDirectory("knste-test-") {
+        val parent = it.join("delete-parent")
+        parent.createDirectory(parents = false, existOk = false)
+        parent.join("first").apply {
+            createDirectory(parents = false, existOk = false)
+            join("nested").createDirectory(parents = false, existOk = false)
+        }
+        parent.join("second").createDirectory(parents = false, existOk = false)
+
+        assertFailsWith<OSException> { parent.removeDirectory() }
+
+        parent.recursiveDelete()
+        assertFalse(parent.exists())
     }
 }

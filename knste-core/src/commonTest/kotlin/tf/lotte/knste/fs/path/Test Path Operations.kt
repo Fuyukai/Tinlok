@@ -20,7 +20,6 @@ import kotlin.test.*
 /**
  * Tests path modification operators.
  */
-@OptIn(Unsafe::class)
 class `Test Path Operations` {
     /**
      * "Touch"es (creates empty) a file.
@@ -29,9 +28,6 @@ class `Test Path Operations` {
         open(StandardOpenModes.CREATE, StandardOpenModes.WRITE) {}
     }
 
-    /**
-     * Tests creating directories.
-     */
     @Test
     fun `Test mkdir`() = Paths.makeTempDirectory("knste-test-") {
         val newPath = it.join("mkdir-test")
@@ -41,9 +37,6 @@ class `Test Path Operations` {
         assertTrue(newPath.isDirectory())
     }
 
-    /**
-     * Tests the owner() function.
-     */
     @Test
     fun `Test owner`() = Paths.makeTempDirectory("knste-test-") {
         val username = Sys.getUsername()
@@ -51,9 +44,6 @@ class `Test Path Operations` {
     }
 
 
-    /**
-     * Tests getting certain stat() info about a file.
-     */
     @Test
     fun `Test stat`() = Paths.makeTempDirectory("knste-test-") {
         assertTrue(it.isDirectory())
@@ -81,29 +71,6 @@ class `Test Path Operations` {
         }
     }
 
-
-    /**
-     * Tests the recursive delete extension.
-     */
-    @Test
-    fun `Test recursive delete`() = Paths.makeTempDirectory("knste-test-") {
-        val parent = it.join("delete-parent")
-        parent.createDirectory(parents = false, existOk = false)
-        parent.join("first").apply {
-            createDirectory(parents = false, existOk = false)
-            join("nested").createDirectory(parents = false, existOk = false)
-        }
-        parent.join("second").createDirectory(parents = false, existOk = false)
-
-        assertFailsWith<OSException> { parent.removeDirectory() }
-
-        parent.recursiveDelete()
-        assertFalse(parent.exists())
-    }
-
-    /**
-     * Tests renaming.
-     */
     @Unsafe
     @Test
     fun `Test rename`() = Paths.makeTempDirectory("knste-test-") {
@@ -124,4 +91,18 @@ class `Test Path Operations` {
         assertTrue(second.isDirectory(followSymlinks = false))
     }
 
+    @Unsafe
+    @Test
+    fun `Test copy`() = Paths.makeTempDirectory("knste-test-") {
+        val first = it.join("test1.txt")
+        val second = it.join("test2.txt")
+
+        val toWrite = "happy cirno day 9/9/2020"
+        first.writeString(toWrite)
+        first.copy(second)
+
+        assertTrue(first.exists())
+        assertTrue(second.exists())
+        assertEquals(first.readAllString(), toWrite)
+    }
 }

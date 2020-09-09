@@ -13,6 +13,9 @@ import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.pointed
 import kotlinx.cinterop.toKString
 import platform.posix.F_OK
+import platform.posix.O_CREAT
+import platform.posix.O_RDONLY
+import platform.posix.O_WRONLY
 import tf.lotte.knste.ByteString
 import tf.lotte.knste.b
 import tf.lotte.knste.exc.FileNotFoundException
@@ -152,11 +155,23 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
     @Unsafe
     override fun rename(path: PurePath): Path {
         Syscall.rename(unsafeToString(), path.unsafeToString())
-        return path._ensureLinuxPath()
+        return path.ensureLinuxPath()
     }
 
+    /**
+     * Efficiently copies from this path using sendfile().
+     */
+    @OptIn(Unsafe::class)
     override fun copy(path: PurePath): Path {
-        TODO()
+        // sendfile to B from A which does an efficient copy
+        val to = Syscall.open(path.unsafeToString(), O_WRONLY or O_CREAT)
+        val from = Syscall.open(this.unsafeToString(), O_RDONLY)
+        try {
+            Syscall.sendfile(to, from, size().toULong())
+        } finally {
+            Syscall.__closeall(to, from)
+        }
+        return path.ensureLinuxPath()
     }
 
     @OptIn(Unsafe::class)
@@ -185,7 +200,7 @@ private inline fun LinuxPath.statSafe(followSymlinks: Boolean): Stat? {
     catch (e: FileNotFoundException) { null }
 }
 
-private inline fun PurePath._ensureLinuxPath(): LinuxPath {
+private inline fun PurePath.ensureLinuxPath(): LinuxPath {
     if (this is LinuxPath) return this
     if (this !is PosixPurePath) error("Not a POSIX path!")
     return LinuxPath(this)

@@ -14,10 +14,13 @@ import platform.posix.*
 import tf.lotte.knste.ByteString
 import tf.lotte.knste.b
 import tf.lotte.knste.readZeroTerminated
+import tf.lotte.knste.util.Unsafe
 
 public actual object Paths {
     public actual val pathSeparator: ByteString = b("/")
 
+    // TODO: Syscall wrapper
+    @OptIn(Unsafe::class)
     public actual fun cwd(): Path {
         val path = memScoped {
             val buf = allocArray<ByteVar>(PATH_MAX)
@@ -30,6 +33,8 @@ public actual object Paths {
         return LinuxPath(pure)
     }
 
+    // TODO: Syscall wrapper
+    @OptIn(Unsafe::class)
     public actual fun home(): Path {
         val path = memScoped {
             val env = getenv("HOME")
@@ -78,6 +83,7 @@ public actual object Paths {
     /**
      * Creates a new temporary directory, returning its [Path].
      */
+    @Unsafe
     public actual fun makeTempDirectory(prefix: String): Path {
         // lol at this function literally replacing XXXXXX
         // ALSO THIS CORRUPTS MEMORY IF YOU DON'T PIN IT
