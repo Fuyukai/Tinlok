@@ -41,7 +41,7 @@ private constructor(
             ByteString(ByteArrayByteStringHolder(ba))
 
         /**
-         * Creates
+         * Creates a new [ByteString] from a raw [ByteStringHolder].
          */
         internal fun fromRawHolder(holder: ByteStringHolder): ByteString = ByteString(holder)
     }
