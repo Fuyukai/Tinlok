@@ -13,11 +13,15 @@ package tf.lotte.knste.net
  * Base abstract class for all socket addresses.
  */
 public abstract class SocketAddress(
-    /** The AF_ address family for this address. */
-    public val family: AddressFamily,
-    /** The SOCK_ socket kind for this address. */
-    public val kind: SocketKind,
     /** The actual IP address. */
     public val ipAddress: IPAddress,
 ) {
+    /** The AF_ address family for this address. */
+    public abstract val family: AddressFamily
+
+    /** The SOCK_ socket kind for this address. */
+    public abstract val kind: SocketKind
+
+    /** The IPPROTO_ socket protocol for this address. */
+    public abstract val protocol: IPProtocol
 }
