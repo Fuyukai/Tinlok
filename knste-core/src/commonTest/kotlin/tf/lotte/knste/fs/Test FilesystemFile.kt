@@ -11,6 +11,7 @@ package tf.lotte.knste.fs
 
 import tf.lotte.knste.b
 import tf.lotte.knste.fs.path.*
+import tf.lotte.knste.io.peek
 import tf.lotte.knste.substring
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -96,6 +97,13 @@ class `Test FilesystemFile` {
             val data2 = file.readUpTo(29)
             assertNotNull(data2)
             assertEquals(data2, part1)
+        }
+
+        path.open(StandardOpenModes.READ) { file ->
+            val data = file.peek(toWrite.size.toLong())
+            assertNotNull(data)
+            assertEquals(data, toWrite)
+            assertEquals(file.cursor(), 0L)
         }
     }
 
