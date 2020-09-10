@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.dsl.*
 import org.jetbrains.dokka.gradle.DokkaTask
 
 plugins {
-    id("org.jetbrains.kotlin.multiplatform").version("1.4.0").apply(false)
+    id("org.jetbrains.kotlin.multiplatform").version("1.4.10").apply(false)
     id("org.jetbrains.dokka").version("1.4.0").apply(false)
 }
 
