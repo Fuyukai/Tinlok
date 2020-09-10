@@ -24,4 +24,19 @@ public abstract class SocketAddress(
 
     /** The IPPROTO_ socket protocol for this address. */
     public abstract val protocol: IPProtocol
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || other !is SocketAddress) return false
+        if (ipAddress != other.ipAddress) return false
+        if (family != other.family) return false
+        if (kind != other.kind) return false
+        if (protocol != other.protocol) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return ipAddress.hashCode()
+    }
 }
