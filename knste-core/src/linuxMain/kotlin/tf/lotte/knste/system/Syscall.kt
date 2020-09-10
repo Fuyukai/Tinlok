@@ -422,6 +422,43 @@ public object Syscall {
         }
     }
 
+    // == Networking == //
+    /**
+     * Calls getaddrinfo(). You are responsible for calling freeaddrinfo() afterwards.
+     */
+    @Unsafe
+    public fun getaddrinfo(
+        alloc: NativePlacement,
+        node: String?, service: String?,
+        family: Int, type: Int, protocol: Int, flags: Int
+    ): addrinfo {
+        val hints = alloc.alloc<addrinfo>()
+        val res = alloc.allocPointerTo<addrinfo>()
+        hints.usePinned {
+            memset(hints.ptr, 0, sizeOf<addrinfo>().convert())
+        }
+
+        hints.ai_flags = flags
+        if (node == null) {
+            hints.ai_flags = hints.ai_flags or AI_PASSIVE
+        }
+        hints.ai_socktype = type
+        hints.ai_family = family
+
+        val code = platform.posix.getaddrinfo(node, service, hints.ptr, res.ptr)
+        if (code.isError) {
+            throw OSException(errno = code)
+        }
+
+        // safe (non-null) if this didn't error
+        return res.pointed!!
+    }
+
+    @Unsafe
+    public fun freeaddrinfo(addrinfo: CPointer<addrinfo>) {
+        platform.posix.freeaddrinfo(addrinfo)
+    }
+
     // == Misc == //
     // region Misc
 
@@ -439,7 +476,7 @@ public object Syscall {
 
         val res = getpwuid_r(uid, passwd.ptr, buffer, bufSize.toULong(), starResult.ptr)
         if (starResult.value == null) {
-            throw OSException(errno, message = Syscall.strerror())
+            throw OSException(errno, message = strerror())
         }
 
         return passwd
