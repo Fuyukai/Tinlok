@@ -16,6 +16,7 @@ import tf.lotte.knste.types.bytestring.ByteStringHolder
 /**
  * Represents an immutable string of singular bytes.
  */
+@OptIn(ExperimentalUnsignedTypes::class)
 public class ByteString
 private constructor(
     private val backing: ByteStringHolder

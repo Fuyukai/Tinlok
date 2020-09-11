@@ -10,11 +10,12 @@
 package tf.lotte.knste.fs
 
 /**
- * Represents the result of an ``[l]stat()`` call.
+ * Represents the result of an ``(l)stat()`` call.
  *
  * Note that some fields are system dependant; they will have corresponding Path functions for
  * their purposes instead.
  */
+@OptIn(ExperimentalUnsignedTypes::class)
 public data class Stat(
     /** The owner UID of this file. */
     val ownerUID: Int,

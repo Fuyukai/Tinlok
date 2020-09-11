@@ -446,8 +446,9 @@ public object Syscall {
         }
         hints.ai_socktype = type
         hints.ai_family = family
+        hints.ai_protocol = protocol
 
-        val code = platform.posix.getaddrinfo(node, service, hints.ptr, res.ptr)
+        val code = getaddrinfo(node, service, hints.ptr, res.ptr)
         if (code.isError) {
             throw OSException(errno = code)
         }
@@ -554,6 +555,7 @@ public object Syscall {
         if (bufSize == -1L) bufSize = 16384
         val buffer = alloc.allocArray<ByteVar>(bufSize)
 
+        @Suppress("UNUSED_VARIABLE")
         val res = getpwuid_r(uid, passwd.ptr, buffer, bufSize.toULong(), starResult.ptr)
         if (starResult.value == null) {
             throw OSException(errno, message = strerror())

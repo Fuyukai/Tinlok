@@ -7,6 +7,9 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
+@file:OptIn(ExperimentalUnsignedTypes::class)
+@file:Suppress("unused")
+
 package tf.lotte.knste.util
 
 // safe conversion
@@ -68,6 +71,10 @@ public inline fun Int.toByteArray(): ByteArray {
     return byteArrayOf(upperByte.toByte(), byte2.toByte(), byte3.toByte(), lowerByte.toByte())
 }
 
+/**
+ * Decodes this uint into a ByteArray in big endian mode.
+ */
+@OptIn(ExperimentalUnsignedTypes::class)  // ?
 public inline fun UInt.toByteArray(): ByteArray {
     return byteArrayOf(upperByte.toByte(), byte2.toByte(), byte3.toByte(), lowerByte.toByte())
 }
