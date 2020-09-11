@@ -29,7 +29,7 @@ public inline val UInt.upperByte: UInt
  * Gets the lower byte of this Int.
  */
 public inline val Int.lowerByte: Int
-    get() = this shr 16 and 0xFF
+    get() = this and 0xFF
 
 /**
  * Gets the lower byte of this UInt.
