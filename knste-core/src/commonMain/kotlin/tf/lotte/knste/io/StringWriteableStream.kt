@@ -9,13 +9,7 @@
 
 package tf.lotte.knste.io
 
-// xx: not sure how to format this
-
 /**
- * Represents a two-directional stream that can read strings.
+ * Like [WriteableStream] but for [String] too.
  */
-public interface BidirectionalStringStream
-    :
-    StringReadableStream,
-    StringWriteableStream,
-    BidirectionalStream
+public interface StringWriteableStream : WriteableStream, StringWriteable

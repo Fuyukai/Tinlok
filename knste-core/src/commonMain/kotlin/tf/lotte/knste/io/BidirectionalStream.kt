@@ -12,4 +12,4 @@ package tf.lotte.knste.io
 /**
  * Represents any stream that operates in both directions (it is both readable and writeable).
  */
-public interface BidirectionalStream : Readable, Writeable, Closeable
+public interface BidirectionalStream : ReadableStream, WriteableStream
