@@ -20,6 +20,7 @@ import tf.lotte.knste.exc.IOException
 import tf.lotte.knste.exc.OSException
 import tf.lotte.knste.net.*
 import tf.lotte.knste.util.Unsafe
+import tf.lotte.knste.util.toInt
 import kotlin.experimental.ExperimentalTypeInference
 
 internal typealias FD = Int
@@ -483,21 +484,37 @@ public object Syscall {
      * Connects a socket over IPv6.
      */
     @Unsafe
-    public fun __connect_ipv6(sock: FD, address: SocketAddress): Int = memScoped {
-        val ipRepresentation = (address.ipAddress as IPv6Address).rawRepresentation
+    public fun __connect_ipv6(sock: FD, ip: IPv6Address, port: Int): Int = memScoped {
+        val ipRepresentation = ip.rawRepresentation
         // runtime safety check!!
         // this is the most unsafe code in the entire library as of writing
         require(ipRepresentation.size == 16) {
             "IPv6 address was too big, refusing to clobber memory"
         }
 
-        // W H Y IS SIN6_ADDR A VAL
-        // have to manually write to the array contained within
-        val struct = alloc<sockaddr_in6>()
+        val struct = alloc<sockaddr_in6> {
+            sin6_family = AF_INET6.toUShort()  // ?
+            // have to manually write to the array contained within
+            sin6_addr.arrayMemberAt<ByteVar>(0L).unsafeClobber(ipRepresentation)
+            sin6_port = port.toUShort()
+        }
 
-        //val ptr = struct.memberAt<ByteVar>()
+        connect(sock, struct.ptr.reinterpret(), sizeOf<sockaddr_in6>().toUInt())
+    }
 
-        1
+    /**
+     * Connects a socket over IPv4.
+     */
+    @Unsafe
+    public fun __connect_ipv4(sock: FD, ip: IPv4Address, port: Int): Int = memScoped {
+        val ipRepresentation = ip.rawRepresentation
+        val struct = alloc<sockaddr_in> {
+            sin_family = AF_INET.toUShort()
+            sin_addr.s_addr = ipRepresentation.toInt().toUInt()
+            sin_port = port.toUShort()
+        }
+
+        connect(sock, struct.ptr.reinterpret(), sizeOf<sockaddr_in>().toUInt())
     }
 
     /**
@@ -506,8 +523,19 @@ public object Syscall {
     @Unsafe
     public fun connect(sock: FD, address: SocketAddress) {
         val res = when (address.family) {
-            AddressFamily.AF_INET6 -> { __connect_ipv6(sock, address) }
+            AddressFamily.AF_INET6 -> {
+                __connect_ipv6(sock, address.ipAddress as IPv6Address, address.port)
+            }
+            AddressFamily.AF_INET -> {
+                __connect_ipv4(sock, address.ipAddress as IPv4Address, address.port)
+            }
             else -> TODO()
+        }
+        if (res.isError) {
+            throw when (errno) {
+                EINPROGRESS -> TODO("EINPROGRESS")
+                else -> OSException(errno, message = strerror())
+            }
         }
     }
 

@@ -40,3 +40,14 @@ public abstract class SocketAddress(
         return ipAddress.hashCode()
     }
 }
+
+/**
+ * Gets the port of a socket address.
+ */
+public val SocketAddress.port: Int get() {
+    return when (this) {
+        is TcpSocketAddress -> port
+        is DatagramSocketAddress -> port
+        else -> 0
+    }
+}
