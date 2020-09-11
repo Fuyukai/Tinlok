@@ -72,6 +72,18 @@ public inline fun UInt.toByteArray(): ByteArray {
     return byteArrayOf(upperByte.toByte(), byte2.toByte(), byte3.toByte(), lowerByte.toByte())
 }
 
+
+/**
+ * Decodes a size-4 byte array to an int in big endian mode.
+ */
+public inline fun ByteArray.toInt(): Int {
+    return (((this[0].toInt()) shl 24)
+        or ((this[1].toInt()) shl 16)
+        or ((this[0].toInt()) shl 8)
+        or (this[0].toInt())
+        )
+}
+
 /**
  * Gets the upper byte of this Long.
  */

@@ -16,11 +16,12 @@ import tf.lotte.knste.system.Syscall
 import tf.lotte.knste.util.Unsafe
 import tf.lotte.knste.util.toByteArray
 
+@ExperimentalUnsignedTypes
 public actual object GlobalResolver : AddressResolver {
     @Unsafe
     private fun unrollAddrInfo(first: addrinfo): List<SocketAddress> = try {
         // unroll addrinfos into a list so we can do safe continues
-        val addrinfos = run {
+        val cAddresses = run {
             var lastInfo = first
             val infos = mutableListOf<addrinfo>()
             while (true) {
@@ -32,18 +33,18 @@ public actual object GlobalResolver : AddressResolver {
         }
 
         // now we create our own SocketAddress instances
-        val addrs = ArrayList<SocketAddress>(addrinfos.size)
-        for (address in addrinfos) {
+        val addresses = ArrayList<SocketAddress>(cAddresses.size)
+        for (info in cAddresses) {
             // lookup the values in our enum
             val family = AddressFamily.values()
-                .find { it.number == address.ai_family } ?: continue
+                .find { it.number == info.ai_family } ?: continue
             val type = SocketKind.values()
-                .find { it.number == address.ai_socktype } ?: continue
+                .find { it.number == info.ai_socktype } ?: continue
             val protocol = IPProtocol.values()
-                .find { it.number == address.ai_protocol } ?: continue
+                .find { it.number == info.ai_protocol } ?: continue
 
             // addresses with a nullptr IP are skipped because ???
-            val sockaddr = address.ai_addr?.pointed ?: continue
+            val sockaddr = info.ai_addr?.pointed ?: continue
             val ip: IPAddress
             val port: Int
 
@@ -72,12 +73,15 @@ public actual object GlobalResolver : AddressResolver {
                 SocketKind.SOCK_STREAM -> {
                     TcpSocketAddress(ip, port)
                 }
-                else -> continue  // TODO: Datagrams etc
+                SocketKind.SOCK_DGRAM -> {
+                    DatagramSocketAddress(ip, port)
+                }
+                else -> continue  // raw sockets
             }
-            addrs.add(finalAddr)
+            addresses.add(finalAddr)
         }
 
-        addrs
+        addresses
     } finally {
         Syscall.freeaddrinfo(first.ptr)
     }
@@ -91,7 +95,7 @@ public actual object GlobalResolver : AddressResolver {
         flags: Int
     ): List<SocketAddress> {
         val strService = if (service == 0) null else service.toString()
-        val result = memScoped {
+        return memScoped {
             val firstAddr = Syscall.getaddrinfo(
                 this, host, strService,
                 family.number, type.number,
@@ -101,7 +105,6 @@ public actual object GlobalResolver : AddressResolver {
 
             unrollAddrInfo(firstAddr)
         }
-        return result
     }
 }
 
