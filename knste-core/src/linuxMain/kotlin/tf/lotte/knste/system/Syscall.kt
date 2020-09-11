@@ -18,6 +18,7 @@ import tf.lotte.knste.exc.FileAlreadyExistsException
 import tf.lotte.knste.exc.FileNotFoundException
 import tf.lotte.knste.exc.IOException
 import tf.lotte.knste.exc.OSException
+import tf.lotte.knste.net.*
 import tf.lotte.knste.util.Unsafe
 import kotlin.experimental.ExperimentalTypeInference
 
@@ -219,7 +220,7 @@ public object Syscall {
      */
     @Unsafe
     public fun sendfile(to: FD, from: FD, size: ULong, offset: Long = 0): ULong = memScoped {
-        var totalWritten = 0UL
+        var totalWritten = offset.toULong()
         // retry loop to ensure we write ALL of the data
         while (true) {
             // i don't know if this ptr needs to be pinned, but i'm doing it to be safe.
@@ -454,9 +455,60 @@ public object Syscall {
         return res.pointed!!
     }
 
+    /**
+     * Frees an [addrinfo] object.
+     */
     @Unsafe
     public fun freeaddrinfo(addrinfo: CPointer<addrinfo>) {
         platform.posix.freeaddrinfo(addrinfo)
+    }
+
+    /**
+     * Creates a new socket and returns the file descriptor.
+     */
+    @Unsafe
+    public fun socket(family: AddressFamily, kind: SocketKind, protocol: IPProtocol): FD {
+        val sock = socket(family.number, kind.number, protocol.number)
+        if (sock.isError) {
+            throw when (errno) {
+                EACCES -> TODO("EACCES")
+                else -> OSException(errno, message = strerror())
+            }
+        }
+
+        return sock
+    }
+
+    /**
+     * Connects a socket over IPv6.
+     */
+    @Unsafe
+    public fun __connect_ipv6(sock: FD, address: SocketAddress): Int = memScoped {
+        val ipRepresentation = (address.ipAddress as IPv6Address).rawRepresentation
+        // runtime safety check!!
+        // this is the most unsafe code in the entire library as of writing
+        require(ipRepresentation.size == 16) {
+            "IPv6 address was too big, refusing to clobber memory"
+        }
+
+        // W H Y IS SIN6_ADDR A VAL
+        // have to manually write to the array contained within
+        val struct = alloc<sockaddr_in6>()
+
+        //val ptr = struct.memberAt<ByteVar>()
+
+        1
+    }
+
+    /**
+     * Connects a socket to an address.
+     */
+    @Unsafe
+    public fun connect(sock: FD, address: SocketAddress) {
+        val res = when (address.family) {
+            AddressFamily.AF_INET6 -> { __connect_ipv6(sock, address) }
+            else -> TODO()
+        }
     }
 
     // == Misc == //

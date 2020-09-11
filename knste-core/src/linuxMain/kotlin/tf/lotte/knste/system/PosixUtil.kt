@@ -42,6 +42,16 @@ public fun CArrayPointer<ByteVar>.readZeroTerminated(maxSize: Int): ByteArray {
 }
 
 /**
+ * Overwrites the memory pointed to with a [ByteArray].
+ */
+@Unsafe
+public fun CArrayPointer<ByteVar>.unsafeClobber(other: ByteArray) {
+    for (idx in other.indices) {
+        this[idx] = other[idx]
+    }
+}
+
+/**
  * Creates a pointer to a pinned Long.
  */
 public fun NativePlacement.ptrTo(value: Pinned<Long>): CPointer<LongVar> {

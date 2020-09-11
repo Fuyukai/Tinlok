@@ -38,7 +38,7 @@ public sealed class IPAddress {
  * An IP address using version 4.
  */
 public class IPv4Address
-internal constructor(private val rawRepresentation: ByteArray) : IPAddress() {
+internal constructor(internal val rawRepresentation: ByteArray) : IPAddress() {
     override val version: Int = IP_VERSION_4
     override val family: AddressFamily get() = AddressFamily.AF_INET
 
@@ -65,8 +65,11 @@ internal constructor(private val rawRepresentation: ByteArray) : IPAddress() {
     }
 }
 
+/**
+ * An IP address using version 6.
+ */
 public class IPv6Address
-internal constructor(private val rawRepresentation: ByteArray) : IPAddress() {
+internal constructor(internal val rawRepresentation: ByteArray) : IPAddress() {
     override val version: Int = IP_VERSION_6
     override val family: AddressFamily get() = AddressFamily.AF_INET6
 
