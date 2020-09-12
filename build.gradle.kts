@@ -7,6 +7,9 @@ plugins {
 }
 
 subprojects {
+    // ignore all -static projects, we configure K/N ourselves
+    if (this.name.startsWith("knste-static")) return@subprojects
+
     apply(plugin = "org.jetbrains.kotlin.multiplatform")
     apply(plugin = "org.jetbrains.dokka")
 

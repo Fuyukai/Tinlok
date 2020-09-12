@@ -9,7 +9,8 @@
 
 package tf.lotte.knste.net
 
-import tf.lotte.knste.types.bytestring.ByteStringHolder
+import tf.lotte.knste.util.Unsafe
+import tf.lotte.knste.util.toByteArray
 
 // see: https://docs.python.org/3/library/ipaddress.html
 // see: https://doc.rust-lang.org/std/net/enum.IpAddr.html
@@ -39,6 +40,29 @@ public sealed class IPAddress {
  */
 public class IPv4Address
 internal constructor(internal val rawRepresentation: ByteArray) : IPAddress() {
+    public companion object {
+        /**
+         * Parses an IPv4 address from a String.
+         */
+        public fun of(ip: String): IPv4Address {
+            val split = ip.split('.')
+            require(split.size == 4) { "Invalid IPv4 address: $ip" }
+            require(split.all { it.isNotEmpty() }) { "Invalid IPv4 address: $ip" }
+
+            val ints = split.map { it.toInt() }
+            require(!ints.any { it > 255 }) { "Invalid IPv4 address: $ip" }
+            return IPv4Address(ints.map { it.toByte() }.toByteArray())
+        }
+
+        /**
+         * Parses an IPv4 address from a decimal [UInt].
+         */
+        @OptIn(ExperimentalUnsignedTypes::class)
+        public fun of(decimal: UInt): IPv4Address {
+            return IPv4Address(decimal.toByteArray())
+        }
+    }
+
     override val version: Int = IP_VERSION_4
     override val family: AddressFamily get() = AddressFamily.AF_INET
 
@@ -70,6 +94,17 @@ internal constructor(internal val rawRepresentation: ByteArray) : IPAddress() {
  */
 public class IPv6Address
 internal constructor(internal val rawRepresentation: ByteArray) : IPAddress() {
+    public companion object {
+        /**
+         * Parses an IPv6 address from a String.
+         */
+        @OptIn(Unsafe::class)
+        public fun of(ip: String): IPv6Address {
+            val bytes = parseIPv6(ip)
+            return IPv6Address(bytes)
+        }
+    }
+
     override val version: Int = IP_VERSION_6
     override val family: AddressFamily get() = AddressFamily.AF_INET6
 
@@ -89,5 +124,10 @@ internal constructor(internal val rawRepresentation: ByteArray) : IPAddress() {
         var result = rawRepresentation.contentHashCode()
         result = 31 * result + version
         return result
+    }
+
+    @OptIn(Unsafe::class)
+    override fun toString(): String {
+        return IPv6toString(rawRepresentation)
     }
 }

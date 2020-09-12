@@ -16,3 +16,4 @@ pluginManagement {
 
 rootProject.name = "knste"
 include("knste-core")
+include("knste-static-ipv6")

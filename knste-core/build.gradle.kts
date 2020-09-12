@@ -7,12 +7,12 @@ plugins {
 }
 
 kotlin {
-    // configure linux cinterop for correct type definitions
-    val linux = targets.filterIsInstanceAnd<KotlinNativeTarget> { it.name.startsWith("linux") }
-    configure(linux) {
-        val main by compilations.getting
-        val linuxInterop by main.cinterops.creating {
-            defFile(project.file("src/linuxMain/linux.def"))
+    linuxX64() {
+        val linuxX64Main by sourceSets.getting {
+            dependencies {
+                api(project(":knste-static-ipv6"))
+            }
         }
     }
+
 }
