@@ -12,10 +12,7 @@ package tf.lotte.knste.net
 /**
  * Base abstract class for all socket addresses.
  */
-public abstract class SocketAddress(
-    /** The actual IP address. */
-    public val ipAddress: IPAddress,
-) {
+public abstract class SocketAddress {
     /** The AF_ address family for this address. */
     public abstract val family: AddressFamily
 
@@ -28,7 +25,6 @@ public abstract class SocketAddress(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || other !is SocketAddress) return false
-        if (ipAddress != other.ipAddress) return false
         if (family != other.family) return false
         if (kind != other.kind) return false
         if (protocol != other.protocol) return false
@@ -37,7 +33,10 @@ public abstract class SocketAddress(
     }
 
     override fun hashCode(): Int {
-        return ipAddress.hashCode()
+        var result = family.hashCode()
+        result = 31 * result + kind.hashCode()
+        result = 31 * result + protocol.hashCode()
+        return result
     }
 }
 

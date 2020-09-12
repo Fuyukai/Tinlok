@@ -20,7 +20,7 @@ public class TcpSocketAddress(
     ip: IPAddress,
     /** The port of this socket address. */
     public val port: Int
-) : SocketAddress(ip) {
+) : InetSocketAddress(ip) {
     public companion object {
         /**
          * Resolves a [host] and [port] combination into a [TcpSocketAddress].
@@ -47,7 +47,7 @@ public class TcpSocketAddress(
         }
     }
 
-    override val family: AddressFamily get() = ipAddress.family
+    override val family: AddressFamily get() = ip.family
     override val kind: SocketKind get() = SocketKind.SOCK_STREAM
     override val protocol: IPProtocol get() = IPProtocol.IPPROTO_TCP
 
