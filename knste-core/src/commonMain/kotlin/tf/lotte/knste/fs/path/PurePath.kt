@@ -18,6 +18,24 @@ import tf.lotte.knste.util.Unsafe
  * Pure path objects provide path-handling operations which don’t actually access a filesystem.
  */
 public interface PurePath {
+    public companion object {
+        /**
+         * Creates a new [PurePath] corresponding to the current OS's path schema.
+         */
+        public fun native(path: ByteString): PurePath {
+            return PlatformPaths.purePath(path)
+        }
+
+        /**
+         * Creates a new [PosixPurePath].
+         */
+        public fun posix(path: ByteString): PosixPurePath {
+            return PosixPurePath.fromByteString(path)
+        }
+
+        // TODO: Windows
+    }
+
     /**
      * If this path is absolute (i.e. it doesn't need to be combined with another path to
      * represent a file).

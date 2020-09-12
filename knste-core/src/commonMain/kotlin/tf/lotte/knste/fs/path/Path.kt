@@ -10,6 +10,7 @@
 
 package tf.lotte.knste.fs.path
 
+import tf.lotte.knste.ByteString
 import tf.lotte.knste.exc.FileNotFoundException
 import tf.lotte.knste.fs.FileOpenMode
 import tf.lotte.knste.fs.FilePermission
@@ -20,6 +21,33 @@ import tf.lotte.knste.util.Unsafe
  * Similar to [PurePath], but can perform I/O operations.
  */
 public interface Path : PurePath {
+    public companion object {
+        public fun of(path: PurePath): Path {
+            return PlatformPaths.path(path)
+        }
+
+        /**
+         * Creates a new platform [Path].
+         */
+        public fun of(path: ByteString): Path {
+            return PlatformPaths.path(path)
+        }
+
+        /**
+         * Creates a new platform [Path] corresponding to the Current Working Directory.
+         */
+        public fun cwd(): Path {
+            return PlatformPaths.cwd()
+        }
+
+        /**
+         * Creates a new platform [Path] corresponding to the current user's HOME directory.
+         */
+        public fun home(): Path {
+            return PlatformPaths.home()
+        }
+    }
+
     // type changes
     public override val parent: Path
     public override fun join(other: PurePath): Path

@@ -31,7 +31,7 @@ class `Test Path Operations` {
     }
 
     @Test
-    fun `Test mkdir`() = Paths.makeTempDirectory("knste-test-") {
+    fun `Test mkdir`() = Path.makeTempDirectory("knste-test-") {
         val newPath = it.join("mkdir-test")
         newPath.createDirectory(parents = false, existOk = false)
 
@@ -40,14 +40,14 @@ class `Test Path Operations` {
     }
 
     @Test
-    fun `Test owner`() = Paths.makeTempDirectory("knste-test-") {
+    fun `Test owner`() = Path.makeTempDirectory("knste-test-") {
         val username = Sys.getUsername()
         assertEquals(it.owner(), username)
     }
 
 
     @Test
-    fun `Test stat`() = Paths.makeTempDirectory("knste-test-") {
+    fun `Test stat`() = Path.makeTempDirectory("knste-test-") {
         assertTrue(it.isDirectory())
         assertFalse(it.isRegularFile())
 
@@ -75,7 +75,7 @@ class `Test Path Operations` {
 
     @Unsafe
     @Test
-    fun `Test rename`() = Paths.makeTempDirectory("knste-test-") {
+    fun `Test rename`() = Path.makeTempDirectory("knste-test-") {
         val first = it.join("test1.txt")
         val second = it.join("test2.txt")
 
@@ -95,7 +95,7 @@ class `Test Path Operations` {
 
     @Unsafe
     @Test
-    fun `Test copy`() = Paths.makeTempDirectory("knste-test-") {
+    fun `Test copy`() = Path.makeTempDirectory("knste-test-") {
         val first = it.join("test1.txt")
         val second = it.join("test2.txt")
 

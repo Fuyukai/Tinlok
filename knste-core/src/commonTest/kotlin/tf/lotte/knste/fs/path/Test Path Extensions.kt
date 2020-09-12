@@ -24,7 +24,7 @@ class `Test Path Extensions` {
      */
     @Test
     fun `Test suffix functions`() {
-        val path = Paths.purePath("file.tar.gz")
+        val path = PurePath.native("file.tar.gz")
         assertEquals(path.suffix, "gz")
         assertEquals(path.suffixes, listOf("tar", "gz"))
     }
@@ -33,7 +33,7 @@ class `Test Path Extensions` {
      * Tests the recursive delete extension.
      */
     @Test
-    fun `Test recursive delete`() = Paths.makeTempDirectory("knste-test-") {
+    fun `Test recursive delete`() = Path.makeTempDirectory("knste-test-") {
         val parent = it.join("delete-parent")
         parent.createDirectory(parents = false, existOk = false)
         parent.join("first").apply {

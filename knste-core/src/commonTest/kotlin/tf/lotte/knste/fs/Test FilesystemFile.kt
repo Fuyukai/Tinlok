@@ -25,7 +25,7 @@ class `Test FilesystemFile` {
      * Tests basic WRITE mode reading and writing.
      */
     @Test
-    fun `Test basic read/write`() = Paths.makeTempDirectory("knste-test-") {
+    fun `Test basic read/write`() = Path.makeTempDirectory("knste-test-") {
         val path = it.join("test.txt")
         val toWrite = b("abcdefghi")
 
@@ -53,7 +53,7 @@ class `Test FilesystemFile` {
     }
 
     @Test
-    fun `Test append`() = Paths.makeTempDirectory("knste-test-") {
+    fun `Test append`() = Path.makeTempDirectory("knste-test-") {
         val path = it.join("test.xt")
 
         val part1 = b("When the incident took place, ")
@@ -79,7 +79,7 @@ class `Test FilesystemFile` {
     }
 
     @Test
-    fun `Test seek`() = Paths.makeTempDirectory("knste-test-") {
+    fun `Test seek`() = Path.makeTempDirectory("knste-test-") {
         val path = it.join("test.txt")
         val toWrite = b("Every word is getting longer, the mosquitoes are getting louder.")
 

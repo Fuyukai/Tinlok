@@ -16,7 +16,8 @@ import tf.lotte.knste.b
 import tf.lotte.knste.system.readZeroTerminated
 import tf.lotte.knste.util.Unsafe
 
-public actual object Paths {
+@PublishedApi
+internal actual object PlatformPaths {
     public actual val pathSeparator: ByteString = b("/")
 
     // TODO: Syscall wrapper
@@ -64,20 +65,18 @@ public actual object Paths {
         return LinuxPath(pure)
     }
 
-    public actual fun purePath(of: String): PurePath {
-        return PosixPurePath.fromString(of)
-    }
-
     public actual fun purePath(of: ByteString): PurePath {
         return PosixPurePath.fromByteString(of)
     }
 
-    public actual fun path(of: String): Path {
-        return LinuxPath(PosixPurePath.fromString(of))
-    }
 
     public actual fun path(of: ByteString): Path {
         return LinuxPath(PosixPurePath.fromByteString(of))
+    }
+
+    public actual fun path(of: PurePath): Path {
+        require(of is PosixPurePath) { "Can't create a real path out of a non-POSIX path" }
+        return LinuxPath(of)
     }
 
     /**

@@ -18,26 +18,21 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
-// == Paths extensions == //
 /**
- * Creates a new temporary directory and calls the provided lambda with its path. The
- * directory will be automatically deleted when the lambda returns.
+ * Creates a new [PurePath] corresponding to the current OS's path schema.
  */
-@OptIn(Unsafe::class, ExperimentalContracts::class)
-public inline fun <R> Paths.makeTempDirectory(prefix: String, block: (Path) -> R): R {
-    contract {
-        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
-    }
+public fun PurePath.Companion.native(path: String): PurePath = native(path.toByteString())
 
-    val dir = makeTempDirectory(prefix)
-    try {
-        return block(dir)
-    } finally {
-        dir.recursiveDelete()
-    }
-}
+/**
+ * Creates a new [PosixPurePath].
+ */
+public fun PurePath.Companion.posix(path: String): PurePath = native(path.toByteString())
 
-// == PurePath extensions == //
+/**
+ * Creates a new platform [Path] from the string [path].
+ */
+public fun Path.Companion.of(path: String): Path = of(path.toByteString())
+
 /**
  * Helper operator function for fluent API usage.
  */
@@ -51,12 +46,12 @@ public operator fun Path.div(other: PurePath): Path = join(other)
 /**
  * Joins this pure path to another [ByteString], returning the combined path.
  */
-public fun PurePath.join(other: ByteString): PurePath = join(Paths.purePath(other))
+public fun PurePath.join(other: ByteString): PurePath = join(PlatformPaths.purePath(other))
 
 /**
  * Joins this path to another [ByteString], returning the combined path.
  */
-public fun Path.join(other: ByteString): Path = join(Paths.purePath(other))
+public fun Path.join(other: ByteString): Path = join(PlatformPaths.purePath(other))
 
 /**
  * Helper operator function for fluent API usage.
@@ -88,6 +83,7 @@ public operator fun PurePath.div(other: String): PurePath = join(other)
  */
 public operator fun Path.div(other: String): Path = join(other)
 
+// == PurePath extensions == //
 /**
  * Gets all of the parents of this Path.
  */
@@ -154,6 +150,24 @@ public val PurePath.suffixes: List<String>
     }
 
 // == Path extensions == //
+/**
+ * Creates a new temporary directory and calls the provided lambda with its path. The
+ * directory will be automatically deleted when the lambda returns.
+ */
+@OptIn(Unsafe::class, ExperimentalContracts::class)
+public inline fun <R> Path.Companion.makeTempDirectory(prefix: String, block: (Path) -> R): R {
+    contract {
+        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+    }
+
+    val dir = PlatformPaths.makeTempDirectory(prefix)
+    try {
+        return block(dir)
+    } finally {
+        dir.recursiveDelete()
+    }
+}
+
 /**
  * Flattens a Path tree into a listing of [Path].
  *
