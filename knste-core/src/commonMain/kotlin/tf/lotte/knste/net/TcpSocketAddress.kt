@@ -26,29 +26,33 @@ public class TcpSocketAddress(
          * Resolves a [host] and [port] combination into a [TcpSocketAddress].
          *
          * @param resolver: The [AddressResolver] to resolve the address with.
-         * @param preferIpv6: If IPv6 should be preferred to create the connection. (Default true)
+         * @param preferIpv6: If IPv6 should be preferred when resolving (default true).
          */
         @OptIn(Unsafe::class)
         public fun resolve(
             host: String, port: Int, resolver: AddressResolver = GlobalResolver,
+        ): TcpSocketAddress {
+            TODO()
+        }
+
+        /**
+         * Creates a new [TcpSocketAddress] for the wildcard address, suitable for binding.
+         *
+         * @param resolver: The [AddressResolver] to resolve the wildcard address with.
+         * @param preferIpv6: If IPv6 should be preferred when resolving (default true).
+         */
+        @OptIn(Unsafe::class)
+        public fun wildcard(
+            port: Int,
+            resolver: AddressResolver = GlobalResolver,
             preferIpv6: Boolean = true
         ): TcpSocketAddress {
-            val addrInfo = resolver.getaddrinfo(
-                host, service = port,
-                family = AddressFamily.AF_UNSPEC,
-                type = SocketKind.SOCK_STREAM,
-                protocol = IPProtocol.IPPROTO_TCP
-            )
-            return if (preferIpv6) {
-                addrInfo.find { it.family == AddressFamily.AF_INET } as TcpSocketAddress
-            } else {
-                addrInfo.firstOrNull() as? TcpSocketAddress
-            } ?: TODO("handle appropriate error")
+            TODO()
         }
     }
 
     override val family: AddressFamily get() = ip.family
-    override val kind: SocketKind get() = SocketKind.SOCK_STREAM
+    override val type: SocketType get() = SocketType.SOCK_STREAM
     override val protocol: IPProtocol get() = IPProtocol.IPPROTO_TCP
 
 

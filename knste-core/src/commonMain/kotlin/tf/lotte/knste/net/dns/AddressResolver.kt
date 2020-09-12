@@ -12,7 +12,7 @@ package tf.lotte.knste.net.dns
 import tf.lotte.knste.net.AddressFamily
 import tf.lotte.knste.net.IPProtocol
 import tf.lotte.knste.net.SocketAddress
-import tf.lotte.knste.net.SocketKind
+import tf.lotte.knste.net.SocketType
 import tf.lotte.knste.util.Unsafe
 
 /**
@@ -31,7 +31,7 @@ public interface AddressResolver {
      * @param host: The hostname to look up. If null, will do a localhost lookup with AI_PASSIVE.
      * @param service: The service port to look up. Optional.
      * @param family: The [AddressFamily] to use. Defaults to UNSPEC (use both).
-     * @param type: The [SocketKind] to use. Defaults to STREAM (TCP).
+     * @param type: The [SocketType] to use. Defaults to STREAM (TCP).
      * @param protocol: The [IPProtocol] to use. Defaults to kernel choice.
      * @param flags: The flags to use.
      */
@@ -39,7 +39,7 @@ public interface AddressResolver {
     public fun getaddrinfo(
         host: String?, service: Int = 0,
         family: AddressFamily = AddressFamily.AF_UNSPEC,
-        type: SocketKind = SocketKind.SOCK_STREAM,
+        type: SocketType = SocketType.SOCK_STREAM,
         protocol: IPProtocol = IPProtocol.IPPROTO_IP,
         flags: Int = 0
     ): List<SocketAddress>

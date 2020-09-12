@@ -469,8 +469,8 @@ public object Syscall {
      * Creates a new socket and returns the file descriptor.
      */
     @Unsafe
-    public fun socket(family: AddressFamily, kind: SocketKind, protocol: IPProtocol): FD {
-        val sock = socket(family.number, kind.number, protocol.number)
+    public fun socket(family: AddressFamily, type: SocketType, protocol: IPProtocol): FD {
+        val sock = socket(family.number, type.number, protocol.number)
         if (sock.isError) {
             throw when (errno) {
                 EACCES -> TODO("EACCES")

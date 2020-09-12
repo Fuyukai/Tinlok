@@ -38,7 +38,7 @@ public actual object GlobalResolver : AddressResolver {
             // lookup the values in our enum
             val family = AddressFamily.values()
                 .find { it.number == info.ai_family } ?: continue
-            val type = SocketKind.values()
+            val type = SocketType.values()
                 .find { it.number == info.ai_socktype } ?: continue
             val protocol = IPProtocol.values()
                 .find { it.number == info.ai_protocol } ?: continue
@@ -70,10 +70,10 @@ public actual object GlobalResolver : AddressResolver {
             }
 
             val finalAddr = when (type) {
-                SocketKind.SOCK_STREAM -> {
+                SocketType.SOCK_STREAM -> {
                     TcpSocketAddress(ip, port)
                 }
-                SocketKind.SOCK_DGRAM -> {
+                SocketType.SOCK_DGRAM -> {
                     DatagramSocketAddress(ip, port)
                 }
                 else -> continue  // raw sockets
@@ -91,7 +91,7 @@ public actual object GlobalResolver : AddressResolver {
     override fun getaddrinfo(
         host: String?, service: Int,
         family: AddressFamily,
-        type: SocketKind, protocol: IPProtocol,
+        type: SocketType, protocol: IPProtocol,
         flags: Int
     ): List<SocketAddress> {
         val strService = if (service == 0) null else service.toString()

@@ -9,12 +9,6 @@
 
 package tf.lotte.knste.net.dns
 
-import tf.lotte.knste.net.AddressFamily
-import tf.lotte.knste.net.IPProtocol
-import tf.lotte.knste.net.SocketAddress
-import tf.lotte.knste.net.SocketKind
-import tf.lotte.knste.util.Unsafe
-
 /**
  * The global address resolver. This is used by default for all resolution requests without an
  * explicit resolver.

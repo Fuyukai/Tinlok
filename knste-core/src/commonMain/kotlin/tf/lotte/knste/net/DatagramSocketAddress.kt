@@ -14,6 +14,6 @@ package tf.lotte.knste.net
  */
 public class DatagramSocketAddress(ip: IPAddress, public val port: Int) : InetSocketAddress(ip) {
     override val family: AddressFamily = ip.family
-    override val kind: SocketKind = SocketKind.SOCK_DGRAM
+    override val type: SocketType = SocketType.SOCK_DGRAM
     override val protocol: IPProtocol = IPProtocol.IPPROTO_UDP
 }

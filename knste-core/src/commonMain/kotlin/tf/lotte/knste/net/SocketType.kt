@@ -14,7 +14,7 @@ package tf.lotte.knste.net
 /**
  * An enumeration of the available socket kinds.
  */
-public expect enum class SocketKind {
+public expect enum class SocketType {
     /** Stream sockets (TCP) */
     SOCK_STREAM,
     /** Datagram sockets (UDP) */
