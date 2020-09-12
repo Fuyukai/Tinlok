@@ -88,7 +88,7 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
 
     override fun size(): Long = stat(followSymlinks = false).size
 
-    @Unsafe
+    @OptIn(Unsafe::class)
     override fun resolve(strict: Boolean): Path {
         if (!strict) TODO("Pure-Kotlin resolving")
         val realPath = memScoped { Syscall.realpath(this, pure.unsafeToString()) }
