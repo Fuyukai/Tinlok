@@ -42,7 +42,6 @@ class `Test GlobalResolver` {
             val inet6 = tcpAddrs.find { it.family == AddressFamily.AF_INET6 }!!
             assertEquals(inet6.port, 443)
             val addrStr = inet6.ip.toString()
-            println(addrStr)
             assertTrue(addrStr == "2606:4700:4700::1001" || addrStr == "2606:4700:4700::1111")
         }
     }
