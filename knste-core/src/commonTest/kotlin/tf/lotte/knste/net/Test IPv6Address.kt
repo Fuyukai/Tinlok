@@ -20,7 +20,7 @@ class `Test IPv6Address` {
     @Test
     fun `Test parsing`() {
         val addr = IPv6Address.of("2001:0db8:85a3:0000:0000:8a2e:0370:7334")
-        assertEquals(addr.toString(), "2001:db8:85ff::8aff:370:7334")
+        assertEquals(addr.toString(), "2001:db8:85a3::8a2e:370:7334")
 
         assertFailsWith<IllegalArgumentException> {
             IPv6Address.of("zzzzzz")

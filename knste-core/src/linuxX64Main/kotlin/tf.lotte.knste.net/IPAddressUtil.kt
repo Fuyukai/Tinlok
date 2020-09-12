@@ -9,12 +9,16 @@
 
 package tf.lotte.knste.net
 
-import tf.lotte.knste.interop.ipv6.*
 import kotlinx.cinterop.*
 import platform.posix.INET6_ADDRSTRLEN
-import platform.posix.htons
-import platform.posix.ntohs
+import tf.lotte.knste.interop.ipv6.ipv6_address_full_t
+import tf.lotte.knste.interop.ipv6.ipv6_from_str
+import tf.lotte.knste.interop.ipv6.ipv6_to_str
 import tf.lotte.knste.util.Unsafe
+
+// DON'T FUCKING TOUCH
+// ON THREAT OF DEATH
+// This gave me about an hour of debugging!!!
 
 /**
  * Implements IPv6 parsing using ipv6-parse C library.
@@ -27,29 +31,31 @@ internal actual fun parseIPv6(string: String): ByteArray = memScoped {
         require(success) { "Invalid IPv6 string: $string" }
     }
 
-    // copy in address from shorts to bytes and in network order
-    val ba = ByteArray(32)
-    for (x in 0..8) {
-        val item = htons(addr.address.components[x])
+    // copy in addresses from shorts, this does weird things with ordering but somehow works!
+    // let the name `ba3` be a lesson to future me who thinks this code could be improved.
+    val ba3 = ByteArray(16)
+    for (x in 0 until 8) {
+        val item = addr.address.components[x]
         // fix byte order
         val upper = ((item.toUInt() shr 8) and 0xFFu).toByte()
-        val lower = (item.toUInt() and 0xFFu).toByte()
-        ba[x * 2] = upper
-        ba[(x * 2) + 1] = lower
+        val lower = ((item.toUInt()) and 0xFFu).toByte()
+        ba3[x * 2] = upper
+        ba3[(x * 2) + 1] = lower
     }
 
-    return ba
+    ba3
 }
 
 @OptIn(ExperimentalUnsignedTypes::class)
 @Unsafe
 internal actual fun IPv6toString(contents: ByteArray): String = memScoped {
     val addr = alloc<ipv6_address_full_t>()
+
     // convert to short array, overwrite addr
-    for (idx in 0..8) {
-        val upper = (contents[idx * 2].toUInt()) shl 8
-        val lower = (contents[(idx * 2) + 1].toUInt())
-        val combined = ntohs((upper or lower).toUShort())
+    for (idx in 0 until 8) {
+        val upper = ((contents[idx * 2].toUInt()) shl 8) and 0xFF00u
+        val lower = (contents[(idx * 2) + 1].toUInt()) and 0xFFu
+        val combined = (upper or lower).toUShort()
         addr.address.components[idx] = combined
     }
 
