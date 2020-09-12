@@ -489,8 +489,9 @@ public object Syscall {
         val ipRepresentation = ip.rawRepresentation
         // runtime safety check!!
         // this is the most unsafe code in the entire library as of writing
-        require(ipRepresentation.size == 16) {
-            "IPv6 address was too big, refusing to clobber memory"
+        val size = ipRepresentation.size
+        require(size == 16) {
+            "IPv6 address size was mismatched (expected 16, got $size), refusing to clobber memory"
         }
 
         val struct = alloc<sockaddr_in6> {
@@ -522,13 +523,13 @@ public object Syscall {
      * Connects a socket to an address.
      */
     @Unsafe
-    public fun connect(sock: FD, address: SocketAddress) {
-        val res = when (address.family) {
+    public fun connect(sock: FD, info: InetConnectionInfo) {
+        val res = when (info.family) {
             AddressFamily.AF_INET6 -> {
-                __connect_ipv6(sock, address.ipAddress as IPv6Address, address.port)
+                __connect_ipv6(sock, info.ip as IPv6Address, info.port)
             }
             AddressFamily.AF_INET -> {
-                __connect_ipv4(sock, address.ipAddress as IPv4Address, address.port)
+                __connect_ipv4(sock, info.ip as IPv4Address, info.port)
             }
             else -> TODO()
         }

@@ -10,8 +10,8 @@
 package tf.lotte.knste.net.dns
 
 import tf.lotte.knste.net.AddressFamily
+import tf.lotte.knste.net.ConnectionInfo
 import tf.lotte.knste.net.IPProtocol
-import tf.lotte.knste.net.SocketAddress
 import tf.lotte.knste.net.SocketType
 import tf.lotte.knste.util.Unsafe
 
@@ -42,5 +42,5 @@ public interface AddressResolver {
         type: SocketType = SocketType.SOCK_STREAM,
         protocol: IPProtocol = IPProtocol.IPPROTO_IP,
         flags: Int = 0
-    ): List<SocketAddress>
+    ): List<ConnectionInfo>
 }

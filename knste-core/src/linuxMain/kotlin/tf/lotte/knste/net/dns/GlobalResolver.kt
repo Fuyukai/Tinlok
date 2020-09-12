@@ -10,8 +10,13 @@
 package tf.lotte.knste.net.dns
 
 import kotlinx.cinterop.*
-import platform.posix.*
+import platform.posix.addrinfo
+import platform.posix.ntohs
+import platform.posix.sockaddr_in
+import platform.posix.sockaddr_in6
 import tf.lotte.knste.net.*
+import tf.lotte.knste.net.tcp.TcpConnectionInfo
+import tf.lotte.knste.net.udp.UdpConnectionInfo
 import tf.lotte.knste.system.Syscall
 import tf.lotte.knste.util.Unsafe
 import tf.lotte.knste.util.toByteArray
@@ -19,7 +24,7 @@ import tf.lotte.knste.util.toByteArray
 @ExperimentalUnsignedTypes
 public actual object GlobalResolver : AddressResolver {
     @Unsafe
-    private fun unrollAddrInfo(first: addrinfo): List<SocketAddress> = try {
+    private fun unrollAddrInfo(first: addrinfo): List<ConnectionInfo> = try {
         // unroll addrinfos into a list so we can do safe continues
         val cAddresses = run {
             var lastInfo = first
@@ -33,7 +38,7 @@ public actual object GlobalResolver : AddressResolver {
         }
 
         // now we create our own SocketAddress instances
-        val addresses = ArrayList<SocketAddress>(cAddresses.size)
+        val addresses = ArrayList<ConnectionInfo>(cAddresses.size)
         for (info in cAddresses) {
             // lookup the values in our enum
             val family = AddressFamily.values()
@@ -54,7 +59,6 @@ public actual object GlobalResolver : AddressResolver {
                     val ba = real.sin_addr.s_addr.toByteArray()
                     ip = IPv4Address(ba)
 
-                    // TODO: Replace this with pure-Kotlin functions, not ntohs
                     port = ntohs(real.sin_port).toInt()
                 }
                 AddressFamily.AF_INET6 -> {
@@ -71,10 +75,10 @@ public actual object GlobalResolver : AddressResolver {
 
             val finalAddr = when (type) {
                 SocketType.SOCK_STREAM -> {
-                    TcpSocketAddress(ip, port)
+                    TcpConnectionInfo(ip, port)
                 }
                 SocketType.SOCK_DGRAM -> {
-                    DatagramSocketAddress(ip, port)
+                    UdpConnectionInfo(ip, port)
                 }
                 else -> continue  // raw sockets
             }
@@ -93,7 +97,7 @@ public actual object GlobalResolver : AddressResolver {
         family: AddressFamily,
         type: SocketType, protocol: IPProtocol,
         flags: Int
-    ): List<SocketAddress> {
+    ): List<ConnectionInfo> {
         val strService = if (service == 0) null else service.toString()
         return memScoped {
             val firstAddr = Syscall.getaddrinfo(

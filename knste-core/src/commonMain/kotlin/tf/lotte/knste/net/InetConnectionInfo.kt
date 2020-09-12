@@ -10,18 +10,21 @@
 package tf.lotte.knste.net
 
 /**
- * Abstract base class for all socket addresses that operate over the Internet Protocol (IP).
+ * Abstract base class for all connection info classes that operate over the Internet Protocol (IP).
  */
-public abstract class InetSocketAddress(
+public abstract class InetConnectionInfo(
     /** The IP address of this socket address. */
-    public val ip: IPAddress
-) : SocketAddress() {
+    public val ip: IPAddress,
+    /** The port of this info, or 0 if this doesn't have a port. */
+    public val port: Int
+) : ConnectionInfo() {
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || this::class != other::class) return false
         if (!super.equals(other)) return false
 
-        other as InetSocketAddress
+        other as InetConnectionInfo
 
         if (ip != other.ip) return false
 
