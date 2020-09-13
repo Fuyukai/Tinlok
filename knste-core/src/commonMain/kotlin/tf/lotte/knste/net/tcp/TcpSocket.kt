@@ -9,10 +9,9 @@
 
 package tf.lotte.knste.net.tcp
 
-import tf.lotte.knste.io.HalfCloseableStream
 import tf.lotte.knste.net.socket.Socket
 
 /**
- * Interface defining a TCP synchronous socket.
+ * Base interface for TCP sockets. Allows setting TCP-specific socket options.
  */
-public interface TcpSynchronousSocket : HalfCloseableStream, Socket
+public interface TcpSocket : Socket
