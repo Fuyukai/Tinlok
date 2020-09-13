@@ -7,7 +7,10 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
-package tf.lotte.knste.net
+package tf.lotte.knste.net.socket
+
+import tf.lotte.knste.net.ConnectionInfo
+import tf.lotte.knste.net.IPProtocol
 
 /**
  * Base abstract class for all socket addresses.

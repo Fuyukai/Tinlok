@@ -11,10 +11,10 @@ package tf.lotte.knste.net.tcp
 
 import tf.lotte.knste.net.AddressFamily
 import tf.lotte.knste.net.IPProtocol
-import tf.lotte.knste.net.SocketAddress
 import tf.lotte.knste.net.SocketType
 import tf.lotte.knste.net.dns.AddressResolver
 import tf.lotte.knste.net.dns.GlobalResolver
+import tf.lotte.knste.net.socket.SocketAddress
 import tf.lotte.knste.util.Unsafe
 
 /**

@@ -10,7 +10,7 @@
 package tf.lotte.knste.net.udp
 
 import tf.lotte.knste.net.IPProtocol
-import tf.lotte.knste.net.SocketAddress
+import tf.lotte.knste.net.socket.SocketAddress
 
 /**
  * A socket address for UDP sockets.
