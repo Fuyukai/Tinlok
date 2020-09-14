@@ -19,6 +19,7 @@ import tf.lotte.knste.exc.FileNotFoundException
 import tf.lotte.knste.exc.IOException
 import tf.lotte.knste.exc.OSException
 import tf.lotte.knste.net.*
+import tf.lotte.knste.net.socket.LinuxSocketOption
 import tf.lotte.knste.util.Unsafe
 import tf.lotte.knste.util.toInt
 import kotlin.experimental.ExperimentalTypeInference
@@ -78,7 +79,7 @@ public object Syscall {
      */
     @Unsafe
     public fun strerror(): String {
-        return strerror(errno)?.toKString() ?: "Unknown error"
+        return strerror(posix_errno())?.toKString() ?: "Unknown error"
     }
 
     // == File opening/closing == //
@@ -578,6 +579,39 @@ public object Syscall {
         // our retry logic is already implemented in write
         // and write() on a socket works fine.
         return write(sock, buffer, size)
+    }
+
+    // These are both really gross!
+    // Consider making a better API, future me!
+    /**
+     * Sets the socket [option] to the [value] provided.
+     */
+    @Unsafe
+    public fun <T> setsockopt(sock: FD, option: LinuxSocketOption<T>, value: T): Unit = memScoped {
+        val native = option.toNativeStructure(this, value) as CValues<*>
+        val size = option.nativeSize()
+        val err = setsockopt(sock, option.level, option.linuxOptionName, native, size.toUInt())
+        if (err.isError) {
+            throw OSException(errno = errno, message = strerror())
+        }
+    }
+
+    /**
+     * Gets a socket option.
+     */
+    @Unsafe
+    public fun <T> getsockopt(sock: FD, option: LinuxSocketOption<T>): T = memScoped {
+        val storage = option.allocateNativeStructure(this)
+        val size = cValuesOf(option.nativeSize().toUInt())
+        val res = platform.posix.getsockopt(
+            sock, option.level, option.linuxOptionName,
+            storage, size
+        )
+        if (res.isError) {
+            throw OSException(errno = errno, message = strerror())
+        }
+
+        option.fromNativeStructure(this, storage)
     }
 
     // == Misc == //

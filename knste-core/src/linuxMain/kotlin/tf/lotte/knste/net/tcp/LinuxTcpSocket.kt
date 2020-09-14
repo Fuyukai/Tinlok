@@ -56,12 +56,14 @@ internal class LinuxTcpSocket : TcpClientSocket {
         Syscall.close(fd)
     }
 
+    @OptIn(Unsafe::class)
     override fun <T> getSocketOption(option: StandardSocketOption<T>): T {
-        TODO("not implemented")
+        return Syscall.getsockopt(fd, option)
     }
 
+    @OptIn(Unsafe::class)
     override fun <T> setSocketOption(option: StandardSocketOption<T>, value: T) {
-        TODO("not implemented")
+        Syscall.setsockopt(fd, option, value)
     }
 
     override fun sendEof() {
