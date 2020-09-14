@@ -7,7 +7,7 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
-@file:Suppress("MemberVisibilityCanBePrivate")
+@file:Suppress("MemberVisibilityCanBePrivate", "unused")
 
 package tf.lotte.knste.system
 
@@ -392,6 +392,23 @@ public object Syscall {
     }
 
     /**
+     * Gets the current working directory.
+     */
+    @Suppress("FoldInitializerAndIfToElvis")
+    @Unsafe
+    public fun getcwd(): ByteArray = memScoped {
+        val buf = allocArray<ByteVar>(PATH_MAX)
+        val res = getcwd(buf, PATH_MAX)
+        if (res == null) {
+            throw when (errno) {
+                EACCES -> TODO("EACESS")
+                else -> OSException(errno, message = strerror())
+            }
+        }
+        res.readZeroTerminated(PATH_MAX)
+    }
+
+    /**
      * Fully resolves a path into an absolute path.
      */
     @Suppress("FoldInitializerAndIfToElvis")
@@ -636,7 +653,7 @@ public object Syscall {
      */
     @Unsafe
     public fun <T> setsockopt(sock: FD, option: LinuxSocketOption<T>, value: T): Unit = memScoped {
-        val native = option.toNativeStructure(this, value) as CValues<*>
+        val native = option.toNativeStructure(this, value)
         val size = option.nativeSize()
         val err = setsockopt(sock, option.level, option.linuxOptionName, native, size.toUInt())
         if (err.isError) {
@@ -651,7 +668,7 @@ public object Syscall {
     public fun <T> getsockopt(sock: FD, option: LinuxSocketOption<T>): T = memScoped {
         val storage = option.allocateNativeStructure(this)
         val size = cValuesOf(option.nativeSize().toUInt())
-        val res = platform.posix.getsockopt(
+        val res = getsockopt(
             sock, option.level, option.linuxOptionName,
             storage, size
         )

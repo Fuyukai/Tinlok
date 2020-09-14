@@ -9,9 +9,10 @@
 
 package tf.lotte.knste.fs.path
 
-import kotlinx.cinterop.*
+import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.memScoped
+import kotlinx.cinterop.usePinned
 import platform.posix.PATH_MAX
-import platform.posix.getcwd
 import platform.posix.getenv
 import platform.posix.mkdtemp
 import tf.lotte.knste.ByteString
@@ -24,21 +25,13 @@ import tf.lotte.knste.util.Unsafe
 internal actual object PlatformPaths {
     public actual val pathSeparator: ByteString = b("/")
 
-    // TODO: Syscall wrapper
     @OptIn(Unsafe::class)
     public actual fun cwd(): Path {
-        val path = memScoped {
-            val buf = allocArray<ByteVar>(PATH_MAX)
-            val res = getcwd(buf, PATH_MAX) ?: TODO("Throw errno")
-            val ba = res.readZeroTerminated(PATH_MAX)
-            ByteString.fromByteArray(ba)
-        }
-
+        val path = ByteString.fromByteArray(Syscall.getcwd())
         val pure = PosixPurePath.fromByteString(path)
         return LinuxPath(pure)
     }
 
-    // TODO: Syscall wrapper
     @OptIn(Unsafe::class)
     public actual fun home(): Path {
         val path = memScoped {
