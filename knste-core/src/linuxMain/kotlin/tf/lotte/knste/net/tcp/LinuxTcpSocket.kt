@@ -22,7 +22,7 @@ import tf.lotte.knste.util.Unsafe
  */
 internal class LinuxTcpSocket : TcpClientSocket {
     // set to true when connected, never unset
-    private var initialIsConnected: Boolean = false
+    private var initialIsCreated: Boolean = false
     private var fd: FD = -1
 
     override lateinit var remoteAddress: TcpConnectionInfo
@@ -30,7 +30,7 @@ internal class LinuxTcpSocket : TcpClientSocket {
 
     @OptIn(Unsafe::class)
     override fun connect(address: TcpSocketAddress) {
-        if (initialIsConnected) TODO("Appropriate error")
+        if (initialIsCreated) error("This socket has already been opened!")
 
         // naiive algorithm
         // TODO: Maybe throw a nicer error?
@@ -41,7 +41,7 @@ internal class LinuxTcpSocket : TcpClientSocket {
 
             // success
             if (connected) {
-                initialIsConnected = true
+                initialIsCreated = true
                 fd = socket
                 remoteAddress = info
                 return
@@ -55,7 +55,7 @@ internal class LinuxTcpSocket : TcpClientSocket {
 
     @OptIn(Unsafe::class)
     override fun close() {
-        if (!initialIsConnected) return
+        if (!initialIsCreated) return
         Syscall.close(fd)
     }
 
@@ -75,7 +75,7 @@ internal class LinuxTcpSocket : TcpClientSocket {
 
     @OptIn(Unsafe::class)
     override fun readUpTo(bytes: Long): ByteString? {
-        if (!initialIsConnected) throw ClosedException("This socket is not connected yet")
+        if (!initialIsCreated) throw ClosedException("This socket is not opened yet")
 
         val buffer = ByteArray(bytes.toInt())
         val size = Syscall.recv(fd, buffer)
@@ -93,7 +93,7 @@ internal class LinuxTcpSocket : TcpClientSocket {
 
     @OptIn(Unsafe::class)
     override fun writeAll(bs: ByteString) {
-        if (!initialIsConnected) throw ClosedException("This socket is not connected yet")
+        if (!initialIsCreated) throw ClosedException("This socket is not opened yet")
         val unwrapped = bs.unwrap()
         Syscall.send(fd, unwrapped)
     }
