@@ -21,11 +21,6 @@ public expect enum class SocketType {
     SOCK_DGRAM,
     /** Raw sockets (SCARY) */
     SOCK_RAW,
-    /** Reliable datagrams, unimplemented (?) */
-    SOCK_RDM,
-    /** Sequential datagrams, unimplemented (?) */
-    SOCK_SEQPACKET,
-
     ;
 
     /** The number of this socket kind. */

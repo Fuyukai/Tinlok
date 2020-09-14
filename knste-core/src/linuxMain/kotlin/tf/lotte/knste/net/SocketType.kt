@@ -16,8 +16,5 @@ public actual enum class SocketType(public actual val number: Int) {
     SOCK_STREAM(platform.posix.SOCK_STREAM),
     SOCK_DGRAM(platform.posix.SOCK_DGRAM),
     SOCK_RAW(platform.posix.SOCK_RAW),
-    SOCK_RDM(platform.posix.SOCK_RDM),
-    SOCK_SEQPACKET(platform.posix.SOCK_SEQPACKET),
-
     ;
 }
