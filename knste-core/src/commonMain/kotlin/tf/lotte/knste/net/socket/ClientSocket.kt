@@ -21,9 +21,4 @@ public interface ClientSocket<I : ConnectionInfo, ADDR : SocketAddress<I>>
     : HalfCloseableStream, Socket<I, ADDR> {
     /** The remote address this socket is connected to. */
     public val remoteAddress: I
-
-    /**
-     * Connects this socket to the remote [address].
-     */
-    public fun connect(address: ADDR)
 }

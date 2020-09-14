@@ -28,8 +28,8 @@ public interface TcpClientSocket : TcpSocket, ClientSocket<TcpConnectionInfo, Tc
          * This method is unsafe as it can leak file descriptors.
          */
         @Unsafe
-        public fun unsafeOpen(): TcpClientSocket {
-            return PlatformSockets.newTcpSynchronousSocket()
+        public fun unsafeOpen(address: TcpSocketAddress): TcpClientSocket {
+            return PlatformSockets.newTcpSynchronousSocket(address)
         }
     }
 }

@@ -26,14 +26,6 @@ private typealias SCS<I, T> = ClientSocket<I, T>
 
 // == TCP socket safe extension functions == //
 /**
- * Opens a new unconnected TCP socket, passing the created socket to the specified lambda.
- */
-@OptIn(Unsafe::class)
-public inline fun <R> TcpClientSocket.Companion.open(block: (TcpClientSocket) -> R): R {
-    return unsafeOpen().use(block)
-}
-
-/**
  * Opens a new unbinded TCP server socket, passing the created socket to the specified lambda.
  */
 @OptIn(Unsafe::class)
@@ -51,9 +43,8 @@ public inline fun <R> TcpServerSocket.Companion.open(block: (TcpServerSocket) ->
 public inline fun <R> TcpClientSocket.Companion.connect(
     address: TcpSocketAddress, block: (TcpClientSocket) -> R
 ): R {
-    val sock = unsafeOpen()
+    val sock = unsafeOpen(address)
     // TODO: TCP_NODELAY and TCP_NOTSENT_LOWAT if needed
-    sock.connect(address)
 
     return sock.use(block)
 }

@@ -11,6 +11,7 @@ package tf.lotte.knste.net.socket
 
 import tf.lotte.knste.net.tcp.TcpClientSocket
 import tf.lotte.knste.net.tcp.TcpServerSocket
+import tf.lotte.knste.net.tcp.TcpSocketAddress
 import tf.lotte.knste.util.Unsafe
 
 /**
@@ -22,7 +23,7 @@ public expect object PlatformSockets {
      * Creates a new unconnected [TcpClientSocket].
      */
     @Unsafe
-    public fun newTcpSynchronousSocket(): TcpClientSocket
+    public fun newTcpSynchronousSocket(address: TcpSocketAddress): TcpClientSocket
 
     /**
      * Creates a new unbinded [TcpServerSocket].
