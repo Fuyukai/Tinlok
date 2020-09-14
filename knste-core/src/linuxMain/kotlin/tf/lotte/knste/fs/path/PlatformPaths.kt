@@ -10,9 +10,13 @@
 package tf.lotte.knste.fs.path
 
 import kotlinx.cinterop.*
-import platform.posix.*
+import platform.posix.PATH_MAX
+import platform.posix.getcwd
+import platform.posix.getenv
+import platform.posix.mkdtemp
 import tf.lotte.knste.ByteString
 import tf.lotte.knste.b
+import tf.lotte.knste.system.Syscall
 import tf.lotte.knste.system.readZeroTerminated
 import tf.lotte.knste.util.Unsafe
 
@@ -42,22 +46,11 @@ internal actual object PlatformPaths {
             if (env != null) {
                 ByteString.fromByteArray(env.readZeroTerminated())
             } else {
-                // complicated...
-                val uid = getuid()
-                val passwd = alloc<passwd>()
-                val starResult = allocPointerTo<passwd>()
-
-                var bufSize = sysconf(_SC_GETPW_R_SIZE_MAX)
-                if (bufSize == -1L) bufSize = 16384
-                val buffer = allocArray<ByteVar>(bufSize)
-
-                val res = getpwuid_r(uid, passwd.ptr, buffer, bufSize.toULong(), starResult.ptr)
-                if (starResult.value == null) {
-                    TODO("getpwduid_r errored")
-                }
-
-                val home = passwd.pw_dir!!.readZeroTerminated(PATH_MAX)
-                ByteString.fromByteArray(home)
+                val uid = Syscall.getuid()
+                val passwd = Syscall.getpwuid_r(this, uid) ?: error("User has no passwd entry")
+                val name = passwd.pw_dir?.readZeroTerminated(PATH_MAX)
+                    ?: error("User has no home directory")
+                ByteString.fromByteArray(name)
             }
         }
 

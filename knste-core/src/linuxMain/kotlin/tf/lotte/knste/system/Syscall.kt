@@ -666,6 +666,14 @@ public object Syscall {
     // region Misc
 
     /**
+     * Gets the current user ID.
+     */
+    @Unsafe
+    public fun getuid(): UInt {
+        return platform.posix.getuid()
+    }
+
+    /**
      * Gets a [passwd] entry for the specified uid.
      */
     @Unsafe
