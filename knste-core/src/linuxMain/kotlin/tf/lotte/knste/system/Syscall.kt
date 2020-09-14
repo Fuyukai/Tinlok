@@ -559,6 +559,43 @@ public object Syscall {
         return true
     }
 
+    /**
+     * Binds a socket to an address.
+     */
+    @Unsafe
+    public fun bind(sock: FD, address: InetConnectionInfo) {
+        val res = memScoped {
+            val struct: sockaddr
+            val size: UInt
+
+            when (address.family) {
+                AddressFamily.AF_INET6 -> {
+                    struct = __ipv6_to_sockaddr(this, address.ip as IPv6Address, address.port)
+                    size = sizeOf<sockaddr_in6>().toUInt()
+                }
+                AddressFamily.AF_INET -> {
+                    struct = __ipv4_to_sockaddr(this, address.ip as IPv4Address, address.port)
+                    size = sizeOf<sockaddr_in>().toUInt()
+                }
+                else -> TODO()
+            }
+
+            bind(sock, struct.ptr, size)
+        }
+
+        if (res.isError) {
+            throw OSException(errno = errno, message = strerror())
+        }
+    }
+
+    /**
+     * Marks a socket as "passive" (a listening socket) with the specified backlog of queued
+     * requests.
+     */
+    @Unsafe
+    public fun listen(sock: FD, backlog: Int) {
+        platform.posix.listen(sock, backlog)
+    }
 
     /**
      * Receives bytes from a socket into the specified buffer.
