@@ -15,40 +15,38 @@ import tf.lotte.knste.util.Unsafe
 /**
  * Helper factory object for creating new [Path] and [PurePath] objects.
  */
-@PublishedApi
-internal expect object PlatformPaths {
+public expect object PlatformPaths {
     /** The path separator that separates individual path components. */
-    val pathSeparator: ByteString
+    public val pathSeparator: ByteString
 
     /**
      * Creates a new [PurePath] for the current working directory.
      */
-    fun cwd(): Path
+    public fun cwd(): Path
 
     /**
      * Creates a new [PurePath] for the current user's home directory.
      */
-    fun home(): Path
+    public fun home(): Path
 
     /**
      * Creates a new platform [Path] from the given [ByteString].
      */
-    fun path(of: ByteString): Path
+    public fun path(of: ByteString): Path
 
     /**
      * Creates a new platform Path from the given [PurePath].
      */
-    fun path(of: PurePath): Path
+    public fun path(of: PurePath): Path
 
     /**
      * Creates a new platform [PurePath] from the given [ByteString].
      */
-    fun purePath(of: ByteString): PurePath
+    public fun purePath(of: ByteString): PurePath
 
     /**
      * Creates a new temporary directory and returns its path.
      */
     @Unsafe
-    @PublishedApi
-    internal fun makeTempDirectory(prefix: String = "kotlin----"): Path
+    public fun makeTempDirectory(prefix: String = "kotlin----"): Path
 }

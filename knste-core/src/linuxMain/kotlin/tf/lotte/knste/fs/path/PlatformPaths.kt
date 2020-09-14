@@ -21,8 +21,11 @@ import tf.lotte.knste.system.Syscall
 import tf.lotte.knste.system.readZeroTerminated
 import tf.lotte.knste.util.Unsafe
 
-@PublishedApi
-internal actual object PlatformPaths {
+/**
+ * Linux implementation of the platform pathing.
+ */
+public actual object PlatformPaths {
+    @Suppress("unused")
     public actual val pathSeparator: ByteString = b("/")
 
     @OptIn(Unsafe::class)
