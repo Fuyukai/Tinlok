@@ -17,6 +17,27 @@ import tf.lotte.knste.net.*
 public class TcpConnectionInfo(
     ip: IPAddress, port: Int,
 ) : InetConnectionInfo(ip, port) {
+    public companion object {
+        /**
+         * Creates a new [TcpConnectionInfo] representing the wildcard address, for binding a
+         * socket to.
+         */
+        public fun wildcard(port: Int): TcpConnectionInfo {
+            // this is the IPv6 wildcard
+            // if you want to use the IPv4 wildcard on a non-dualstack system (what year is it!)
+            // you have to make it yourself.
+            return TcpConnectionInfo(IPv6Address.of("::"), port)
+        }
+
+        /**
+         * Creates a new [TcpConnectionInfo] representing the localhost address, for binding a
+         * socket to.
+         */
+        public fun localhost(port: Int): TcpConnectionInfo {
+            return TcpConnectionInfo(IPv6Address.of("::1"), port)
+        }
+    }
+
     override val family: AddressFamily get() {
         return when (ip) {
             is IPv4Address -> AddressFamily.AF_INET
