@@ -57,5 +57,8 @@ public class TcpSocketAddress private constructor(
         return true
     }
 
+    override fun toString(): String {
+        return "TcpSocketAddress${connections}"
+    }
 
 }

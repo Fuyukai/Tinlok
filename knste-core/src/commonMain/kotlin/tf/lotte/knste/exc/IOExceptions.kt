@@ -30,3 +30,9 @@ public open class FileNotFoundException(
     public val path: String, cause: Throwable? = null
 ) : IOException(path, cause)
 
+/**
+ * Base super class for all socket exceptions.
+ */
+public open class SocketException(
+    message: String? = null, cause: Throwable? = null
+) : IOException(message, cause)

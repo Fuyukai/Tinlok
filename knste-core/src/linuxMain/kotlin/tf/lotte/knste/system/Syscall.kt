@@ -501,7 +501,7 @@ public object Syscall {
             sin6_port = port.toUShort()
         }
 
-        connect(sock, struct.ptr.reinterpret(), sizeOf<sockaddr_in6>().toUInt())
+        retry { connect(sock, struct.ptr.reinterpret(), sizeOf<sockaddr_in6>().toUInt()) }
     }
 
     /**
@@ -516,14 +516,17 @@ public object Syscall {
             sin_port = port.toUShort()
         }
 
-        connect(sock, struct.ptr.reinterpret(), sizeOf<sockaddr_in>().toUInt())
+        retry { connect(sock, struct.ptr.reinterpret(), sizeOf<sockaddr_in>().toUInt()) }
     }
 
     /**
      * Connects a socket to an address.
+     *
+     * This will only throw when the error is misuse related. It will return false if the
+     * connection could not be established for a network reason.
      */
     @Unsafe
-    public fun connect(sock: FD, info: InetConnectionInfo) {
+    public fun connect(sock: FD, info: InetConnectionInfo): Boolean {
         val res = when (info.family) {
             AddressFamily.AF_INET6 -> {
                 __connect_ipv6(sock, info.ip as IPv6Address, info.port)
@@ -533,12 +536,48 @@ public object Syscall {
             }
             else -> TODO()
         }
+
+        // TODO: Separate EINPROGRESS out into a sealed return type?
         if (res.isError) {
-            throw when (errno) {
-                EINPROGRESS -> TODO("EINPROGRESS")
-                else -> OSException(errno, message = strerror())
+            when (errno) {
+                ECONNREFUSED, ENETUNREACH, ETIMEDOUT -> return false
+                else -> throw OSException(errno, message = strerror())
             }
         }
+
+        return true
+    }
+
+    /**
+     * Receives bytes from a socket into the specified buffer.
+     */
+    @Unsafe
+    public fun recv(sock: FD, buffer: ByteArray, size: Int = buffer.size, flags: Int = 0): Int {
+        assert(size <= IO_MAX) { "Count is too high!" }
+        assert(buffer.size >= size) { "Buffer is too small!" }
+
+        val read = buffer.usePinned {
+            retry { recv(sock, it.addressOf(0), size.toULong(), flags) }
+        }
+
+        if (read.isError) {
+            throw OSException(errno = errno, message = strerror())
+        }
+
+        return read.toInt()
+    }
+
+    /**
+     * Writes bytes to a socket from the specified buffer.
+     */
+    @Unsafe
+    public fun send(sock: FD, buffer: ByteArray, size: Int = buffer.size): Long {
+        assert(size <= IO_MAX) { "Count is too high!" }
+        assert(buffer.size >= size) { "Buffer is too small!" }
+
+        // our retry logic is already implemented in write
+        // and write() on a socket works fine.
+        return write(sock, buffer, size)
     }
 
     // == Misc == //

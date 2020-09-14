@@ -26,4 +26,8 @@ public class TcpConnectionInfo(
 
     override val protocol: IPProtocol get() = IPProtocol.IPPROTO_TCP
     override val type: SocketType get() = SocketType.SOCK_STREAM
+
+    override fun toString(): String {
+        return "TcpConnectionInfo($ip, $port)"
+    }
 }
