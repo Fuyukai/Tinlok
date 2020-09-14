@@ -23,7 +23,6 @@ import tf.lotte.knste.util.Unsafe
 internal class LinuxTcpSocket : TcpClientSocket {
     // set to true when connected, never unset
     private var initialIsConnected: Boolean = false
-
     private var fd: FD = -1
 
     @OptIn(Unsafe::class)
@@ -33,14 +32,14 @@ internal class LinuxTcpSocket : TcpClientSocket {
         // naiive algorithm
         // TODO: Maybe throw a nicer error?
         val iterator = address.iterator()
-        for (info in address) {
+        for (info in iterator) {
             val socket = Syscall.socket(info.family, info.type, info.protocol)
             val connected = Syscall.connect(socket, info)
 
             // success
             if (connected) {
                 initialIsConnected = true
-                // TODO: An actual connected property
+                fd = socket
                 return
             }
 

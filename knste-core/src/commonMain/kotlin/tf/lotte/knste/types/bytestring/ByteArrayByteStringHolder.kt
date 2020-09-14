@@ -19,7 +19,7 @@ public class ByteArrayByteStringHolder(private val ba: ByteArray) : ByteStringHo
     override fun contains(other: Byte): Boolean = ba.contains(other)
 
     override fun decode(): String {
-        return ba.decodeToString()
+        return ba.decodeToString(throwOnInvalidSequence = true)
     }
 
     override fun iterator(): Iterator<Byte> {

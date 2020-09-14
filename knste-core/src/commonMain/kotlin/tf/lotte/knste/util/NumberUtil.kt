@@ -80,14 +80,27 @@ public inline fun UInt.toByteArray(): ByteArray {
 }
 
 
+// wtf past me
+// this was this[0], this[1], this[0], this[0]
 /**
  * Decodes a size-4 byte array to an int in big endian mode.
  */
 public inline fun ByteArray.toInt(): Int {
     return (((this[0].toInt()) shl 24)
         or ((this[1].toInt()) shl 16)
-        or ((this[0].toInt()) shl 8)
-        or (this[0].toInt())
+        or ((this[2].toInt()) shl 8)
+        or (this[3].toInt())
+        )
+}
+
+/**
+ * Decodes a size-4 unsigned byte array to a uint in big endian mode.
+ */
+public inline fun UByteArray.toUInt(): UInt {
+    return (((this[0].toUInt()) shl 24)
+        or ((this[1].toUInt()) shl 16)
+        or ((this[2].toUInt()) shl 8)
+        or (this[3].toUInt())
         )
 }
 

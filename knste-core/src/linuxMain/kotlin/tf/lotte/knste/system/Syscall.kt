@@ -21,7 +21,7 @@ import tf.lotte.knste.exc.OSException
 import tf.lotte.knste.net.*
 import tf.lotte.knste.net.socket.LinuxSocketOption
 import tf.lotte.knste.util.Unsafe
-import tf.lotte.knste.util.toInt
+import tf.lotte.knste.util.toUInt
 import kotlin.experimental.ExperimentalTypeInference
 
 internal typealias FD = Int
@@ -499,7 +499,7 @@ public object Syscall {
             sin6_family = AF_INET6.toUShort()  // ?
             // have to manually write to the array contained within
             sin6_addr.arrayMemberAt<ByteVar>(0L).unsafeClobber(ipRepresentation)
-            sin6_port = port.toUShort()
+            sin6_port = htons(port.toUShort())
         }
 
         retry { connect(sock, struct.ptr.reinterpret(), sizeOf<sockaddr_in6>().toUInt()) }
@@ -510,11 +510,11 @@ public object Syscall {
      */
     @Unsafe
     public fun __connect_ipv4(sock: FD, ip: IPv4Address, port: Int): Int = memScoped {
-        val ipRepresentation = ip.rawRepresentation
+        val ipRepresentation = ip.rawRepresentation.toUByteArray()
         val struct = alloc<sockaddr_in> {
             sin_family = AF_INET.toUShort()
-            sin_addr.s_addr = ipRepresentation.toInt().toUInt()
-            sin_port = port.toUShort()
+            sin_addr.s_addr = ipRepresentation.toUInt()
+            sin_port = htons(port.toUShort())
         }
 
         retry { connect(sock, struct.ptr.reinterpret(), sizeOf<sockaddr_in>().toUInt()) }
@@ -540,6 +540,7 @@ public object Syscall {
 
         // TODO: Separate EINPROGRESS out into a sealed return type?
         if (res.isError) {
+            println("error: ${strerror()}")
             when (errno) {
                 ECONNREFUSED, ENETUNREACH, ETIMEDOUT -> return false
                 else -> throw OSException(errno, message = strerror())

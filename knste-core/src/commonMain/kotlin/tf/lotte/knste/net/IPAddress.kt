@@ -85,7 +85,7 @@ internal constructor(internal val rawRepresentation: ByteArray) : IPAddress() {
     }
 
     override fun toString(): String {
-        return rawRepresentation.joinToString(".") { it.toString() }
+        return rawRepresentation.joinToString(".") { it.toUByte().toString() }
     }
 }
 
