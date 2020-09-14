@@ -20,8 +20,9 @@ import tf.lotte.knste.net.tcp.TcpServerSocket
 import tf.lotte.knste.net.tcp.TcpSocketAddress
 import tf.lotte.knste.util.Unsafe
 
-private typealias ADD = SocketAddress<*>
-private typealias SCS<T> = ClientSocket<T>
+private typealias CI = ConnectionInfo
+private typealias ADD<I> = SocketAddress<I>
+private typealias SCS<I, T> = ClientSocket<I, T>
 
 // == TCP socket safe extension functions == //
 /**
@@ -82,7 +83,7 @@ public inline fun <R> TcpServerSocket.Companion.bind(
  * the specified lambda [block]. The connection will be automatically closed when the bloc
  */
 @OptIn(Unsafe::class)
-public inline fun <R, ADDR : ADD, T : SCS<ADD>> ServerSocket<*, T>.accept(
+public inline fun <R, I: CI, ADDR : ADD<I>, T : SCS<I, ADDR>> ServerSocket<*, *, T>.accept(
     block: (T) -> R
 ): R {
     return unsafeAccept().use(block)

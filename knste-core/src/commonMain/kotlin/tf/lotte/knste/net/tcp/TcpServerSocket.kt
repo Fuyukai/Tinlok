@@ -17,7 +17,8 @@ import tf.lotte.knste.util.Unsafe
  * Interface defining a TCP synchronous server socket that produces [TcpClientSocket]
  * instances on ``accept()``.
  */
-public interface TcpServerSocket : ServerSocket<TcpSocketAddress, TcpClientSocket> {
+public interface TcpServerSocket :
+    ServerSocket<TcpConnectionInfo, TcpSocketAddress, TcpClientSocket> {
     public companion object {
         /**
          * Opens a new [TcpServerSocket] from a platform socket.
