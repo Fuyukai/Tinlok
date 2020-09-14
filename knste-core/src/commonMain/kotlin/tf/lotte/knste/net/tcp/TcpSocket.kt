@@ -14,4 +14,4 @@ import tf.lotte.knste.net.socket.Socket
 /**
  * Base interface for TCP sockets. Allows setting TCP-specific socket options.
  */
-public interface TcpSocket : Socket
+public interface TcpSocket : Socket<TcpConnectionInfo, TcpSocketAddress>

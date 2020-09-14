@@ -25,6 +25,9 @@ internal class LinuxTcpSocket : TcpClientSocket {
     private var initialIsConnected: Boolean = false
     private var fd: FD = -1
 
+    override lateinit var remoteAddress: TcpConnectionInfo
+        private set
+
     @OptIn(Unsafe::class)
     override fun connect(address: TcpSocketAddress) {
         if (initialIsConnected) TODO("Appropriate error")
@@ -40,6 +43,7 @@ internal class LinuxTcpSocket : TcpClientSocket {
             if (connected) {
                 initialIsConnected = true
                 fd = socket
+                remoteAddress = info
                 return
             }
 

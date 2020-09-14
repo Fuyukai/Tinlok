@@ -23,7 +23,8 @@ import kotlin.test.assertTrue
 class `Test TcpSocket` {
     @Test
     fun `Test basic socket read`() {
-        val address = TcpSocketAddress.resolve("time-a.nist.gov", 13)
+        // d-g selected because it is dual stack
+        val address = TcpSocketAddress.resolve("time-d-g.nist.gov", 13)
         val data = TcpClientSocket.connect(address) {
             it.readUpTo(4096)
         }

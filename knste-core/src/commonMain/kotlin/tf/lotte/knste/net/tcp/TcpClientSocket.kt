@@ -20,7 +20,7 @@ import tf.lotte.knste.util.Unsafe
  *
  * This is simply a [HalfCloseableStream] combined with a [Socket].
  */
-public interface TcpClientSocket : ClientSocket<TcpSocketAddress> {
+public interface TcpClientSocket : TcpSocket, ClientSocket<TcpConnectionInfo, TcpSocketAddress> {
     public companion object {
         /**
          * Creates a new [TcpClientSocket] from a platform socket.

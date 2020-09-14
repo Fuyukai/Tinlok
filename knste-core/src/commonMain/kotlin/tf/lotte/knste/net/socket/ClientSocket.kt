@@ -10,13 +10,18 @@
 package tf.lotte.knste.net.socket
 
 import tf.lotte.knste.io.HalfCloseableStream
+import tf.lotte.knste.net.ConnectionInfo
 
 /**
  * A client socket that performs I/O synchronously.
  *
  * @param ADDR: The type of address this client socket uses.
  */
-public interface ClientSocket<ADDR : SocketAddress<*>> : HalfCloseableStream, Socket {
+public interface ClientSocket<I : ConnectionInfo, ADDR : SocketAddress<I>>
+    : HalfCloseableStream, Socket<I, ADDR> {
+    /** The remote address this socket is connected to. */
+    public val remoteAddress: I
+
     /**
      * Connects this socket to the remote [address].
      */

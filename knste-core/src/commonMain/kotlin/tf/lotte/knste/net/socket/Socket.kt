@@ -10,11 +10,12 @@
 package tf.lotte.knste.net.socket
 
 import tf.lotte.knste.io.Closeable
+import tf.lotte.knste.net.ConnectionInfo
 
 /**
  * Base interface for all socket classes.
  */
-public interface Socket : Closeable {
+public interface Socket<I : ConnectionInfo, ADDR : SocketAddress<I>> : Closeable {
     /**
      * Sets the standard socket [option] on this socket.
      *

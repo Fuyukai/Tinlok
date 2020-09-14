@@ -9,14 +9,18 @@
 
 package tf.lotte.knste.net.socket
 
+import tf.lotte.knste.net.ConnectionInfo
 import tf.lotte.knste.util.Unsafe
 
 /**
  * A server socket that synchronously produces new [ClientSocket] instances when
  * accepting.
  */
-public interface ServerSocket<ADDR: SocketAddress<*>, T: ClientSocket<ADDR>>
-    : Socket {
+public interface ServerSocket<
+    I : ConnectionInfo,
+    ADDR : SocketAddress<I>,
+    T : ClientSocket<I, ADDR>
+    > : Socket<I, ADDR> {
     /**
      * Binds this socket to the specified [address].
      */

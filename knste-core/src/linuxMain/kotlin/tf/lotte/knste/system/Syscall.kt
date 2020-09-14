@@ -483,41 +483,40 @@ public object Syscall {
     }
 
     /**
-     * Connects a socket over IPv6.
+     * Converts an [IPv6Address] to a [sockaddr].
      */
     @Unsafe
-    public fun __connect_ipv6(sock: FD, ip: IPv6Address, port: Int): Int = memScoped {
+    public fun __ipv6_to_sockaddr(alloc: NativePlacement, ip: IPv6Address, port: Int): sockaddr {
         val ipRepresentation = ip.rawRepresentation
         // runtime safety check!!
-        // this is the most unsafe code in the entire library as of writing
         val size = ipRepresentation.size
         require(size == 16) {
             "IPv6 address size was mismatched (expected 16, got $size), refusing to clobber memory"
         }
 
-        val struct = alloc<sockaddr_in6> {
+        val struct = alloc.alloc<sockaddr_in6> {
             sin6_family = AF_INET6.toUShort()  // ?
             // have to manually write to the array contained within
             sin6_addr.arrayMemberAt<ByteVar>(0L).unsafeClobber(ipRepresentation)
             sin6_port = htons(port.toUShort())
         }
 
-        retry { connect(sock, struct.ptr.reinterpret(), sizeOf<sockaddr_in6>().toUInt()) }
+        return struct.reinterpret()
     }
 
     /**
-     * Connects a socket over IPv4.
+     * Converts an [IPv4Address] to a [sockaddr].
      */
     @Unsafe
-    public fun __connect_ipv4(sock: FD, ip: IPv4Address, port: Int): Int = memScoped {
+    public fun __ipv4_to_sockaddr(alloc: NativePlacement, ip: IPv4Address, port: Int): sockaddr {
         val ipRepresentation = ip.rawRepresentation.toUByteArray()
-        val struct = alloc<sockaddr_in> {
+        val struct = alloc.alloc<sockaddr_in> {
             sin_family = AF_INET.toUShort()
             sin_addr.s_addr = ipRepresentation.toUInt()
             sin_port = htons(port.toUShort())
         }
 
-        retry { connect(sock, struct.ptr.reinterpret(), sizeOf<sockaddr_in>().toUInt()) }
+        return struct.reinterpret()
     }
 
     /**
@@ -528,14 +527,24 @@ public object Syscall {
      */
     @Unsafe
     public fun connect(sock: FD, info: InetConnectionInfo): Boolean {
-        val res = when (info.family) {
-            AddressFamily.AF_INET6 -> {
-                __connect_ipv6(sock, info.ip as IPv6Address, info.port)
+        val res = memScoped {
+            val struct: sockaddr
+            val size: UInt
+
+            when (info.family) {
+                AddressFamily.AF_INET6 -> {
+                    struct = __ipv6_to_sockaddr(this, info.ip as IPv6Address, info.port)
+                    size = sizeOf<sockaddr_in6>().toUInt()
+                }
+                AddressFamily.AF_INET -> {
+                    struct = __ipv4_to_sockaddr(this, info.ip as IPv4Address, info.port)
+                    size = sizeOf<sockaddr_in>().toUInt()
+                }
+                else -> TODO()
             }
-            AddressFamily.AF_INET -> {
-                __connect_ipv4(sock, info.ip as IPv4Address, info.port)
-            }
-            else -> TODO()
+
+            // TODO: Change this to an [e]poll() based solution for timeouts.
+            retry { connect(sock, struct.ptr, size) }
         }
 
         // TODO: Separate EINPROGRESS out into a sealed return type?
@@ -549,6 +558,7 @@ public object Syscall {
 
         return true
     }
+
 
     /**
      * Receives bytes from a socket into the specified buffer.
