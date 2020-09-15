@@ -31,6 +31,7 @@ internal actual fun parseIPv6(string: String): ByteArray = memScoped {
         require(success) { "Invalid IPv6 string: $string" }
     }
 
+    // todo this is slow
     // copy in addresses from shorts, this does weird things with ordering but somehow works!
     // let the name `ba3` be a lesson to future me who thinks this code could be improved.
     val ba3 = ByteArray(16)
@@ -52,6 +53,7 @@ internal actual fun IPv6toString(contents: ByteArray): String = memScoped {
     val addr = alloc<ipv6_address_full_t>()
 
     // convert to short array, overwrite addr
+    // todo this is slow
     for (idx in 0 until 8) {
         val upper = ((contents[idx * 2].toUInt()) shl 8) and 0xFF00u
         val lower = (contents[(idx * 2) + 1].toUInt()) and 0xFFu

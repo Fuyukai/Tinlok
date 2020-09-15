@@ -18,6 +18,7 @@ import tf.lotte.tinlok.net.*
 import tf.lotte.tinlok.net.tcp.TcpConnectionInfo
 import tf.lotte.tinlok.net.udp.UdpConnectionInfo
 import tf.lotte.tinlok.system.Syscall
+import tf.lotte.tinlok.system.readBytesFast
 import tf.lotte.tinlok.util.Unsafe
 import tf.lotte.tinlok.util.toByteArray
 
@@ -65,7 +66,7 @@ public actual object GlobalResolver : AddressResolver {
                     val real = sockaddr.reinterpret<sockaddr_in6>()
                     // XX: Kotlin in6_addr has no fields!
                     val addrPtr = real.sin6_addr.arrayMemberAt<ByteVar>(0L)
-                    val addr = addrPtr.readBytes(16)
+                    val addr = addrPtr.readBytesFast(16)
                     ip = IPv6Address(addr)
 
                     port = ntohs(real.sin6_port).toInt()

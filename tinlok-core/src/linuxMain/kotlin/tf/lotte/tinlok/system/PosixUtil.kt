@@ -23,7 +23,9 @@ public fun CArrayPointer<ByteVar>.readZeroTerminated(): ByteArray {
         else break
     }
 
-    return readBytes(length)
+    val buf = ByteArray(length)
+    Syscall.__fast_ptr_to_bytearray(this, buf, length)
+    return buf
 }
 
 /**
@@ -38,8 +40,22 @@ public fun CArrayPointer<ByteVar>.readZeroTerminated(maxSize: Int): ByteArray {
         else if (this[length] != 0.toByte()) length += 1
         else break
     }
-    return readBytes(length)
+    val buf = ByteArray(length)
+    Syscall.__fast_ptr_to_bytearray(this, buf, length)
+    return buf
 }
+
+/**
+ * Reads bytes from a [COpaquePointer] using __fast_ptr_to_bytearray instead of the naiive Kotlin
+ * byte-by-byte copy.
+ */
+@Unsafe
+public fun COpaquePointer.readBytesFast(count: Int): ByteArray {
+    val buf = ByteArray(count)
+    Syscall.__fast_ptr_to_bytearray(this, buf, count)
+    return buf
+}
+
 
 /**
  * Overwrites the memory pointed to with a [ByteArray].

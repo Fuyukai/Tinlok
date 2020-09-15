@@ -90,6 +90,21 @@ public object Syscall {
         return strerror(posix_errno())?.toKString() ?: "Unknown error"
     }
 
+    /**
+     * Copies [size] bytes from the pointer at [pointer] to [buf].
+     *
+     * This uses memcpy() which is faster than the naiive Kotlin method. This will buffer
+     * overflow if [pointer] is smaller than size!
+     */
+    @Unsafe
+    public fun __fast_ptr_to_bytearray(pointer: COpaquePointer, buf: ByteArray, size: Int) {
+        assert(buf.size <= size) { "Size is too big!" }
+
+        buf.usePinned {
+            memcpy(it.addressOf(0), pointer, size.toULong())
+        }
+    }
+
     // == File opening/closing == //
     // region File opening/closing
 
@@ -619,7 +634,7 @@ public object Syscall {
                 val inet6 = addr.reinterpret<sockaddr_in6>()
                 // XX: Kotlin in6_addr has no fields!
                 val addrPtr = inet6.sin6_addr.arrayMemberAt<ByteVar>(0L)
-                val ba = addrPtr.readBytes(16)
+                val ba = addrPtr.readBytesFast(16)
                 val ip = IPv6Address(ba)
                 val port = ntohs(inet6.sin6_port).toInt()
                 creator.from(ip, port)
