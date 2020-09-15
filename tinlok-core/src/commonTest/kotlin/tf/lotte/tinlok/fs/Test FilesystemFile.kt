@@ -1,9 +1,9 @@
 /*
  * Copyright (C) 2020 Charlotte Skye.
  *
- * This file is part of KNSTE.
+ * This file is part of Tinlok.
  *
- * KNSTE is dually released under the GNU Lesser General Public License,
+ * Tinlok is dually released under the GNU Lesser General Public License,
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
@@ -25,7 +25,7 @@ class `Test FilesystemFile` {
      * Tests basic WRITE mode reading and writing.
      */
     @Test
-    fun `Test basic read/write`() = Path.makeTempDirectory("knste-test-") {
+    fun `Test basic read/write`() = Path.makeTempDirectory("Tinlok-test-") {
         val path = it.join("test.txt")
         val toWrite = b("abcdefghi")
 
@@ -53,7 +53,7 @@ class `Test FilesystemFile` {
     }
 
     @Test
-    fun `Test append`() = Path.makeTempDirectory("knste-test-") {
+    fun `Test append`() = Path.makeTempDirectory("Tinlok-test-") {
         val path = it.join("test.xt")
 
         val part1 = b("When the incident took place, ")
@@ -79,7 +79,7 @@ class `Test FilesystemFile` {
     }
 
     @Test
-    fun `Test seek`() = Path.makeTempDirectory("knste-test-") {
+    fun `Test seek`() = Path.makeTempDirectory("Tinlok-test-") {
         val path = it.join("test.txt")
         val toWrite = b("Every word is getting longer, the mosquitoes are getting louder.")
 

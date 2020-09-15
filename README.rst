@@ -46,11 +46,11 @@ context.
 Where?
 ======
 
-KNSTE is not currently available anywhere. Stay tuned.
+Tinlok is not currently available anywhere. Stay tuned.
 
 Stability
 =========
 
-For all I care, use KNSTE in production. I make zero stability guarantees or remarks on being
+For all I care, use Tinlok in production. I make zero stability guarantees or remarks on being
 "production ready".
 

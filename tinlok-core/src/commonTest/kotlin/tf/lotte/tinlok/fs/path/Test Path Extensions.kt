@@ -1,9 +1,9 @@
 /*
  * Copyright (C) 2020 Charlotte Skye.
  *
- * This file is part of KNSTE.
+ * This file is part of Tinlok.
  *
- * KNSTE is dually released under the GNU Lesser General Public License,
+ * Tinlok is dually released under the GNU Lesser General Public License,
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
@@ -33,7 +33,7 @@ class `Test Path Extensions` {
      * Tests the recursive delete extension.
      */
     @Test
-    fun `Test recursive delete`() = Path.makeTempDirectory("knste-test-") {
+    fun `Test recursive delete`() = Path.makeTempDirectory("Tinlok-test-") {
         val parent = it.join("delete-parent")
         parent.createDirectory(parents = false, existOk = false)
         parent.join("first").apply {

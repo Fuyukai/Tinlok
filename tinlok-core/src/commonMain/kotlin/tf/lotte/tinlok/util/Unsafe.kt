@@ -1,9 +1,9 @@
 /*
  * Copyright (C) 2020 Charlotte Skye.
  *
- * This file is part of KNSTE.
+ * This file is part of Tinlok.
  *
- * KNSTE is dually released under the GNU Lesser General Public License,
+ * Tinlok is dually released under the GNU Lesser General Public License,
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 

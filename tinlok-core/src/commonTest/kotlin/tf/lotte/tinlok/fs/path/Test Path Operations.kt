@@ -1,9 +1,9 @@
 /*
  * Copyright (C) 2020 Charlotte Skye.
  *
- * This file is part of KNSTE.
+ * This file is part of Tinlok.
  *
- * KNSTE is dually released under the GNU Lesser General Public License,
+ * Tinlok is dually released under the GNU Lesser General Public License,
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
@@ -31,7 +31,7 @@ class `Test Path Operations` {
     }
 
     @Test
-    fun `Test mkdir`() = Path.makeTempDirectory("knste-test-") {
+    fun `Test mkdir`() = Path.makeTempDirectory("Tinlok-test-") {
         val newPath = it.join("mkdir-test")
         newPath.createDirectory(parents = false, existOk = false)
 
@@ -40,14 +40,14 @@ class `Test Path Operations` {
     }
 
     @Test
-    fun `Test owner`() = Path.makeTempDirectory("knste-test-") {
+    fun `Test owner`() = Path.makeTempDirectory("Tinlok-test-") {
         val username = Sys.getUsername()
         assertEquals(it.owner(), username)
     }
 
 
     @Test
-    fun `Test stat`() = Path.makeTempDirectory("knste-test-") {
+    fun `Test stat`() = Path.makeTempDirectory("Tinlok-test-") {
         assertTrue(it.isDirectory())
         assertFalse(it.isRegularFile())
 
@@ -75,7 +75,7 @@ class `Test Path Operations` {
 
     @Unsafe
     @Test
-    fun `Test rename`() = Path.makeTempDirectory("knste-test-") {
+    fun `Test rename`() = Path.makeTempDirectory("Tinlok-test-") {
         val first = it.join("test1.txt")
         val second = it.join("test2.txt")
 
@@ -95,7 +95,7 @@ class `Test Path Operations` {
 
     @Unsafe
     @Test
-    fun `Test copy`() = Path.makeTempDirectory("knste-test-") {
+    fun `Test copy`() = Path.makeTempDirectory("Tinlok-test-") {
         val first = it.join("test1.txt")
         val second = it.join("test2.txt")
 
