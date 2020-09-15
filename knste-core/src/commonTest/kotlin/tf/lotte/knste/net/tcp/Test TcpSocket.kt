@@ -9,12 +9,19 @@
 
 package tf.lotte.knste.net.tcp
 
+import tf.lotte.knste._workarounds.__Workaround_TcpSocketTests
 import tf.lotte.knste.net.connect
 import kotlin.test.Test
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 // Welcome to the rest of your life.
+// Kotlin/Native concurrency is *completely* broken.
+// Kotlin MPP (as far as I can tell) does not let us create a nativeTest source set.
+// So, instead,
+// In order to not fucking copy the tests every time,
+// part of these tests are specified in nativeMain (and as a result copied to the final library).
+// This lets us actually access the Worker class, and open a new TCP server socket.
 
 /**
  * Tests the TcpSocket class.
@@ -38,5 +45,10 @@ class `Test TcpSocket` {
 
         val split = decoded.split(' ')
         assertTrue(split.contains("UTC(NIST)"))
+    }
+
+    @Test
+    fun `Test socket accept`() {
+        __Workaround_TcpSocketTests.testSocketAccept()
     }
 }

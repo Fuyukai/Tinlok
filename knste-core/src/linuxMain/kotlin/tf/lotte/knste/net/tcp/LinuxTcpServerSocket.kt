@@ -17,21 +17,15 @@ import tf.lotte.knste.util.Unsafe
 /**
  * Implements Linux TCP server socket that produces new [LinuxTcpSocket] children.
  */
-internal class LinuxTcpServerSocket : LinuxTcpParent(), TcpServerSocket {
-    override var fd: FD = -1
-
+internal class LinuxTcpServerSocket(
+    override val fd: FD,
+    private val address: TcpConnectionInfo
+) : LinuxTcpParent(), TcpServerSocket {
     @OptIn(Unsafe::class)
-    override fun bind(address: TcpConnectionInfo, backlog: Int) {
-        val sock = Syscall.socket(address.family, address.type, address.protocol)
-        try {
-            Syscall.bind(sock, address)
-            Syscall.listen(sock, backlog)
-            fd = sock
-        } catch (e: Throwable) {
-            // ensure the socket is always closed if bind() or listen() fail
-            Syscall.close(sock)
-            throw e
-        }
+    override fun bind(backlog: Int) {
+        Syscall.bind(fd, address)
+        Syscall.listen(fd, backlog)
+        isOpen = true
     }
 
     @Unsafe

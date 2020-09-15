@@ -10,10 +10,7 @@
 package tf.lotte.knste.net.socket
 
 import tf.lotte.knste.exc.SocketException
-import tf.lotte.knste.net.tcp.LinuxTcpSocket
-import tf.lotte.knste.net.tcp.TcpClientSocket
-import tf.lotte.knste.net.tcp.TcpServerSocket
-import tf.lotte.knste.net.tcp.TcpSocketAddress
+import tf.lotte.knste.net.tcp.*
 import tf.lotte.knste.system.Syscall
 import tf.lotte.knste.util.Unsafe
 
@@ -49,10 +46,12 @@ public actual object PlatformSockets {
     }
 
     /**
-     * Creates a new unbinded [TcpServerSocket].
+     * Creates a new unbound [TcpServerSocket].
      */
     @Unsafe
-    public actual fun newTcpSynchronousServerSocket(): TcpServerSocket {
-        TODO()
+    public actual fun newTcpSynchronousServerSocket(address: TcpConnectionInfo): TcpServerSocket {
+        val fd = Syscall.socket(address.family, address.type, address.protocol)
+        val sock = LinuxTcpServerSocket(fd, address)
+        return sock
     }
 }

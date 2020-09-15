@@ -21,13 +21,15 @@ public interface TcpServerSocket :
     ServerSocket<TcpConnectionInfo, TcpSocketAddress, TcpClientSocket> {
     public companion object {
         /**
-         * Opens a new [TcpServerSocket] from a platform socket.
+         * Opens a new unbound [TcpServerSocket] from a platform socket.
          *
          * This method is unsafe as it can leak file descriptors.
          */
         @Unsafe
-        public fun unsafeOpen(): TcpServerSocket {
-            return PlatformSockets.newTcpSynchronousServerSocket()
+        public fun unsafeOpen(
+            address: TcpConnectionInfo,
+        ): TcpServerSocket {
+            return PlatformSockets.newTcpSynchronousServerSocket(address)
         }
     }
 }

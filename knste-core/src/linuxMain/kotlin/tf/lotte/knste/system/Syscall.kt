@@ -648,7 +648,7 @@ public object Syscall {
                     struct = __ipv4_to_sockaddr(this, address.ip as IPv4Address, address.port)
                     size = sizeOf<sockaddr_in>().toUInt()
                 }
-                else -> TODO()
+                else -> TODO("Unknown address family")
             }
 
             bind(sock, struct.ptr, size)
@@ -665,7 +665,10 @@ public object Syscall {
      */
     @Unsafe
     public fun listen(sock: FD, backlog: Int) {
-        platform.posix.listen(sock, backlog)
+        val res = platform.posix.listen(sock, backlog)
+        if (res.isError) {
+            throw OSException(errno, message = strerror())
+        }
     }
 
     /**

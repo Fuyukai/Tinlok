@@ -16,6 +16,7 @@ import tf.lotte.knste.net.socket.ServerSocket
 import tf.lotte.knste.net.socket.SocketAddress
 import tf.lotte.knste.net.socket.StandardSocketOption
 import tf.lotte.knste.net.tcp.TcpClientSocket
+import tf.lotte.knste.net.tcp.TcpConnectionInfo
 import tf.lotte.knste.net.tcp.TcpServerSocket
 import tf.lotte.knste.net.tcp.TcpSocketAddress
 import tf.lotte.knste.util.Unsafe
@@ -23,15 +24,6 @@ import tf.lotte.knste.util.Unsafe
 private typealias CI = ConnectionInfo
 private typealias ADD<I> = SocketAddress<I>
 private typealias SCS<I, T> = ClientSocket<I, T>
-
-// == TCP socket safe extension functions == //
-/**
- * Opens a new unbinded TCP server socket, passing the created socket to the specified lambda.
- */
-@OptIn(Unsafe::class)
-public inline fun <R> TcpServerSocket.Companion.open(block: (TcpServerSocket) -> R): R {
-    return unsafeOpen().use(block)
-}
 
 // == TCP socket helper functions == //
 
@@ -50,22 +42,35 @@ public inline fun <R> TcpClientSocket.Companion.connect(
 }
 
 /**
+ * Creates a new unbound TCP server socket.
+ */
+@OptIn(Unsafe::class)
+public inline fun <R> TcpServerSocket.Companion.open(
+    address: TcpConnectionInfo,
+    block: (TcpServerSocket) -> R
+): R {
+    val sock = unsafeOpen(address)
+    return sock.use(block)
+}
+
+/**
  * Opens a new TCP server socket, binds it to the specified [address] with the specified
  * [backlog], using the default socket options, passing the created socket to the specified
  * lambda.
  */
 @OptIn(Unsafe::class)
 public inline fun <R> TcpServerSocket.Companion.bind(
-    address: TcpSocketAddress, backlog: Int = 128, block: (TcpServerSocket) -> R
+    address: TcpConnectionInfo, backlog: Int = 128, block: (TcpServerSocket) -> R
 ): R {
-    val sock = unsafeOpen()
+    return TcpServerSocket.open(address) {
+        // Always set REUSEADDR on non-Windows
+        if (!Sys.osInfo.isWindows) {
+            it.setSocketOption(StandardSocketOption.SO_REUSEADDR, true)
+        }
 
-    if (!Sys.osInfo.isWindows) {
-        sock.setSocketOption(StandardSocketOption.SO_REUSEADDR, true)
+        it.bind(backlog)
+        block(it)
     }
-
-    sock.bind(address, backlog = backlog)
-    return sock.use(block)
 }
 
 // == Server socket helpers == //
