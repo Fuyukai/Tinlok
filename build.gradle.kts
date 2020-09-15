@@ -1,20 +1,17 @@
-import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 plugins {
     id("org.jetbrains.kotlin.multiplatform").version("1.4.10").apply(false)
-    id("org.jetbrains.dokka").version("1.4.0").apply(false)
 }
 
 subprojects {
     // ignore all -static projects, we configure K/N ourselves
-    if (this.name.startsWith("knste-static")) return@subprojects
+    if (this.name.startsWith("tinlok-static")) return@subprojects
 
     apply(plugin = "org.jetbrains.kotlin.multiplatform")
-    apply(plugin = "org.jetbrains.dokka")
 
-    group = "tf.lotte.knste"
+    group = "tf.lotte.tinlok"
     version = "1.0.0"
 
     repositories {
@@ -47,7 +44,6 @@ subprojects {
                 }
             }
             val commonTest by getting {
-
                 dependencies {
                     implementation(kotlin("test-common"))
                     implementation(kotlin("test-annotations-common"))
@@ -73,16 +69,6 @@ subprojects {
                     useExperimentalAnnotation("kotlin.RequiresOptIn")
                     //useExperimentalAnnotation("tf.lotte.knste.util.Unsafe")
                 }
-            }
-        }
-    }
-
-    tasks.named<DokkaTask>("dokkaHtml") {
-        outputDirectory.set(buildDir.resolve("dokka"))
-
-        dokkaSourceSets {
-            configureEach {
-                includeNonPublic.set(true)
             }
         }
     }

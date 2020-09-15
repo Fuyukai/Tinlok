@@ -1,20 +1,20 @@
-KNSTE
------
+Tinlok
+------
 
-**The KNSTE GitHub page is a temporary location.**
+**The Tinlok GitHub page is a temporary location.**
 
-KNSTE (Kotlin Native STdlib Extensions) is a library that fills in the "missing pieces" from the
-Kotlin standard library on native platforms as well as adding useful optional extra libraries.
+Tinlok is a library that fills in the "missing pieces" from the Kotlin standard library on native
+platforms as well as adding useful optional extra libraries.
 
-KNSTE is entirely re-implementations of common standard library features for Native desktop only. It
-is not designed for the JVM, iOS or Android and support will not be added.
+Tinlok is entirely re-implementations of common standard library features for Native desktop only.
+It is not designed for the JVM, iOS or Android and support will not be added.
 
 What?
 =====
 
-KNSTE adds or is planning to contain the following modules and features:
+Tinlok adds or is planning to contain the following modules and features:
 
-- ``knste-core``
+- ``tinlok-core``
  - Path helpers (inspired by Python's ``pathlib``)
  - Filesystem I/O
  - Network I/O
@@ -23,13 +23,13 @@ KNSTE adds or is planning to contain the following modules and features:
  - (Planned) Hashes (Blake2)
  - (Planned) Compression/decompression (zlib, gzip, lzma)
 
-- ``knste-async`` (Planned)
+- ``tinlok-async`` (Planned)
  - Suspending I/O extensions using ``kotlinx.coroutines``
 
-- ``knste-tls`` (Planned)
+- ``tinlok-tls`` (Planned)
  - TLS extensions to networking I/O (sync and async)
 
-- ``knste-crypto`` (Planned)
+- ``tinlok-crypto`` (Planned)
  - Libsodium-based cryptography library
 
 Why?
@@ -54,9 +54,3 @@ Stability
 For all I care, use KNSTE in production. I make zero stability guarantees or remarks on being
 "production ready".
 
-Versioning
-==========
-
-KNSTE using a versioning scheme called Less Afraid Versioning, which prioritises creating sound
-designs over paranoid obsession over backwards compatibility. This means that APIs can, and will,
-break between minor or patch versions if they are not the best possible design.

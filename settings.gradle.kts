@@ -14,6 +14,8 @@ pluginManagement {
     }
 }
 
-rootProject.name = "knste"
-include("knste-core")
-include("knste-static-ipv6")
+rootProject.name = "tinlok"
+include("tinlok-core")
+
+// static libraries
+include("tinlok-static-ipv6")
