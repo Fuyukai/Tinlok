@@ -31,7 +31,13 @@ public actual object PlatformSockets {
         // TODO: Maybe re-throw a nicer error on connect() errno?
         for (info in address) {
             val socket = Syscall.socket(info.family, info.type, info.protocol)
-            val connected = Syscall.connect(socket, info)
+            val connected = try {
+                Syscall.connect(socket, info)
+            } catch (e: Throwable) {
+                // always close if connect() fails
+                Syscall.close(socket)
+                throw e
+            }
 
             // success
             if (connected) {

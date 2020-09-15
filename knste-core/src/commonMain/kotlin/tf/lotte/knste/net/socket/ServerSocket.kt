@@ -24,7 +24,7 @@ public interface ServerSocket<
     /**
      * Binds this socket to the specified [address].
      */
-    public fun bind(address: ADDR, backlog: Int = 128)  // old linux support for 128
+    public fun bind(address: I, backlog: Int = 128)  // old linux support for 128
 
     /**
      * Accepts a new connection, returning a synchronous client socket for the incoming connection.

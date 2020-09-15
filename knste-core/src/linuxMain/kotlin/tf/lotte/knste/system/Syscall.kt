@@ -21,6 +21,7 @@ import tf.lotte.knste.exc.OSException
 import tf.lotte.knste.net.*
 import tf.lotte.knste.net.socket.LinuxSocketOption
 import tf.lotte.knste.util.Unsafe
+import tf.lotte.knste.util.toByteArray
 import tf.lotte.knste.util.toUInt
 import kotlin.experimental.ExperimentalTypeInference
 
@@ -39,6 +40,13 @@ internal typealias FD = Int
  */
 @OptIn(ExperimentalTypeInference::class, ExperimentalUnsignedTypes::class)
 public object Syscall {
+    // wrapper types, for e.g. accept
+
+    /**
+     * Wraps an accepted socket and a [ConnectionInfo] for the accepted socket.
+     */
+    public class Accepted<T: ConnectionInfo>(public val fd: FD, public val info: T?)
+
     public const val ERROR: Int = -1
     public const val LONG_ERROR: Long = -1L
 
@@ -574,6 +582,52 @@ public object Syscall {
         }
 
         return true
+    }
+
+    // this easily has the ability to be one of the grossest APIs in the entire library.
+    /**
+     * Accepts a new connection from the specified socket.
+     */
+    @Unsafe
+    public fun <T: ConnectionInfo> accept(
+        sock: FD, creator: ConnectionInfoCreator<T>
+    ): Accepted<T> = memScoped {
+        val addr = alloc<sockaddr_storage>()
+        val sizePtr = alloc<UIntVar>()
+        val size = sizeOf<sockaddr_storage>().toUInt()
+        sizePtr.value = size
+
+        val accepted = retry { accept(sock, addr.ptr.reinterpret(), sizePtr.ptr) }
+        if (accepted.isError) {
+            throw OSException(errno, message = strerror())
+        }
+
+        // nb: this is duplicated partially from getaddrinfo()
+        // TODO: don't duplicate this
+
+        // read out the IP address and put it in our own high-level object
+        // for remoteAddress
+        val address = when (addr.ss_family) {
+            AF_INET.toUShort() -> {
+                val inet4 = addr.reinterpret<sockaddr_in>()
+                val ba = inet4.sin_addr.s_addr.toByteArray()
+                val ip = IPv4Address(ba)
+                val port = ntohs(inet4.sin_port).toInt()
+                creator.from(ip, port)
+            }
+            AF_INET6.toUShort() -> {
+                val inet6 = addr.reinterpret<sockaddr_in6>()
+                // XX: Kotlin in6_addr has no fields!
+                val addrPtr = inet6.sin6_addr.arrayMemberAt<ByteVar>(0L)
+                val ba = addrPtr.readBytes(16)
+                val ip = IPv6Address(ba)
+                val port = ntohs(inet6.sin6_port).toInt()
+                creator.from(ip, port)
+            }
+            else -> null
+        }
+
+        return Accepted(accepted, address)
     }
 
     /**
