@@ -1,3 +1,5 @@
+.. _index:
+
 Tinlok
 ======
 
@@ -7,21 +9,18 @@ Tinlok focuses on **usability** and **correctness**, *not* simplicity. Computers
 and we don't pretend otherwise, but KNSTE tries to make that complication as easy to use as
 possible.
 
-Vital statistics:
+.. toctree::
+   :maxdepth: 1
+   :caption: Important info
 
-* Supported operating systems:
-
-  - Linux (AMD64, AArch64)
-  - Windows (AMD64)
-  - With your help, others!
-
-* Dually licensed under the LGPL 3.0 (or later) and the MPL 2.0
+   safety.rst
+   platforms.rst
 
 .. toctree::
-   :maxdepth: 3
-   :caption: Documentation contents:
+   :maxdepth: 1
+   :caption: Modules
 
-   contents/safety.rst
+   modules/core/index.rst
 
-   contents/modules/core/index.rst
+
 

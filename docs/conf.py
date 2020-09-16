@@ -17,7 +17,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = "KNSTE"
+project = "Tinlok"
 copyright = "2020, Charlotte Skye"
 author = "Charlotte Skye"
 
