@@ -22,7 +22,10 @@ import tf.lotte.tinlok.util.Unsafe
  */
 public interface Path : PurePath {
     public companion object {
-        public fun of(path: PurePath): Path {
+        /**
+         * Creates a new platform Path using the specified [PlatformPurePath].
+         */
+        public fun of(path: PlatformPurePath): Path {
             return PlatformPaths.path(path)
         }
 

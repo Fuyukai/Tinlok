@@ -13,6 +13,11 @@ import tf.lotte.tinlok.ByteString
 import tf.lotte.tinlok.util.Unsafe
 
 /**
+ * Defines the [PurePath] that for the current platform.
+ */
+public expect class PlatformPurePath : PurePath
+
+/**
  * Helper factory object for creating new [Path] and [PurePath] objects.
  */
 public expect object PlatformPaths {
@@ -37,12 +42,12 @@ public expect object PlatformPaths {
     /**
      * Creates a new platform Path from the given [PurePath].
      */
-    public fun path(of: PurePath): Path
+    public fun path(of: PlatformPurePath): Path
 
     /**
      * Creates a new platform [PurePath] from the given [ByteString].
      */
-    public fun purePath(of: ByteString): PurePath
+    public fun purePath(of: ByteString): PlatformPurePath
 
     /**
      * Creates a new temporary directory and returns its path.

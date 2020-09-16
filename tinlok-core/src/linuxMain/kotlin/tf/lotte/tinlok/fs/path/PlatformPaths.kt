@@ -21,6 +21,8 @@ import tf.lotte.tinlok.system.Syscall
 import tf.lotte.tinlok.system.readZeroTerminated
 import tf.lotte.tinlok.util.Unsafe
 
+public actual typealias PlatformPurePath = PosixPurePath
+
 /**
  * Linux implementation of the platform pathing.
  */
@@ -54,7 +56,7 @@ public actual object PlatformPaths {
         return LinuxPath(pure)
     }
 
-    public actual fun purePath(of: ByteString): PurePath {
+    public actual fun purePath(of: ByteString): PosixPurePath {
         return PosixPurePath.fromByteString(of)
     }
 
@@ -63,8 +65,7 @@ public actual object PlatformPaths {
         return LinuxPath(PosixPurePath.fromByteString(of))
     }
 
-    public actual fun path(of: PurePath): Path {
-        require(of is PosixPurePath) { "Can't create a real path out of a non-POSIX path" }
+    public actual fun path(of: PosixPurePath): Path {
         return LinuxPath(of)
     }
 
