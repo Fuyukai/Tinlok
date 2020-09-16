@@ -29,10 +29,10 @@ subprojects {
 
         // temp disabled
         // darwin targets
-        //macosX64()
+        // macosX64()
 
         // windows
-        mingwX64()
+        // mingwX64()
 
 
         sourceSets {
