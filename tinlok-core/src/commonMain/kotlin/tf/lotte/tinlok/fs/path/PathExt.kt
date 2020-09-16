@@ -9,24 +9,16 @@
 
 package tf.lotte.tinlok.fs.path
 
-import tf.lotte.tinlok.*
+import tf.lotte.tinlok.ByteString
 import tf.lotte.tinlok.fs.FilesystemFile
 import tf.lotte.tinlok.fs.StandardOpenModes
 import tf.lotte.tinlok.io.use
+import tf.lotte.tinlok.toByteString
 import tf.lotte.tinlok.util.Unsafe
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
-/**
- * Creates a new [PurePath] corresponding to the current OS's path schema.
- */
-public fun PurePath.Companion.native(path: String): PurePath = native(path.toByteString())
-
-/**
- * Creates a new [PosixPurePath].
- */
-public fun PurePath.Companion.posix(path: String): PurePath = native(path.toByteString())
 
 /**
  * Creates a new platform [Path] from the string [path].
@@ -34,39 +26,9 @@ public fun PurePath.Companion.posix(path: String): PurePath = native(path.toByte
 public fun Path.Companion.of(path: String): Path = of(path.toByteString())
 
 /**
- * Helper operator function for fluent API usage.
- */
-public operator fun PurePath.div(other: PurePath): PurePath = join(other)
-
-/**
- * Helper operator function for fluent API usage.
- */
-public operator fun Path.div(other: PurePath): Path = join(other)
-
-/**
- * Joins this pure path to another [ByteString], returning the combined path.
- */
-public fun PurePath.join(other: ByteString): PurePath = join(PlatformPaths.purePath(other))
-
-/**
  * Joins this path to another [ByteString], returning the combined path.
  */
 public fun Path.join(other: ByteString): Path = join(PlatformPaths.purePath(other))
-
-/**
- * Helper operator function for fluent API usage.
- */
-public operator fun PurePath.div(other: ByteString): PurePath = join(other)
-
-/**
- * Helper operator function for fluent API usage.
- */
-public operator fun Path.div(other: ByteString): Path = join(other)
-
-/**
- * Joins this path to another String, returning the combined path.
- */
-public fun PurePath.join(other: String): PurePath = join(other.toByteString())
 
 /**
  * Joins this path to another String, returning the combined path.
@@ -76,98 +38,20 @@ public fun Path.join(other: String): Path = join(other.toByteString())
 /**
  * Helper operator function for fluent API usage.
  */
-public operator fun PurePath.div(other: String): PurePath = join(other)
+public operator fun Path.div(other: PurePath): Path = join(other)
 
 /**
  * Helper operator function for fluent API usage.
  */
 public operator fun Path.div(other: String): Path = join(other)
 
-// == PurePath extensions == //
 /**
- * Gets all of the parents of this Path.
+ * Helper operator function for fluent API usage.
  */
-public fun PurePath.allParents(): List<PurePath> {
-    // no parent
-    return when (rawComponents.size) {
-        1 -> listOf()
-        // only one parent
-        2 -> listOf(parent)
-        // lots of parents
-        else -> {
-            val working = ArrayList<PurePath>(rawComponents.size - 1)
-            var last = parent
-            while (last.parent != last) {
-                working.add(last)
-                last = last.parent
-            }
-            working
-        }
-    }
-}
+public operator fun Path.div(other: ByteString): Path = join(other)
 
-// https://docs.python.org/3/library/pathlib.html#pathlib.PurePath.suffix
-/**
- * Gets the file extension of the name of this file, if any. (``file.tar.gz`` -> ``gz``)
- */
-public val PurePath.rawSuffix: ByteString?
-    get() {
-        val idx = rawName.lastIndexOf('.'.toByte())
-        return if (idx <= -1) null
-        else rawName.substring(idx + 1)
-    }
 
-/**
- * Gets the file extension of the name of this file, if any. (``file.tar.gz`` -> ``gz``)
- */
-public val PurePath.suffix: String?
-    get() {
-        return rawSuffix?.decode()
-    }
-
-// https://docs.python.org/3/library/pathlib.html#pathlib.PurePath.suffixes
-/**
- * Gets all the file extensions of the name of this file, if any.
- */
-public val PurePath.rawSuffixes: List<ByteString>
-    get() {
-        if (!rawName.contains('.'.toByte())) return emptyList()
-        val split = rawName.split(b("."))
-        return split.drop(1)
-    }
-
-/**
- * Gets all the file extensions of the name of this file, if any.
- */
-public val PurePath.suffixes: List<String>
-    get() {
-        // copy to avoid repeated decoding on default impls
-        val nam = name
-
-        if (!nam.contains('.')) return emptyList()
-        val split = nam.split('.')
-        return split.drop(1)
-    }
-
-// == Path extensions == //
-/**
- * Creates a new temporary directory and calls the provided lambda with its path. The
- * directory will be automatically deleted when the lambda returns.
- */
-@OptIn(Unsafe::class, ExperimentalContracts::class)
-public inline fun <R> Path.Companion.makeTempDirectory(prefix: String, block: (Path) -> R): R {
-    contract {
-        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
-    }
-
-    val dir = PlatformPaths.makeTempDirectory(prefix)
-    try {
-        return block(dir)
-    } finally {
-        dir.recursiveDelete()
-    }
-}
-
+// == Path I/O extensions == //
 /**
  * Flattens a Path tree into a listing of [Path].
  *
@@ -266,3 +150,21 @@ public fun Path.readAllBytes(): ByteString =
  * Reads all of the bytes from the file represented by this Path, and decode it into a [String].
  */
 public fun Path.readAllString(): String = readAllBytes().decode()
+
+/**
+ * Creates a new temporary directory and calls the provided lambda with its path. The
+ * directory will be automatically deleted when the lambda returns.
+ */
+@OptIn(Unsafe::class, ExperimentalContracts::class)
+public inline fun <R> Path.Companion.makeTempDirectory(prefix: String, block: (Path) -> R): R {
+    contract {
+        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+    }
+
+    val dir = PlatformPaths.makeTempDirectory(prefix)
+    try {
+        return block(dir)
+    } finally {
+        dir.recursiveDelete()
+    }
+}

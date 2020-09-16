@@ -22,7 +22,7 @@ public interface PurePath {
         /**
          * Creates a new [PurePath] corresponding to the current OS's path schema.
          */
-        public fun native(path: ByteString): PurePath {
+        public fun native(path: ByteString): PlatformPurePath {
             return PlatformPaths.purePath(path)
         }
 
