@@ -62,12 +62,17 @@ public interface PurePath {
     public val name: String
 
     /**
-     * Joins this path to another path, returning the combined path.
+     * Resolves the other path as if it was a child of this path.
      *
      * If the other path is absolute, it will simply replace this path. Otherwise, it will be
      * concatenated onto the end of this path.
      */
-    public fun join(other: PurePath): PurePath
+    public fun resolveChild(other: PurePath): PurePath
+
+    /**
+     * Replaces the name of this path, returning the new path.
+     */
+    public fun withName(name: ByteString): PurePath
 
     /**
      * Converts the path within to a Kotlin string. This *will* break if non-unicode paths are used.

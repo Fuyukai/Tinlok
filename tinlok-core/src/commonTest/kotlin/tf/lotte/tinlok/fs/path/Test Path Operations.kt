@@ -32,7 +32,7 @@ class `Test Path Operations` {
 
     @Test
     fun `Test mkdir`() = Path.makeTempDirectory("Tinlok-test-") {
-        val newPath = it.join("mkdir-test")
+        val newPath = it.resolveChild("mkdir-test")
         newPath.createDirectory(parents = false, existOk = false)
 
         assertTrue(newPath.exists())
@@ -52,7 +52,7 @@ class `Test Path Operations` {
         assertFalse(it.isRegularFile())
 
         run {
-            val file = it.join("file")
+            val file = it.resolveChild("file")
             assertFalse(file.isRegularFile())
 
             file.touch()
@@ -65,7 +65,7 @@ class `Test Path Operations` {
         }
 
         run {
-            val file = it.join("file2")
+            val file = it.resolveChild("file2")
 
             file.writeString("abcdef")
             assertTrue(file.exists())
@@ -76,8 +76,8 @@ class `Test Path Operations` {
     @Unsafe
     @Test
     fun `Test rename`() = Path.makeTempDirectory("Tinlok-test-") {
-        val first = it.join("test1.txt")
-        val second = it.join("test2.txt")
+        val first = it.resolveChild("test1.txt")
+        val second = it.resolveChild("test2.txt")
 
         first.touch()
         first.rename(second)
@@ -96,8 +96,8 @@ class `Test Path Operations` {
     @Unsafe
     @Test
     fun `Test copy`() = Path.makeTempDirectory("Tinlok-test-") {
-        val first = it.join("test1.txt")
-        val second = it.join("test2.txt")
+        val first = it.resolveChild("test1.txt")
+        val second = it.resolveChild("test2.txt")
 
         val toWrite = "happy cirno day 9/9/2020"
         first.writeString(toWrite)

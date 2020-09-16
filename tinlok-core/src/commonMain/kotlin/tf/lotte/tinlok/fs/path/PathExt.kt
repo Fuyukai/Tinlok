@@ -28,27 +28,32 @@ public fun Path.Companion.of(path: String): Path = of(path.toByteString())
 /**
  * Joins this path to another [ByteString], returning the combined path.
  */
-public fun Path.join(other: ByteString): Path = join(PlatformPaths.purePath(other))
+public fun Path.resolveChild(other: ByteString): Path = resolveChild(PlatformPaths.purePath(other))
 
 /**
  * Joins this path to another String, returning the combined path.
  */
-public fun Path.join(other: String): Path = join(other.toByteString())
+public fun Path.resolveChild(other: String): Path = resolveChild(other.toByteString())
 
 /**
  * Helper operator function for fluent API usage.
  */
-public operator fun Path.div(other: PurePath): Path = join(other)
+public operator fun Path.div(other: PurePath): Path = resolveChild(other)
 
 /**
  * Helper operator function for fluent API usage.
  */
-public operator fun Path.div(other: String): Path = join(other)
+public operator fun Path.div(other: String): Path = resolveChild(other)
 
 /**
  * Helper operator function for fluent API usage.
  */
-public operator fun Path.div(other: ByteString): Path = join(other)
+public operator fun Path.div(other: ByteString): Path = resolveChild(other)
+
+/**
+ * Replaces the name of this path, returning the new path.
+ */
+public fun Path.withName(name: String): Path = withName(name.toByteString())
 
 
 // == Path I/O extensions == //

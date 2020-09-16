@@ -69,9 +69,10 @@ public open class PosixPurePath(rawParts: List<ByteString>) : PurePath {
         rawComponents.map { it.decode() }
     }
 
-    override val isAbsolute: Boolean = rawComponents[0] == SLASH
-    override val rawName: ByteString
-        get() = rawComponents.last()
+    override val isAbsolute: Boolean get() = rawComponents[0] == SLASH
+    override val rawName: ByteString by lazy {
+        rawComponents.last()
+    }
 
     override val name: String by lazy { rawName.decode() }
 
@@ -89,8 +90,8 @@ public open class PosixPurePath(rawParts: List<ByteString>) : PurePath {
         }
     }
 
-    override fun join(other: PurePath): PosixPurePath {
-        if (other !is PosixPurePath) error("Can only accept other Posix paths!")
+    override fun resolveChild(other: PurePath): PosixPurePath {
+        require(other is PosixPurePath) { "Can only accept other Posix paths!" }
 
         // other absolute paths always win out
         // this is similar to pathlib.PurePath
@@ -99,6 +100,14 @@ public open class PosixPurePath(rawParts: List<ByteString>) : PurePath {
         else {
             PosixPurePath(rawComponents + other.rawComponents)
         }
+    }
+
+    override fun withName(name: ByteString): PosixPurePath {
+        require(!name.contains('/'.toByte())) { "Invalid name: $name" }
+
+        val components = rawComponents.toMutableList()
+        components[components.size - 1] = name
+        return PosixPurePath(components)
     }
 
     @Unsafe
@@ -125,7 +134,7 @@ public open class PosixPurePath(rawParts: List<ByteString>) : PurePath {
     }
 
     override fun toString(): String {
-        val s = rawComponents.map { it.toString() }.joinToString(", ")
+        val s = rawComponents.joinToString(", ") { it.toString() }
         return "PosixPurePath[$s]"
     }
 }

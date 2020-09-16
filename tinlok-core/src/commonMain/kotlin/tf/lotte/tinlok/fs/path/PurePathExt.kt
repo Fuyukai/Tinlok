@@ -27,30 +27,36 @@ public fun PurePath.Companion.posix(path: String): PosixPurePath = posix(path.to
 /**
  * Joins this pure path to another [ByteString], returning the combined path.
  */
-public fun PurePath.join(other: ByteString): PurePath = join(PlatformPaths.purePath(other))
+public fun PurePath.resolveChild(other: ByteString): PurePath = resolveChild(PlatformPaths.purePath(other))
 
 /**
  * Joins this path to another String, returning the combined path.
  */
-public fun PurePath.join(other: String): PurePath = join(other.toByteString())
+public fun PurePath.resolveChild(other: String): PurePath = resolveChild(other.toByteString())
 
 /**
  * Helper operator function for fluent API usage.
  */
-public operator fun PurePath.div(other: PurePath): PurePath = join(other)
+public operator fun PurePath.div(other: PurePath): PurePath = resolveChild(other)
 
 /**
  * Helper operator function for fluent API usage.
  */
-public operator fun PurePath.div(other: ByteString): PurePath = join(other)
+public operator fun PurePath.div(other: ByteString): PurePath = resolveChild(other)
 
 /**
  * Helper operator function for fluent API usage.
  */
-public operator fun PurePath.div(other: String): PurePath = join(other)
+public operator fun PurePath.div(other: String): PurePath = resolveChild(other)
+
+/**
+ * Replaces the name of this path, returning the new path.
+ */
+public fun PurePath.withName(name: String): PurePath = withName(name.toByteString())
 
 
 // == PurePath extensions == //
+
 /**
  * Gets all of the parents of this Path.
  */

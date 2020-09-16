@@ -34,13 +34,13 @@ class `Test Path Extensions` {
      */
     @Test
     fun `Test recursive delete`() = Path.makeTempDirectory("Tinlok-test-") {
-        val parent = it.join("delete-parent")
+        val parent = it.resolveChild("delete-parent")
         parent.createDirectory(parents = false, existOk = false)
-        parent.join("first").apply {
+        parent.resolveChild("first").apply {
             createDirectory(parents = false, existOk = false)
-            join("nested").createDirectory(parents = false, existOk = false)
+            resolveChild("nested").createDirectory(parents = false, existOk = false)
         }
-        parent.join("second").createDirectory(parents = false, existOk = false)
+        parent.resolveChild("second").createDirectory(parents = false, existOk = false)
 
         assertFailsWith<OSException> { parent.removeDirectory() }
 

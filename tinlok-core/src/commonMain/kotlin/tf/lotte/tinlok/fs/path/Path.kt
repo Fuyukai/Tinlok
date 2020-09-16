@@ -53,7 +53,8 @@ public interface Path : PurePath {
 
     // type changes
     public override val parent: Path
-    public override fun join(other: PurePath): Path
+    public override fun resolveChild(other: PurePath): Path
+    public override fun withName(name: ByteString): Path
 
     // == query operators == //
     /**
@@ -88,7 +89,7 @@ public interface Path : PurePath {
      * If [strict] is true, the path must exist and [FileNotFoundException] will be raised if it
      * is not. If [strict] is false, the path will be resolved as far as possible.
      */
-    public fun resolve(strict: Boolean = false): Path
+    public fun toAbsolutePath(strict: Boolean = false): Path
 
     /**
      * Gets the owner username for this file, or null if this file doesn't have an owner (some

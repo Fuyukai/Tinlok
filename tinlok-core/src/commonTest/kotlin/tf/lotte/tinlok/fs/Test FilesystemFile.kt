@@ -26,7 +26,7 @@ class `Test FilesystemFile` {
      */
     @Test
     fun `Test basic read/write`() = Path.makeTempDirectory("Tinlok-test-") {
-        val path = it.join("test.txt")
+        val path = it.resolveChild("test.txt")
         val toWrite = b("abcdefghi")
 
         path.open(StandardOpenModes.WRITE, StandardOpenModes.CREATE) { file ->
@@ -54,7 +54,7 @@ class `Test FilesystemFile` {
 
     @Test
     fun `Test append`() = Path.makeTempDirectory("Tinlok-test-") {
-        val path = it.join("test.xt")
+        val path = it.resolveChild("test.xt")
 
         val part1 = b("When the incident took place, ")
         val part2 = b("the victim was alone at his table, sir.")
@@ -80,7 +80,7 @@ class `Test FilesystemFile` {
 
     @Test
     fun `Test seek`() = Path.makeTempDirectory("Tinlok-test-") {
-        val path = it.join("test.txt")
+        val path = it.resolveChild("test.txt")
         val toWrite = b("Every word is getting longer, the mosquitoes are getting louder.")
 
         val part1 = toWrite.substring(0, 29)

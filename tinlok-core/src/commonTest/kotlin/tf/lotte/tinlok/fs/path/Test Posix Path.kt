@@ -9,9 +9,7 @@
 
 package tf.lotte.tinlok.fs.path
 
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 /**
  * Tests the [PosixPurePath] class.
@@ -40,7 +38,7 @@ class `Test Posix Path` {
         val etc = PosixPurePath.fromString("/etc")
         val usr = PosixPurePath.fromString("/usr")
 
-        assertEquals(etc.join(usr), usr)
+        assertEquals(etc.resolveChild(usr), usr)
 
         val systemd = PosixPurePath.fromString("systemd/system")
         val etcSystemd = PosixPurePath.fromString("/etc/systemd/system")
@@ -48,5 +46,18 @@ class `Test Posix Path` {
         val joinedSystemd = etc / systemd
         assertTrue(joinedSystemd.isAbsolute)
         assertEquals(joinedSystemd, etcSystemd)
+    }
+
+    @Test
+    fun `Test withName`() {
+        val etc = PosixPurePath.fromString("/etc/passwd")
+        val shadow = etc.withName("shadow")
+
+        assertNotEquals(shadow.name, "passwd")
+        assertEquals(shadow.name, "shadow")
+
+        assertFailsWith<IllegalArgumentException> {
+            etc.withName("fre/nda")
+        }
     }
 }

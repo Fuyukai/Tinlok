@@ -36,7 +36,8 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
     override val components: List<String> by pure::components
     override val rawName: ByteString by pure::rawName
     override val name: String by pure::name
-    override fun join(other: PurePath): LinuxPath = LinuxPath(pure.join(other))
+    override fun resolveChild(other: PurePath): LinuxPath = LinuxPath(pure.resolveChild(other))
+    override fun withName(name: ByteString): LinuxPath = LinuxPath(pure.withName(name))
 
     @Unsafe
     override fun unsafeToString(): String {
@@ -54,8 +55,7 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
         return Syscall.access(strPath, F_OK)
     }
 
-    @OptIn(Unsafe::class)
-    public fun stat(followSymlinks: Boolean): Stat = memScoped {
+    @OptIn(Unsafe::class) fun stat(followSymlinks: Boolean): Stat = memScoped {
         val strPath = pure.unsafeToString()
         val pathStat = Syscall.stat(this, strPath, followSymlinks)
 
@@ -89,7 +89,7 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
     override fun size(): Long = stat(followSymlinks = false).size
 
     @OptIn(Unsafe::class)
-    override fun resolve(strict: Boolean): Path {
+    override fun toAbsolutePath(strict: Boolean): Path {
         if (!strict) TODO("Pure-Kotlin resolving")
         val realPath = memScoped { Syscall.realpath(this, pure.unsafeToString()) }
         return LinuxPath(PosixPurePath.fromByteString(realPath))
@@ -143,7 +143,7 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
                 if (bs == dot) continue
                 if (bs == dotdot) continue
 
-                items.add(join(bs))
+                items.add(resolveChild(bs))
             }
 
             return items
