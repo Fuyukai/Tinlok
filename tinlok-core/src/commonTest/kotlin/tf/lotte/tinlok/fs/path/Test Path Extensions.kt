@@ -9,11 +9,9 @@
 
 package tf.lotte.tinlok.fs.path
 
+import tf.lotte.tinlok.exc.IsADirectoryException
 import tf.lotte.tinlok.exc.OSException
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
-import kotlin.test.assertFalse
+import kotlin.test.*
 
 /**
  * Tests various extensions to [PurePath] and [Path].
@@ -46,5 +44,29 @@ class `Test Path Extensions` {
 
         parent.recursiveDelete()
         assertFalse(parent.exists())
+    }
+
+    @Test
+    fun `Test writeAll`() = Path.makeTempDirectory("Tinlok-test-") {
+        // ensure atomic writes work properly
+        val fileA = it.resolveChild("fileA")
+        fileA.writeString("test!", atomic = true)
+        assertTrue(fileA.exists())
+        val contentA = fileA.readAllString()
+        assertEquals(contentA, "test!")
+
+        // ensure attempting to write over a directory throws the right error
+        val fileB = it.resolveChild("fileB")
+        fileB.createDirectory(parents = false, existOk = false)
+
+        // separate tests for atomic true and false
+        assertFailsWith<IsADirectoryException> {
+            fileB.writeString("failure!", atomic = false)
+        }
+        assertFailsWith<IsADirectoryException> {
+            fileB.writeString("failure!", atomic = true)
+        }
+
+        Unit
     }
 }

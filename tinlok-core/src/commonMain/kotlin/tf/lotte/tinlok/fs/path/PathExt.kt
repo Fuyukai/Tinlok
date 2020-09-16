@@ -10,6 +10,9 @@
 package tf.lotte.tinlok.fs.path
 
 import tf.lotte.tinlok.ByteString
+import tf.lotte.tinlok.b
+import tf.lotte.tinlok.exc.FileAlreadyExistsException
+import tf.lotte.tinlok.exc.IsADirectoryException
 import tf.lotte.tinlok.fs.FilesystemFile
 import tf.lotte.tinlok.fs.StandardOpenModes
 import tf.lotte.tinlok.io.use
@@ -19,6 +22,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
+private val TEMP_SUFFIX = b(".~")
 
 /**
  * Creates a new platform [Path] from the string [path].
@@ -128,19 +132,50 @@ public inline fun <R> Path.open(vararg modes: StandardOpenModes, block: (Filesys
 /**
  * Writes the specified [ByteString] [bs] to the file represented by this [Path]. The file will be
  * created if it doesn't exist.
+ *
+ * If [atomic] is true, the file will be created atomically; either all of the content will be
+ * written or none will. (This is achieved with a write to a temporary file, then renaming the
+ * temporary file over the real file.)
  */
-public fun Path.writeBytes(bs: ByteString) {
-    open(StandardOpenModes.WRITE, StandardOpenModes.CREATE) {
-        it.writeAll(bs)
+@OptIn(Unsafe::class)
+public fun Path.writeBytes(bs: ByteString, atomic: Boolean = true) {
+    if (atomic) {
+        val realPath = if (this.exists()) {
+            if (this.isDirectory(followSymlinks = true)) {
+                throw IsADirectoryException(unsafeToString())
+            }
+
+            if (!this.isRegularFile(followSymlinks = false) && !this.isLink()) {
+                throw FileAlreadyExistsException(unsafeToString())
+            }
+
+            // resolve through symlinks
+            this.toAbsolutePath(strict = true)
+        } else this
+        val tempName = realPath.withName(rawName + TEMP_SUFFIX)
+
+        tempName.open(StandardOpenModes.WRITE, StandardOpenModes.CREATE) {
+            it.writeAll(bs)
+        }
+
+        tempName.rename(realPath)
+    } else {
+        open(StandardOpenModes.WRITE, StandardOpenModes.CREATE) {
+            it.writeAll(bs)
+        }
     }
 }
 
 /**
  * Writes the specified [String] [str] to the file represented by this [Path]. The file will be
  * created if it doesn't exist.
+ *
+ * If [atomic] is true, the file will be created atomically; either all of the content will be
+ * written or none will. (This is achieved with a write to a temporary file, then renaming the
+ * temporary file over the real file.)
  */
-public fun Path.writeString(str: String) {
-    writeBytes(str.toByteString())
+public fun Path.writeString(str: String, atomic: Boolean = true) {
+    writeBytes(str.toByteString(), atomic = atomic)
 }
 
 /**

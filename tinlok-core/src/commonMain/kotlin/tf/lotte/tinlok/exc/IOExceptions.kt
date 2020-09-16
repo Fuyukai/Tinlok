@@ -31,6 +31,13 @@ public open class FileNotFoundException(
 ) : IOException(path, cause)
 
 /**
+ * Thrown when a path is a directory and an attempt is made to treat it as a regular file.
+ */
+public open class IsADirectoryException(
+    public val path: String, cause: Throwable? = null,
+) : IOException(path, cause)
+
+/**
  * Base super class for all socket exceptions.
  */
 public open class SocketException(

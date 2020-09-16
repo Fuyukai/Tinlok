@@ -19,6 +19,7 @@ import platform.posix.O_WRONLY
 import tf.lotte.tinlok.ByteString
 import tf.lotte.tinlok.b
 import tf.lotte.tinlok.exc.FileNotFoundException
+import tf.lotte.tinlok.exc.IsADirectoryException
 import tf.lotte.tinlok.fs.*
 import tf.lotte.tinlok.system.Syscall
 import tf.lotte.tinlok.system.readZeroTerminated
@@ -55,7 +56,8 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
         return Syscall.access(strPath, F_OK)
     }
 
-    @OptIn(Unsafe::class) fun stat(followSymlinks: Boolean): Stat = memScoped {
+    @OptIn(Unsafe::class)
+    fun stat(followSymlinks: Boolean): Stat = memScoped {
         val strPath = pure.unsafeToString()
         val pathStat = Syscall.stat(this, strPath, followSymlinks)
 
@@ -188,6 +190,10 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
 
     @Unsafe
     override fun unsafeOpen(vararg modes: FileOpenMode): FilesystemFile {
+        if (this.isDirectory(followSymlinks = false)) {
+            throw IsADirectoryException(unsafeToString())
+        }
+
         return LinuxSyncFile(this, modes.toSet())
     }
 }

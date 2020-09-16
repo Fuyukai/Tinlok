@@ -14,10 +14,7 @@ package tf.lotte.tinlok.system
 import kotlinx.cinterop.*
 import platform.posix.*
 import tf.lotte.tinlok.ByteString
-import tf.lotte.tinlok.exc.FileAlreadyExistsException
-import tf.lotte.tinlok.exc.FileNotFoundException
-import tf.lotte.tinlok.exc.IOException
-import tf.lotte.tinlok.exc.OSException
+import tf.lotte.tinlok.exc.*
 import tf.lotte.tinlok.net.*
 import tf.lotte.tinlok.net.socket.LinuxSocketOption
 import tf.lotte.tinlok.util.Unsafe
@@ -114,6 +111,7 @@ public object Syscall {
             throw when (errno) {
                 EEXIST -> FileAlreadyExistsException(path)
                 ENOENT -> FileNotFoundException(path)
+                EISDIR -> IsADirectoryException(path)
                 EACCES -> TODO("EACCES")
                 else -> OSException(errno, message = strerror())
             }
