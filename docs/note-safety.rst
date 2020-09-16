@@ -16,9 +16,11 @@ There is no common abstraction for these unsafe calls; only the safe wrappers ar
 API Safety
 ----------
 
-Some common APIs are marked as unsafe. These APIs are generally either easy to misuse, can cause
-errors with no clear cause, or leak resources if not handled properly. All of these APIs are
-marked as ``Unsafe``, and usually have a safer wrapper with stronger constraints.
+Some common APIs are marked as unsafe, for varying reasons:
+
+* Easy to misuse
+
+  - Some common APIs require extra setup before they can be use
 
 The ``Unsafe`` annotation
 -------------------------
