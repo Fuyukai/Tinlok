@@ -16,6 +16,10 @@ These platforms have priority support:
 
 * Linux ARM64 (``linuxAMD64``)
 
+.. warning::
+
+    Tinlok needs relatively new versions of the Linux kernel and glibc for all features. Ensure
+    you are on at least the latest kernel.org LTS (5.4 at time of writing).
 
 Pending support
 ---------------
