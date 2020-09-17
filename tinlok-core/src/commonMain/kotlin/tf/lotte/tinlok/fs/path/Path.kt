@@ -124,6 +124,14 @@ public interface Path : PurePath {
     public fun rename(path: PurePath): Path
 
     /**
+     * Checks if it is safe to rename this path to the other [path].
+     *
+     * This method is used for e.g. Linux filesystems. It does not check things like directory
+     * status.
+     */
+    public fun isSafeToRename(path: Path): Boolean
+
+    /**
      * Copies this file at this path to the new path [Path], returning the new path.
      *
      * For copying empty directories, use [createDirectory]. For copying directories recursively,

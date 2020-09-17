@@ -9,6 +9,8 @@
 
 package tf.lotte.tinlok.fs
 
+import tf.lotte.tinlok.util.Unsafe
+
 /**
  * Represents the result of an ``(l)stat()`` call.
  *
@@ -16,6 +18,7 @@ package tf.lotte.tinlok.fs
  * their purposes instead.
  */
 @OptIn(ExperimentalUnsignedTypes::class)
+@Unsafe
 public data class Stat(
     /** The owner UID of this file. */
     val ownerUID: Int,
@@ -24,6 +27,9 @@ public data class Stat(
 
     /** The size of this file, in bytes. */
     val size: Long,
+
+    /** The device ID of this file. */
+    val deviceId: ULong,
 
     // internal properties
     private val st_mode: UInt

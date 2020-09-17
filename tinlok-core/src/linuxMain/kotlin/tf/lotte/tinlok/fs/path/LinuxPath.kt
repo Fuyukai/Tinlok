@@ -65,6 +65,7 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
             ownerUID = pathStat.st_uid.toInt(),
             ownerGID = pathStat.st_gid.toInt(),
             size = pathStat.st_size,
+            deviceId = pathStat.st_dev,
             st_mode = pathStat.st_mode
         )
     }
@@ -79,15 +80,19 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
         passwd?.pw_name?.toKString()
     }
 
+    @OptIn(Unsafe::class)
     override fun isDirectory(followSymlinks: Boolean): Boolean =
         statSafe(followSymlinks)?.isDirectory ?: false
 
+    @OptIn(Unsafe::class)
     override fun isRegularFile(followSymlinks: Boolean): Boolean =
         statSafe(followSymlinks)?.isFile ?: false
 
+    @OptIn(Unsafe::class)
     override fun isLink(): Boolean =
         statSafe(followSymlinks = false)?.isLink ?: false
 
+    @OptIn(Unsafe::class)
     override fun size(): Long = stat(followSymlinks = false).size
 
     @OptIn(Unsafe::class)
@@ -160,6 +165,36 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
         return path.ensureLinuxPath()
     }
 
+    @OptIn(Unsafe::class)
+    override fun isSafeToRename(path: Path): Boolean {
+        // obviously can't rename
+        if (path !is LinuxPath) return false
+
+        // equally can't rename if we don't exist
+        val dev = this.statSafe(followSymlinks = false)?.deviceId ?: return false
+
+        // find the device ID of the other path
+        // first we check the other file directly, not following symlinks as a rename would just
+        // overwrite the symlink
+        val otherPathStat = path.statSafe(followSymlinks = false)
+        if (otherPathStat != null) {
+            // rename(2) doesn't work across filesystems (!!!) so different device IDs means it
+            // would fail
+            return otherPathStat.deviceId == dev
+        }
+
+        // if it's null, we want to check the parent but we do follow the symlink as we'd be
+        // renaming over the file in the real location
+        val parentStat = path.parent.statSafe(followSymlinks = true)
+        if (parentStat != null) {
+            return parentStat.deviceId == dev
+        }
+
+        // either the file or the parent directory doesn't exist
+        // so we obviously cannot rename over it
+        return false
+    }
+
     /**
      * Efficiently copies from this path using sendfile().
      */
@@ -217,6 +252,7 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
 /**
  * Helper function for safe stat.
  */
+@OptIn(Unsafe::class)
 private inline fun LinuxPath.statSafe(followSymlinks: Boolean): Stat? {
     return try {
         stat(followSymlinks)
