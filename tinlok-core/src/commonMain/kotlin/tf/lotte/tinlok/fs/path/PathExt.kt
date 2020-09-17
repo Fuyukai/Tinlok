@@ -116,6 +116,51 @@ public fun Path.delete() {
     else unlink()
 }
 
+
+// XXX: This is not particularly efficient allocation or system call wise...
+//      I'm justifying it by this being an uncommon operation.
+//      Somebody can feel free to optimise this.
+/**
+ * Recursively copies a directory to another path.
+ */
+@OptIn(Unsafe::class)
+public fun Path.recursiveCopy(to: Path) {
+    // TODO: This can error falsely if the directory is deleted between the exists() and
+    //  isDirectory check.
+
+    val fromAbsolute = this.toAbsolutePath(strict = true)
+    // this is reversed because the paths are in nested to unnested order, whereas we need
+    // to make them in the opposite order
+    val allPaths = fromAbsolute.flattenTree().asReversed()
+
+    if (to.exists()) {
+        // simple check ensuring
+        if (!to.isDirectory(followSymlinks = true)) {
+            throw FileAlreadyExistsException(to.unsafeToString())
+        }
+    } else {
+        to.createDirectory(parents = true, existOk = false)
+    }
+
+
+    for (old in allPaths) {
+        val new = old.reparent(fromAbsolute, to)
+        val linkTarget = old.linkTarget()
+        when {
+            // simply make a new symlink
+            linkTarget != null -> new.symlinkTo(linkTarget)
+            // new empty directory
+            old.isDirectory(followSymlinks = false) -> {
+                new.createDirectory(parents = false, existOk = true)
+            }
+            // just a file, copy it
+            old.isRegularFile(followSymlinks = false) -> {
+                old.copy(new)
+            }
+        }
+    }
+}
+
 /**
  * Opens a path for file I/O, calling the specified lambda with the opened file. The file will be
  * automatically closed when the lambda exits.

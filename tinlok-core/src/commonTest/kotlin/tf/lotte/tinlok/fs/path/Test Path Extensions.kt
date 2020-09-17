@@ -46,6 +46,34 @@ class `Test Path Extensions` {
         assertFalse(parent.exists())
     }
 
+    /**
+     * Tests recursively copying a directory.
+     */
+    @Test
+    fun `Test recursive copy`() = Path.makeTempDirectory("Tinlok-test-") {
+        val parent = it.resolveChild("parent")
+        parent.createDirectory()
+        parent.resolveChild("child").apply {
+            createDirectory(parents = false, existOk = false)
+            val p = resolveChild("one.txt").also { one ->
+                one.writeString("one!")
+            }
+            resolveChild("two.txt").symlinkTo(p.toAbsolutePath())
+        }
+
+        val copyTo = it.resolveChild("parent2")
+        parent.recursiveCopy(copyTo)
+
+        assertTrue(copyTo.exists())
+        val copyChild = copyTo.resolveChild("child")
+        assertTrue(copyChild.exists())
+        val one = copyChild.resolveChild("one.txt")
+        assertEquals(one.readAllString(), "one!")
+        val two = copyChild.resolveChild("two.txt")
+        assertTrue(two.isLink())
+        assertEquals(two.readAllString(), "one!")
+    }
+
     @Test
     fun `Test writeAll`() = Path.makeTempDirectory("Tinlok-test-") {
         // ensure atomic writes work properly
