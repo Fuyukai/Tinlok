@@ -36,7 +36,7 @@ internal typealias FD = Int
  * Public extensions (ones not a direct mapping to libc) are prefixed with two underscores.
  */
 @OptIn(ExperimentalTypeInference::class, ExperimentalUnsignedTypes::class)
-public object Syscall {
+public actual object Syscall {
     // wrapper types, for e.g. accept
 
     /**
@@ -94,7 +94,7 @@ public object Syscall {
      * overflow if [pointer] is smaller than size!
      */
     @Unsafe
-    public fun __fast_ptr_to_bytearray(pointer: COpaquePointer, buf: ByteArray, size: Int) {
+    public actual fun __fast_ptr_to_bytearray(pointer: COpaquePointer, buf: ByteArray, size: Int) {
         assert(buf.size <= size) { "Size is too big!" }
 
         buf.usePinned {
