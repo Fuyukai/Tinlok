@@ -446,6 +446,25 @@ public actual object Syscall {
     }
 
     /**
+     * Gets the real value of the symbolic link at [path].
+     */
+    @Unsafe
+    public fun readlink(alloc: NativePlacement, path: String): ByteString {
+        val buffer = alloc.allocArray<ByteVar>(PATH_MAX)
+        val res = readlink(path, buffer, PATH_MAX)
+        if (res.isError) {
+            throw when (errno) {
+                EACCES -> TODO("EACESS")
+                ENOENT -> FileNotFoundException(path)
+                else -> OSException(errno, message = strerror())
+            }
+        }
+
+        val ba = buffer.readZeroTerminated(res.toInt())
+        return ByteString.fromUncopied(ba)
+    }
+
+    /**
      * Renames a file or directory.
      */
     @Unsafe
