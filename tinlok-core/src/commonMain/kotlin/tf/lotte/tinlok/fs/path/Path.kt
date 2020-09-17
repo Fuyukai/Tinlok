@@ -83,6 +83,11 @@ public interface Path : PurePath {
      */
     public fun size(): Long
 
+    /**
+     * Gets the link target of this path, or null if it is not a symlink.
+     */
+    public fun linkTarget(): Path?
+
     // See: pathlib.Path.resolve()
     /**
      * Resolves a path into an absolute path, returning the new resolved path.

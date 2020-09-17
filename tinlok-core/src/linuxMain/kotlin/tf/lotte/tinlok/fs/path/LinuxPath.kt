@@ -12,14 +12,12 @@ package tf.lotte.tinlok.fs.path
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.pointed
 import kotlinx.cinterop.toKString
-import platform.posix.F_OK
-import platform.posix.O_CREAT
-import platform.posix.O_RDONLY
-import platform.posix.O_WRONLY
+import platform.posix.*
 import tf.lotte.tinlok.ByteString
 import tf.lotte.tinlok.b
 import tf.lotte.tinlok.exc.FileNotFoundException
 import tf.lotte.tinlok.exc.IsADirectoryException
+import tf.lotte.tinlok.exc.OSException
 import tf.lotte.tinlok.fs.*
 import tf.lotte.tinlok.system.Syscall
 import tf.lotte.tinlok.system.readZeroTerminated
@@ -93,6 +91,20 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
 
     @OptIn(Unsafe::class)
     override fun size(): Long = stat(followSymlinks = false).size
+
+    @OptIn(Unsafe::class)
+    override fun linkTarget(): Path? = memScoped {
+        // safer approach
+        return try {
+            val link = Syscall.readlink(this, unsafeToString())
+            LinuxPath(PosixPurePath.fromByteString(link))
+        } catch (e: FileNotFoundException) {
+            null
+        } catch (e: OSException) {
+            if (e.errno == EINVAL) null
+            else throw e
+        }
+    }
 
     @OptIn(Unsafe::class)
     override fun toAbsolutePath(strict: Boolean): Path {
@@ -206,11 +218,21 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
         }
 
         // sendfile to B from A which does an efficient copy
-        val to = Syscall.open(path.unsafeToString(), O_WRONLY or O_CREAT)
-        val from = Syscall.open(this.unsafeToString(), O_RDONLY)
+        // also, get the correct permissions from the original file
+        val perms = stat(followSymlinks = false).permBits
+        val to = Syscall.open(path.unsafeToString(), O_WRONLY or O_CREAT, perms.toInt())
+        // always close to if opening from errors
+        val from = try {
+            Syscall.open(this.unsafeToString(), O_RDONLY)
+        } catch (e: Throwable) {
+            Syscall.close(to)
+            throw e
+        }
+
         try {
             Syscall.sendfile(to, from, size().toULong())
         } finally {
+            // always close both fds
             Syscall.__closeall(to, from)
         }
         return path.ensureLinuxPath()
