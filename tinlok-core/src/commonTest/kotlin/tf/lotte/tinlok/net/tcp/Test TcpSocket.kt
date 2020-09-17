@@ -31,7 +31,7 @@ class `Test TcpSocket` {
     @Test
     fun `Test basic socket read`() {
         // d-g selected because it is dual stack
-        val address = TcpSocketAddress.resolve("time-d-g.nist.gov", 13)
+        val address = TcpSocketAddress.resolve("time-d-b.nist.gov", 13)
         val data = TcpClientSocket.connect(address) {
             it.readUpTo(4096)
         }
