@@ -104,6 +104,8 @@ internal class LinuxSyncFile(
 
     @OptIn(Unsafe::class)
     override fun readAll(): ByteString {
+        if (!isOpen) throw ClosedException("This file is closed")
+
         // get the correct size for symlinks
         val realPath = path.toAbsolutePath(strict = true)
         val size = realPath.size() - cursor()
