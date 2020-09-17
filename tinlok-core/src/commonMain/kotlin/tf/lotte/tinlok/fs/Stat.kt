@@ -52,4 +52,10 @@ public data class Stat(
     /** If this stat is for a regular file. */
     public val isFile: Boolean
         get() = (st_mode and S_IFMT) == S_ISREG
+
+    /**
+     * The permission bits for this stat.
+     */
+    public val permBits: UInt
+        get() = (st_mode and (0xfffu))
 }
