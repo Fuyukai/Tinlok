@@ -452,9 +452,24 @@ public actual object Syscall {
     public fun rename(from: String, to: String) {
         val res = platform.posix.rename(from, to)
         // TODO: figure out error for ENOENT...
-        if (res == ERROR) {
+        if (res.isError) {
             throw when (errno) {
                 EEXIST, ENOTEMPTY -> FileAlreadyExistsException(to)
+                else -> OSException(errno, message = strerror())
+            }
+        }
+    }
+
+    /**
+     * Creates a new symlink at [linkpath] that points to [target].
+     */
+    @Unsafe
+    public fun symlink(target: String, linkpath: String) {
+        val res = platform.posix.symlink(target, linkpath)
+        if (res.isError) {
+            throw when (res) {
+                EACCES -> TODO("EACCES")
+                EEXIST -> FileAlreadyExistsException(linkpath)
                 else -> OSException(errno, message = strerror())
             }
         }
