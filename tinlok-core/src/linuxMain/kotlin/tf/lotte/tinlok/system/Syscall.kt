@@ -618,7 +618,6 @@ public actual object Syscall {
 
         // TODO: Separate EINPROGRESS out into a sealed return type?
         if (res.isError) {
-            println("error: ${strerror()}")
             when (errno) {
                 ECONNREFUSED, ENETUNREACH, ETIMEDOUT -> return false
                 else -> throw OSException(errno, message = strerror())
