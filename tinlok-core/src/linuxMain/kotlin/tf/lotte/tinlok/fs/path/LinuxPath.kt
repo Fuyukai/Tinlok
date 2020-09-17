@@ -177,6 +177,11 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
     }
 
     @OptIn(Unsafe::class)
+    override fun symlinkTo(path: Path) {
+        Syscall.symlink(path.unsafeToString(), this.unsafeToString())
+    }
+
+    @OptIn(Unsafe::class)
     override fun removeDirectory() {
         val path = this.unsafeToString()
         Syscall.rmdir(path)
@@ -195,6 +200,17 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
         }
 
         return LinuxSyncFile(this, modes.toSet())
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || other !is Path) return false
+
+        return pure.rawComponents == other.rawComponents
+    }
+
+    override fun hashCode(): Int {
+        return pure.hashCode()
     }
 }
 

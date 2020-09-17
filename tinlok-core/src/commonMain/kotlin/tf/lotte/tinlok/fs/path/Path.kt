@@ -132,6 +132,11 @@ public interface Path : PurePath {
     public fun copy(path: PurePath): Path
 
     /**
+     * Creates a new symbolic link at this path pointing to the specified other [path].
+     */
+    public fun symlinkTo(path: Path)
+
+    /**
      * Removes this directory. It must be empty.
      */
     public fun removeDirectory()

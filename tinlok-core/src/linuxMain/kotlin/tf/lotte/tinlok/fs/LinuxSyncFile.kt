@@ -104,7 +104,9 @@ internal class LinuxSyncFile(
 
     @OptIn(Unsafe::class)
     override fun readAll(): ByteString {
-        val size = path.size() - cursor()
+        // get the correct size for symlinks
+        val realPath = path.toAbsolutePath(strict = true)
+        val size = realPath.size() - cursor()
         if (size >= Syscall.IO_MAX) {
             throw UnsupportedOperationException("File is too big to read in one go currently")
         }

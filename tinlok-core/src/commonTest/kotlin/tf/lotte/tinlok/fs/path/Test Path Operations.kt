@@ -12,6 +12,7 @@
 package tf.lotte.tinlok.fs.path
 
 import tf.lotte.tinlok.Sys
+import tf.lotte.tinlok.b
 import tf.lotte.tinlok.fs.StandardOpenModes
 import tf.lotte.tinlok.util.Unsafe
 import kotlin.test.Test
@@ -73,7 +74,7 @@ class `Test Path Operations` {
         }
     }
 
-    @Unsafe
+    @OptIn(Unsafe::class)
     @Test
     fun `Test rename`() = Path.makeTempDirectory("Tinlok-test-") {
         val first = it.resolveChild("test1.txt")
@@ -93,7 +94,6 @@ class `Test Path Operations` {
         assertTrue(second.isDirectory(followSymlinks = false))
     }
 
-    @Unsafe
     @Test
     fun `Test copy`() = Path.makeTempDirectory("Tinlok-test-") {
         val first = it.resolveChild("test1.txt")
@@ -107,4 +107,27 @@ class `Test Path Operations` {
         assertTrue(second.exists())
         assertEquals(first.readAllString(), toWrite)
     }
+
+    @Test
+    fun `Test symlink`() = Path.makeTempDirectory("Tinlok-test-") {
+        val first = it.resolveChild("test1.txt")
+        // continuation indents are possiibly the dumbest form of kotlin formatting
+        // big personal fuck you to whoever made those part of the formatting
+
+        val toWrite = b("kandi boy raver he's the one for me and when the " +
+            "music starts to play we'll be dancing to the beat"
+        )
+
+        first.writeBytes(toWrite, atomic = false)
+
+        val second = it.resolveChild("test2.txt")
+        second.symlinkTo(first)
+        assertTrue(second.exists())
+        assertTrue(second.isLink())
+        assertEquals(second.toAbsolutePath(strict = true), first.toAbsolutePath(strict = true))
+
+        val read = second.readAllBytes()
+        assertEquals(read, toWrite)
+    }
+
 }
