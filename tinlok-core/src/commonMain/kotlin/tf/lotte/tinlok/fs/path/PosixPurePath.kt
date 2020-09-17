@@ -110,6 +110,49 @@ public open class PosixPurePath(rawParts: List<ByteString>) : PurePath {
         return PosixPurePath(components)
     }
 
+    override fun isChildOf(other: PurePath): Boolean {
+        // un-absolute pure paths cannot be compared child-wise
+        // as there exists no reference point to compare
+        // but absolute paths can be compared with other absolutes
+        // and relatives can be compared with other relatives
+        if (isAbsolute != other.isAbsolute) {
+            return false
+        }
+
+        // obviously false if the other one is bigger than us
+        // also, if the path has the same amount of components it cannot be a child as at best it
+        // will be the same directory
+        if (other.rawComponents.size >= rawComponents.size) return false
+
+        // check all the components of the other one, if it doesn't match us we're not a child
+        // of it
+        for ((c1, c2) in other.rawComponents.zip(rawComponents)) {
+            if (c1 != c2) return false
+        }
+
+        // all matched in other, we are a child
+        return true
+    }
+
+    override fun reparent(from: PurePath, to: PurePath): PosixPurePath {
+        require(this.isChildOf(from)) { "$this is not a child of $from" }
+        require(!this.isChildOf(to)) { "$this is already a child of $to" }
+
+        // reallocate components to the correct size
+        val size = (this.rawComponents.size - from.rawComponents.size) + to.rawComponents.size
+        val components = ArrayList<ByteString>(size)
+
+        // copy in the parts from the new parent
+        components.addAll(to.rawComponents)
+        // then copy in the parts from ourselves
+        // starting at the offset of the first element past our current parent
+        for (idx in from.rawComponents.size until this.rawComponents.size) {
+            components.add(this.rawComponents[idx])
+        }
+
+        return PosixPurePath(components)
+    }
+
     @Unsafe
     override fun unsafeToString(): String {
         val joined = if (isAbsolute) {

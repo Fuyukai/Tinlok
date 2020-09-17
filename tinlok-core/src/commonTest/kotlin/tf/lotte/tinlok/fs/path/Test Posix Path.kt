@@ -16,13 +16,19 @@ import kotlin.test.*
  */
 class `Test Posix Path` {
     @Test
-    fun `Test parents`() {
+    fun `Test isAbsolute`() {
         val etc = PosixPurePath.fromString("/etc")
         assertTrue(etc.isAbsolute)
 
-        val path = PosixPurePath.fromString("/etc/passwd")
+        val notEtc = PosixPurePath.fromString("./etc")
+        assertFalse(notEtc.isAbsolute)
+    }
 
-        assertEquals(path.parent, etc)
+    @Test
+    fun `Test parents`() {
+        val etc = PosixPurePath.fromString("/etc")
+        val passwd = PosixPurePath.fromString("/etc/passwd")
+        assertEquals(passwd.parent, etc)
 
         val root = PosixPurePath.fromString("/")
         assertEquals(root.parent, root)
@@ -58,6 +64,43 @@ class `Test Posix Path` {
 
         assertFailsWith<IllegalArgumentException> {
             etc.withName("fre/nda")
+        }
+    }
+
+    @Test
+    fun `Test child check`() {
+        val usr = PosixPurePath.fromString("/usr")
+        val usrlib = PosixPurePath.fromString("/usr/lib")
+        assertTrue(usrlib.isChildOf(usr))
+
+        // can't be a child of yourselves
+        assertFalse(usr.isChildOf(usr))
+
+        // always a child of root if you're absolute and not root
+        val root = PosixPurePath.fromString("/")
+        assertTrue(usr.isChildOf(root))
+
+        // relative paths
+        val path1 = PosixPurePath.fromString("some/directory")
+        val path2 = PosixPurePath.fromString("some/directory/child")
+        assertTrue(path2.isChildOf(path1))
+        // relative paths are never children of absolute paths
+        assertFalse(path1.isChildOf(root))
+    }
+
+    @Test
+    fun `Test reparenting`() {
+        // use the docstring tests as examples!
+        val usr = PosixPurePath.fromString("/usr")
+        val local = PosixPurePath.fromString("/usr/local")
+        val sitePackages = PosixPurePath.fromString("/usr/lib/python3.8/site-packages")
+        val localSitePackages = PosixPurePath.fromString("/usr/local/lib/python3.8/site-packages")
+
+        val newPath = sitePackages.reparent(usr, local)
+        assertEquals(newPath, localSitePackages)
+
+        assertFailsWith<IllegalArgumentException> {
+            localSitePackages.reparent(usr, local)
         }
     }
 }

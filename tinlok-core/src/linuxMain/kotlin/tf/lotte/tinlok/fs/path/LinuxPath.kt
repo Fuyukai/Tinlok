@@ -41,13 +41,12 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
     override fun withName(name: ByteString): LinuxPath = LinuxPath(pure.withName(name))
 
     @Unsafe
-    override fun unsafeToString(): String {
-        return pure.unsafeToString()
-    }
-
-    override fun toString(): String {
-        return pure.toString()
-    }
+    override fun unsafeToString(): String = pure.unsafeToString()
+    // todo: make this use LinuxPath as the prefix
+    override fun toString(): String = pure.toString()
+    override fun isChildOf(other: PurePath): Boolean = pure.isChildOf(other)
+    override fun reparent(from: PurePath, to: PurePath): LinuxPath =
+        LinuxPath(pure.reparent(from, to))
 
     // == path functionality == //
     @OptIn(Unsafe::class)
@@ -200,6 +199,12 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
      */
     @OptIn(Unsafe::class)
     override fun copy(path: PurePath): Path {
+        // open() doesn't fail on directories...
+        // so we have to check it ourselves
+        if (this.isDirectory(followSymlinks = true)) {
+            throw IsADirectoryException(unsafeToString())
+        }
+
         // sendfile to B from A which does an efficient copy
         val to = Syscall.open(path.unsafeToString(), O_WRONLY or O_CREAT)
         val from = Syscall.open(this.unsafeToString(), O_RDONLY)

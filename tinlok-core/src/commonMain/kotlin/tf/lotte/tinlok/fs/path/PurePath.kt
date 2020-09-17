@@ -75,6 +75,19 @@ public interface PurePath {
     public fun withName(name: ByteString): PurePath
 
     /**
+     * Checks if this path is the child of the [other] path.
+     */
+    public fun isChildOf(other: PurePath): Boolean
+
+    /**
+     * Changes the parent of a path from the parent [from] to the new parent [to].
+     *
+     * For example, reparenting ``/usr/lib/python3.8/site-packages`` from ``/usr`` to
+     * ``/usr/local`` would return ``/usr/local/lib/python3.8/site-packages``.
+     */
+    public fun reparent(from: PurePath, to: PurePath): PurePath
+
+    /**
      * Converts the path within to a Kotlin string. This *will* break if non-unicode paths are used.
      */
     @Unsafe
