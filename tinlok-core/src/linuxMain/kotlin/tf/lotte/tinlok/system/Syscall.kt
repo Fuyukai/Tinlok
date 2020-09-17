@@ -246,15 +246,12 @@ public object Syscall {
         var totalWritten = offset.toULong()
         // retry loop to ensure we write ALL of the data
         while (true) {
-            // i don't know if this ptr needs to be pinned, but i'm doing it to be safe.
-            val longValue = totalWritten.toLong()  // off_t
-            val written = longValue.usePinned {
-                platform.linux.sendfile(
-                    to, from,
-                    ptrTo(it),
-                    (size - totalWritten)
-                )
-            }
+            val longValue = cValuesOf(totalWritten.toLong())  // off_t
+            val written = platform.linux.sendfile(
+                to, from,
+                longValue,
+                (size - totalWritten)
+            )
 
             if (written.isError && errno != EINTR) {
                 throw OSException(errno, message = strerror())
