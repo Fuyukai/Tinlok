@@ -9,6 +9,8 @@ Tinlok focuses on **usability** and **correctness**, *not* simplicity. Computers
 and we don't pretend otherwise, but Tinlok tries to make that complication as easy to use as
 possible.
 
+
+
 .. toctree::
    :maxdepth: 1
    :caption: Important info
@@ -18,6 +20,7 @@ possible.
    note-platforms.rst
    note-stability.rst
    note-issues.rst
+   note-dokka.rst
 
 .. toctree::
    :maxdepth: 1

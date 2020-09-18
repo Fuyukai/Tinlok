@@ -17,6 +17,7 @@ build/
 # sphinx stuff
 docs/.venv
 docs/_build
+docs/_dokka
 
 # misc personal files
 TODO
