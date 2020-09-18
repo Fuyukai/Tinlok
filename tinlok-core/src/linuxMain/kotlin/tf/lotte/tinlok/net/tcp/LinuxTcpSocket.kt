@@ -9,6 +9,7 @@
 
 package tf.lotte.tinlok.net.tcp
 
+import platform.posix.SHUT_WR
 import tf.lotte.tinlok.ByteString
 import tf.lotte.tinlok.exc.ClosedException
 import tf.lotte.tinlok.system.FD
@@ -28,8 +29,9 @@ internal class LinuxTcpSocket(
 
     override val remoteAddress = address
 
+    @OptIn(Unsafe::class)
     override fun sendEof() {
-        TODO("not implemented")
+        Syscall.shutdown(fd, SHUT_WR)
     }
 
     @OptIn(Unsafe::class)
