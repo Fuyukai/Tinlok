@@ -247,7 +247,7 @@ public fun Path.writeBytes(bs: ByteString, atomic: Boolean = true) {
             it.writeAll(bs)
         }
 
-        tempName.rename(realPath)
+        tempName.move(realPath)
     } else {
         open(StandardOpenModes.WRITE, StandardOpenModes.CREATE) {
             it.writeAll(bs)
