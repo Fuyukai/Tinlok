@@ -14,7 +14,7 @@ import tf.lotte.tinlok.net.tcp.TcpConnectionInfo
 /**
  * Defines a connection information creator, to turn an IP address into a ConnectionInfo.
  */
-public interface ConnectionInfoCreator<T: ConnectionInfo> {
+public interface ConnectionInfoCreator<T : ConnectionInfo> {
     /**
      * An information creator for [TcpConnectionInfo] instances.
      */

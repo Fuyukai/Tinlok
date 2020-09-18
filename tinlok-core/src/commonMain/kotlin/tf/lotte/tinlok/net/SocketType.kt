@@ -15,8 +15,10 @@ package tf.lotte.tinlok.net
 public expect enum class SocketType {
     /** Stream sockets (TCP) */
     SOCK_STREAM,
+
     /** Datagram sockets (UDP) */
     SOCK_DGRAM,
+
     /** Raw sockets (SCARY) */
     SOCK_RAW,
     ;

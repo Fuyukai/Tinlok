@@ -15,10 +15,13 @@ package tf.lotte.tinlok.net
 public expect enum class IPProtocol {
     /** Kernel's choice */
     IPPROTO_IP,
+
     /** ICMP protocol */
     IPPROTO_ICMP,
+
     /** TCP protocol */
     IPPROTO_TCP,
+
     /** UDP protocol */
     IPPROTO_UDP
 }

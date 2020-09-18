@@ -79,7 +79,7 @@ public inline fun <R> TcpServerSocket.Companion.bind(
  * the specified lambda [block]. The connection will be automatically closed when the bloc
  */
 @OptIn(Unsafe::class)
-public inline fun <R, I: CI, ADDR : ADD<I>, T : SCS<I, ADDR>> ServerSocket<*, *, T>.accept(
+public inline fun <R, I : CI, ADDR : ADD<I>, T : SCS<I, ADDR>> ServerSocket<*, *, T>.accept(
     block: (T) -> R
 ): R {
     return unsafeAccept().use(block)

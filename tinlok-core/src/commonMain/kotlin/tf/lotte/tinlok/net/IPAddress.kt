@@ -38,6 +38,7 @@ public sealed class IPAddress {
 /**
  * An IP address using version 4.
  */
+@OptIn(ExperimentalUnsignedTypes::class)
 public class IPv4Address
 internal constructor(internal val rawRepresentation: ByteArray) : IPAddress() {
     public companion object {

@@ -94,7 +94,6 @@ public open class PosixPurePath(rawParts: List<ByteString>) : PurePath {
     override val name: String by lazy { rawName.decode() }
 
 
-
     override fun resolveChild(other: PurePath): PosixPurePath {
         require(other is PosixPurePath) { "Can only accept other Posix paths!" }
 

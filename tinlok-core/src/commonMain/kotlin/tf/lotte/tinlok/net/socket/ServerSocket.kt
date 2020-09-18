@@ -16,7 +16,7 @@ import tf.lotte.tinlok.util.Unsafe
  * A server socket that synchronously produces new [ClientSocket] instances when
  * accepting.
  *
- * 
+ *
  */
 public interface ServerSocket<
     I : ConnectionInfo,

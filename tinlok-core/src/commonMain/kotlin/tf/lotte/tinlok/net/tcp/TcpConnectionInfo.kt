@@ -38,12 +38,13 @@ public class TcpConnectionInfo(
         }
     }
 
-    override val family: AddressFamily get() {
-        return when (ip) {
-            is IPv4Address -> AddressFamily.AF_INET
-            is IPv6Address -> AddressFamily.AF_INET6
+    override val family: AddressFamily
+        get() {
+            return when (ip) {
+                is IPv4Address -> AddressFamily.AF_INET
+                is IPv6Address -> AddressFamily.AF_INET6
+            }
         }
-    }
 
     override val protocol: IPProtocol get() = IPProtocol.IPPROTO_TCP
     override val type: SocketType get() = SocketType.SOCK_STREAM

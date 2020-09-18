@@ -37,7 +37,7 @@ public actual sealed class StandardSocketOption<T>(override val name: String) :
             // somebody may be able to correct this in the future.
             // a lot of the CValue classes etc are really confusing.
             val int = allocator.alloc<IntVar>()
-            int.value  = if (value) 1 else 0
+            int.value = if (value) 1 else 0
             return int.ptr
         }
 
@@ -89,49 +89,49 @@ public actual sealed class StandardSocketOption<T>(override val name: String) :
         /**
          * This option toggles recording of debugging information in the underlying protocol modules.
          */
-        public actual val SO_DEBUG: StandardSocketOption<Boolean>
-            = BooleanSocketOption("SO_DEBUG", 1  /* SO_DEBUG */)
+        public actual val SO_DEBUG: StandardSocketOption<Boolean> =
+            BooleanSocketOption("SO_DEBUG", 1  /* SO_DEBUG */)
 
         /**
          * This option allows a second application to re-bind to this port before the TIME_WAIT
          * period is up if this socket is ungracefully closed.
          */
-        public actual val SO_REUSEADDR: StandardSocketOption<Boolean>
-            = BooleanSocketOption("SO_REUSEADDR", 2  /* SO_REUSEADDR */)
+        public actual val SO_REUSEADDR: StandardSocketOption<Boolean> =
+            BooleanSocketOption("SO_REUSEADDR", 2  /* SO_REUSEADDR */)
 
         /**
          * This option controls whether the underlying protocol should periodically transmit messages
          * on a connected socket. If the peer fails to respond to these messages, the connection is
          * considered broken.
          */
-        public actual val SO_KEEPALIVE: StandardSocketOption<Boolean>
-            = BooleanSocketOption("SO_KEEPALIVE", 9  /* SO_KEEPALIVE */)
+        public actual val SO_KEEPALIVE: StandardSocketOption<Boolean> =
+            BooleanSocketOption("SO_KEEPALIVE", 9  /* SO_KEEPALIVE */)
 
         /**
          * This option controls if broadcast packets can be sent over this socket. This has no effect
          * on IPv6 sockets.
          */
-        public actual val SO_BROADCAST: StandardSocketOption<Boolean>
-            = BooleanSocketOption("SO_BROADCAST", 6  /* SO_BROADCAST */)
+        public actual val SO_BROADCAST: StandardSocketOption<Boolean> =
+            BooleanSocketOption("SO_BROADCAST", 6  /* SO_BROADCAST */)
 
         /**
          * If this option is set, out-of-band data received on the socket is placed in the normal input
          * queue.
          */
-        public actual val SO_OOBINLINE: StandardSocketOption<Boolean>
-            = BooleanSocketOption("SO_OOBINLINE", 10  /* SO_OOBINLINE */)
+        public actual val SO_OOBINLINE: StandardSocketOption<Boolean> =
+            BooleanSocketOption("SO_OOBINLINE", 10  /* SO_OOBINLINE */)
 
         /**
          * This option gets or sets the size of the output buffer.
          */
-        public actual val SO_SNDBUF: StandardSocketOption<ULong>
-            = ULongSocketOption("SO_SNDBUF", 7  /* SO_SNDBUF */)
+        public actual val SO_SNDBUF: StandardSocketOption<ULong> =
+            ULongSocketOption("SO_SNDBUF", 7  /* SO_SNDBUF */)
 
         /**
          * This option gets or sets the size of the input buffer.
          */
-        public actual val SO_RCVBUF: StandardSocketOption<ULong>
-            = ULongSocketOption("SO_RCVBUF", 8  /* SO_RCVBUF */)
+        public actual val SO_RCVBUF: StandardSocketOption<ULong> =
+            ULongSocketOption("SO_RCVBUF", 8  /* SO_RCVBUF */)
 
     }
 }

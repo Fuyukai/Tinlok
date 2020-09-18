@@ -59,8 +59,7 @@ public fun PurePath.withName(name: String): PurePath = withName(name.toByteStrin
 /**
  * Checks if this path is the parent of the [other] path.
  */
-public fun PurePath.isParentOf(other: PurePath): Boolean
-    = other.isChildOf(this)
+public fun PurePath.isParentOf(other: PurePath): Boolean = other.isChildOf(this)
 
 /**
  * Gets all of the parents of this Path.

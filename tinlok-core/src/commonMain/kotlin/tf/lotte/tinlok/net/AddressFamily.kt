@@ -16,8 +16,10 @@ public expect enum class AddressFamily {
     // main IP
     /** Unspecified address family. */
     AF_UNSPEC,
+
     /** IPv4 */
     AF_INET,
+
     /** IPv6 */
     AF_INET6,
     // AF_UNIX is available on newer versions of Windows 10 so it's available on all platforms

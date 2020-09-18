@@ -42,7 +42,7 @@ public actual object Syscall {
     /**
      * Wraps an accepted socket and a [ConnectionInfo] for the accepted socket.
      */
-    public class Accepted<T: ConnectionInfo>(public val fd: FD, public val info: T?)
+    public class Accepted<T : ConnectionInfo>(public val fd: FD, public val info: T?)
 
     public const val ERROR: Int = -1
     public const val LONG_ERROR: Long = -1L
@@ -632,7 +632,7 @@ public actual object Syscall {
      * Accepts a new connection from the specified socket.
      */
     @Unsafe
-    public fun <T: ConnectionInfo> accept(
+    public fun <T : ConnectionInfo> accept(
         sock: FD, creator: ConnectionInfoCreator<T>
     ): Accepted<T> = memScoped {
         val addr = alloc<sockaddr_storage>()

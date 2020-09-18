@@ -39,8 +39,10 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
     override val name: String by pure::name
     override fun resolveChild(other: PurePath): LinuxPath = LinuxPath(pure.resolveChild(other))
     override fun withName(name: ByteString): LinuxPath = LinuxPath(pure.withName(name))
+
     @Unsafe
     override fun unsafeToString(): String = pure.unsafeToString()
+
     // todo: make this use LinuxPath as the prefix
     override fun toString(): String = pure.toString()
     override fun isChildOf(other: PurePath): Boolean = pure.isChildOf(other)

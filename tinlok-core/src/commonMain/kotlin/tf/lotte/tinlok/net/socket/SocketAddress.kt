@@ -15,7 +15,7 @@ import tf.lotte.tinlok.net.IPProtocol
 /**
  * Base abstract class for all socket addresses.
  */
-public abstract class SocketAddress<T: ConnectionInfo> : Set<T> {
+public abstract class SocketAddress<T : ConnectionInfo> : Set<T> {
     /** The protocol for this socket address. */
     public abstract val protocol: IPProtocol
 }

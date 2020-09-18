@@ -20,6 +20,7 @@ import tf.lotte.tinlok.util.Unsafe
 internal abstract class LinuxTcpParent : TcpSocket {
     /* socket has been opened and fd != -1 */
     protected var isOpen: Boolean = false
+
     /* linux socket file descriptor */
     protected abstract val fd: FD
 
