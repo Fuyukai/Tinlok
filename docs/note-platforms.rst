@@ -1,7 +1,7 @@
 .. _platform_support:
 
-Platform support
-================
+A note on platform support
+==========================
 
 Tinlok, being a native library, needs to be ported to each target it runs on. Whilst a lot of
 code is shared, libc bindings are specific to each OS and statically linked libraries are

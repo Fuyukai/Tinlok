@@ -22,6 +22,11 @@ Some common APIs are marked as unsafe, for varying reasons:
 
   - Some common APIs require extra setup before they can be use
 
+* Resource leaks
+
+  - Kotlin/Native has no concept of finalisers. This means that opening a file without making
+    sure you close it later on will leak that file descriptor, permanently.
+
 The ``Unsafe`` annotation
 -------------------------
 

@@ -10,7 +10,7 @@
 package tf.lotte.tinlok
 
 // TODO: This is not very efficient.
-// I believe a proper search alg would be faster. But that's for another day.
+//  I believe a proper search alg would be faster. But that's for another day.
 /**
  * Splits a [ByteString] by the specified [delim].
  */

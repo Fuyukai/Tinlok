@@ -14,7 +14,10 @@ possible.
    :caption: Important info
 
    note-safety.rst
+   note-fork.rst
    note-platforms.rst
+   note-stability.rst
+   note-issues.rst
 
 .. toctree::
    :maxdepth: 1

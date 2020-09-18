@@ -9,8 +9,6 @@
 
 package tf.lotte.tinlok.net
 
-// TODO: see if we care about RDM/SEQPACKET
-
 /**
  * An enumeration of the available socket kinds.
  */
