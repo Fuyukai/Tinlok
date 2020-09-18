@@ -108,15 +108,6 @@ public fun Path.recursiveDelete() {
     this.removeDirectory()
 }
 
-/**
- * Helper function that deletes a directory or a file with the right call.
- */
-public fun Path.delete() {
-    if (isDirectory(followSymlinks = false)) recursiveDelete()
-    else unlink()
-}
-
-
 // XXX: This is not particularly efficient allocation or system call wise...
 //      I'm justifying it by this being an uncommon operation.
 //      Somebody can feel free to optimise this.
@@ -155,11 +146,64 @@ public fun Path.recursiveCopy(to: Path) {
             }
             // just a file, copy it
             old.isRegularFile(followSymlinks = false) -> {
-                old.copy(new)
+                old.copyFile(new)
             }
         }
     }
 }
+
+// == Combination helpers == //
+
+/**
+ * Moves any file or directory safely. This is the recommended method to move a path safely as it
+ * will work cross-filesystem.
+ *
+ * This method is not guaranteed to be atomic but the new file or directory will exist before the
+ * old file or directory is removed if a non-atomic method is chosen.
+ */
+@OptIn(Unsafe::class)
+public fun Path.move(to: Path) {
+    if (isSafeToRename(to)) {
+        this.rename(to)
+    } else {
+        // copy then delete
+        this.copy(to)
+        this.delete()
+    }
+}
+
+/**
+ * Copies the file or folder at this path to the specified other path. This is recommended over
+ * using copyFile or recursiveCopy as it will pick the right method appropriately.
+ */
+@OptIn(Unsafe::class)
+public fun Path.copy(to: Path) {
+    val link = this.linkTarget()
+    if (link != null) {
+        return to.symlinkTo(link)
+    }
+
+    // not a symlink..
+    // maybe a directory?
+    if (isDirectory(followSymlinks = false)) {
+        return recursiveCopy(to)
+    }
+
+    // not a directory either...
+    // just copy it as a file.
+    copyFile(to)
+}
+
+
+/**
+ * Helper function that deletes the directory or file at this path. This is recommended
+ * over using recursiveDelete or unlink as it will pick the right method appropriately.
+ */
+public fun Path.delete() {
+    if (isDirectory(followSymlinks = false)) recursiveDelete()
+    else unlink()
+}
+
 
 /**
  * Opens a path for file I/O, calling the specified lambda with the opened file. The file will be
