@@ -47,10 +47,18 @@ public interface PurePath {
 
     /**
      * The string representation of the components that comprise this path.
-     *
-     * This will decode the underlying components on every read
      */
     public val components: List<String>
+
+    /**
+     * The raw anchor of this path.
+     */
+    public val rawAnchor: ByteString?
+
+    /**
+     * The anchor of this path.
+     */
+    public val anchor: String?
 
     /** The parent of this Path. */
     public val parent: PurePath

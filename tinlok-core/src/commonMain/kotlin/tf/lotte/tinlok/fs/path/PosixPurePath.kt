@@ -70,11 +70,8 @@ public open class PosixPurePath(rawParts: List<ByteString>) : PurePath {
     }
 
     override val isAbsolute: Boolean get() = rawComponents[0] == SLASH
-    override val rawName: ByteString by lazy {
-        rawComponents.last()
-    }
-
-    override val name: String by lazy { rawName.decode() }
+    override val rawAnchor: ByteString? get() = if (isAbsolute) SLASH else null
+    override val anchor: String? get() = rawAnchor?.decode()
 
     override val parent: PosixPurePath by lazy {
         if (rawComponents.size >= 2) {
@@ -89,6 +86,14 @@ public open class PosixPurePath(rawParts: List<ByteString>) : PurePath {
             else DOT_PATH
         }
     }
+
+    override val rawName: ByteString by lazy {
+        rawComponents.last()
+    }
+
+    override val name: String by lazy { rawName.decode() }
+
+
 
     override fun resolveChild(other: PurePath): PosixPurePath {
         require(other is PosixPurePath) { "Can only accept other Posix paths!" }
