@@ -7,7 +7,7 @@ Here's a list of issues I know about with the codebase:
 
 * Non-unicode paths don't work
 
-  - This is a Kotlin issue; see `KT-41853<https://youtrack.jetbrains.com/issue/KT-41853>`_.
+  - This is a Kotlin issue; see `KT-41853 <https://youtrack.jetbrains.com/issue/KT-41853>`_.
 
 * No pure-Kotlin path resolving
 
@@ -27,6 +27,6 @@ Here's a list of issues I know about with the codebase:
 
 * Path extensions really really like to call lstat()
 
-* If you are stupid and call fork() (DON'T CALL FORK) file descriptors will be copied (no
+* If you are stupid and do fork-exec (DON'T CALL FORK) file descriptors will be copied (no
   O_CLOEXC yet)
 
