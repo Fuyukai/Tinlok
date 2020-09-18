@@ -779,6 +779,17 @@ public actual object Syscall {
         option.fromNativeStructure(this, storage)
     }
 
+    /**
+     * Shuts down part of a fully duplex connection.
+     */
+    @Unsafe
+    public fun shutdown(sock: FD, how: Int) {
+        val res = platform.posix.shutdown(sock, how)
+        if (res.isError) {
+            throw OSException(errno, message = strerror())
+        }
+    }
+
     // == Misc == //
     // region Misc
 
