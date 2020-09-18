@@ -210,8 +210,8 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
      * Efficiently copies from this path using sendfile().
      */
     @OptIn(Unsafe::class)
-    override fun copy(path: PurePath): Path {
-        // open() doesn't fail on directories...
+    override fun copyFile(path: PurePath): Path {
+        // open() doesn't fail on directories (with O_RDONLY)...
         // so we have to check it ourselves
         if (this.isDirectory(followSymlinks = true)) {
             throw IsADirectoryException(unsafeToString())

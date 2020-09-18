@@ -143,7 +143,7 @@ public interface Path : PurePath {
      * For copying empty directories, use [createDirectory]. For copying directories recursively,
      * see [tf.lotte.tinlok.fs.path.recursiveCopy].
      */
-    public fun copy(path: PurePath): Path
+    public fun copyFile(path: PurePath): Path
 
     /**
      * Creates a new symbolic link at this path pointing to the specified other [path].

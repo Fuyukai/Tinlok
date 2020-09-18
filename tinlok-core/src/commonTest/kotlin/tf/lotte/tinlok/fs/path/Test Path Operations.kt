@@ -101,7 +101,7 @@ class `Test Path Operations` {
 
         val toWrite = "happy cirno day 9/9/2020"
         first.writeString(toWrite)
-        first.copy(second)
+        first.copyFile(second)
 
         assertTrue(first.exists())
         assertTrue(second.exists())
