@@ -15,12 +15,12 @@ possible.
    :maxdepth: 1
    :caption: Important info
 
-   note-safety.rst
-   note-fork.rst
-   note-platforms.rst
-   note-stability.rst
-   note-issues.rst
-   note-dokka.rst
+   notes/note-safety.rst
+   notes/note-fork.rst
+   notes/note-platforms.rst
+   notes/note-stability.rst
+   notes/note-issues.rst
+   notes/note-dokka.rst
 
 .. toctree::
    :maxdepth: 1
