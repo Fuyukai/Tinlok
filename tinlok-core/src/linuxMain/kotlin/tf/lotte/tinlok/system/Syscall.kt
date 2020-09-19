@@ -371,7 +371,15 @@ public actual object Syscall {
      */
     @Unsafe
     public fun readdir(dirfd: CValuesRef<DIR>): CPointer<dirent>? {
-        return platform.posix.readdir(dirfd)
+        // reset errno so we can tell apart an error from an end of stream
+        set_posix_errno(0)
+
+        val res = platform.posix.readdir(dirfd)
+        if (res == null && errno != 0) {
+            throwErrno(errno)
+        }
+
+        return res
     }
 
     /**
