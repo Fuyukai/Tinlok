@@ -114,14 +114,22 @@ public actual object Syscall {
      */
     @Unsafe
     public fun strerror(): String {
-        return platform.posix.strerror(posix_errno())?.toKString() ?: "Unknown error"
+        return strerror(posix_errno())
     }
 
     /**
      * Gets the strerror() for the specified errno.
      */
     public fun strerror(errno: Int): String {
-        return platform.posix.strerror(errno)?.toKString() ?: "Unknown error"
+        // this is large, but should always be sufficient
+        // if any strerror is too big, i'll update it
+        val buf = ByteArray(1024)
+        val res = buf.usePinned {
+            strerror_r(errno, it.addressOf(0), buf.size.toULong())
+        }
+        if (res.isError) throw Error("strerror returned errno, can't reasonably do anything")
+        // gross!
+        return buf.toKString()
     }
 
     /**
