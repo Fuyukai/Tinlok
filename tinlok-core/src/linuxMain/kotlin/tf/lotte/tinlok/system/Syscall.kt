@@ -324,8 +324,12 @@ public actual object Syscall {
         val pathStat = alloc.alloc<stat>()
 
         val res = if (followSymlinks) stat(path, pathStat.ptr) else lstat(path, pathStat.ptr)
-        return if (res.isError) null
-        else pathStat
+        if (res.isError) {
+            if (res == ENOENT) return null
+            else throwErrnoPath(errno, path)
+        }
+
+        return pathStat
     }
 
     /**
