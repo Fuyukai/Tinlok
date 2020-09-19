@@ -25,7 +25,6 @@ import kotlin.experimental.ExperimentalTypeInference
 internal typealias FD = Int
 
 // TODO: Probably want to make some of these enums.
-// TODO: Some EINVAL probably can be IllegalArgumentException, rather than IOException.
 
 /**
  * Namespace object for all the libc calls.
@@ -80,11 +79,49 @@ public actual object Syscall {
     }
 
     /**
+     * Throws on errno for paths.
+     */
+    public fun throwErrnoPath(errno: Int, path: String): Nothing {
+        throw when (errno) {
+            ENOENT -> FileNotFoundException(path)
+            EEXIST -> FileAlreadyExistsException(path)
+            EISDIR -> IsADirectoryException(path)
+            else -> throwErrno(errno)
+        }
+    }
+
+    /**
+     * Throws on errno.
+     */
+    public fun throwErrno(errno: Int): Nothing {
+        throw when (errno) {
+            EACCES -> AccessDeniedException()
+            EPERM -> PermissionDeniedException()
+
+            // sockets
+            EPIPE -> BrokenPipeException()
+            ESHUTDOWN -> SocketShutdownException()
+            ECONNRESET -> ConnectionResetException()
+            ECONNABORTED -> ConnectionAbortedException()
+            ECONNREFUSED -> ConnectionRefusedException()
+
+            else -> OSException(errno = errno, message = strerror(errno))
+        }
+    }
+
+    /**
      * Gets the current errno strerror().
      */
     @Unsafe
     public fun strerror(): String {
-        return strerror(posix_errno())?.toKString() ?: "Unknown error"
+        return platform.posix.strerror(posix_errno())?.toKString() ?: "Unknown error"
+    }
+
+    /**
+     * Gets the strerror() for the specified errno.
+     */
+    public fun strerror(errno: Int): String {
+        return platform.posix.strerror(errno)?.toKString() ?: "Unknown error"
     }
 
     /**
@@ -108,13 +145,7 @@ public actual object Syscall {
     @Unsafe
     private fun openShared(path: String, fd: Int): Int {
         if (fd.isError) {
-            throw when (errno) {
-                EEXIST -> FileAlreadyExistsException(path)
-                ENOENT -> FileNotFoundException(path)
-                EISDIR -> IsADirectoryException(path)
-                EACCES -> TODO("EACCES")
-                else -> OSException(errno, message = strerror())
-            }
+            throwErrnoPath(errno, path)
         }
 
         return fd
@@ -142,7 +173,7 @@ public actual object Syscall {
     public fun close(fd: FD) {
         val res = platform.posix.close(fd)
         if (res.isError) {
-            throw OSException(errno, message = strerror())
+            throwErrno(errno)
         }
     }
 
@@ -190,9 +221,9 @@ public actual object Syscall {
 
         if (readCount.isError) {
             // TODO: EAGAIN
-            throw when (errno) {
-                EIO -> IOException(strerror())
-                else -> OSException(errno, message = strerror())
+            when (errno) {
+                EAGAIN -> TODO("EAGAIN")
+                else -> throwErrno(errno)
             }
         }
 
@@ -223,7 +254,7 @@ public actual object Syscall {
 
                 // eintr means it didn't write anything, so we can transparently retry
                 if (written.isError && errno != EINTR) {
-                    throw OSException(errno, message = strerror())
+                    throwErrno(errno)
                 }
 
                 // make sure we actually write all of the bytes we want to write
@@ -254,7 +285,7 @@ public actual object Syscall {
             )
 
             if (written.isError && errno != EINTR) {
-                throw OSException(errno, message = strerror())
+                throwErrno(errno)
             }
 
             // always safe conversion
@@ -274,7 +305,7 @@ public actual object Syscall {
     public fun lseek(fd: FD, position: Long, whence: Int): Long {
         val res = platform.posix.lseek(fd, position, whence)
         if (res.isError) {
-            throw OSException(errno, message = strerror())
+            throwErrno(errno)
         }
 
         return res
@@ -298,10 +329,7 @@ public actual object Syscall {
             else lstat(path, pathStat.ptr)
 
         if (res.isError) {
-            throw when (errno) {
-                ENOENT -> FileNotFoundException(path)
-                else -> OSException(errno, message = strerror())
-            }
+            throwErrnoPath(errno, path)
         }
 
         return pathStat
@@ -316,11 +344,7 @@ public actual object Syscall {
         if (result.isError) {
             if (errno == EACCES) return false
             if (errno == ENOENT && mode == F_OK) return false
-            else throw when (errno) {
-                ENOENT -> FileNotFoundException(path)
-                EROFS -> IOException("Filesystem is read-only")  // TODO: Dedicated error?
-                else -> OSException(errno, message = strerror())
-            }
+            else throwErrno(errno)
         }
 
         return true
@@ -334,10 +358,7 @@ public actual object Syscall {
     public fun opendir(path: String): CPointer<DIR> {
         val dirfd = platform.posix.opendir(path)
         if (dirfd == null) {
-            throw when (errno) {
-                ENOENT -> FileNotFoundException(path)
-                else -> OSException(errno, message = strerror())
-            }
+            throwErrnoPath(errno, path)
         }
 
         return dirfd
@@ -358,7 +379,7 @@ public actual object Syscall {
     public fun closedir(dirfd: CValuesRef<DIR>) {
         val res = platform.posix.closedir(dirfd)
         if (res.isError) {
-            throw OSException(errno, message = strerror())
+            throwErrno(errno)
         }
     }
 
@@ -373,11 +394,7 @@ public actual object Syscall {
         val result = mkdir(path, mode)
         if (result.isError) {
             if (errno == EEXIST && existOk) return
-            else throw when (errno) {
-                EEXIST -> FileAlreadyExistsException(path)
-                ENOENT -> FileNotFoundException(path)
-                else -> OSException(errno, message = strerror())
-            }
+            else throwErrnoPath(errno, path)
         }
     }
 
@@ -388,10 +405,7 @@ public actual object Syscall {
     public fun rmdir(path: String) {
         val result = platform.posix.rmdir(path)
         if (result.isError) {
-            throw when (errno) {
-                ENOENT -> FileNotFoundException(path)
-                else -> OSException(errno, message = strerror())
-            }
+            throwErrnoPath(errno, path)
         }
     }
 
@@ -402,10 +416,7 @@ public actual object Syscall {
     public fun unlink(path: String) {
         val result = platform.posix.unlink(path)
         if (result.isError) {
-            throw when (errno) {
-                ENOENT -> FileNotFoundException(path)
-                else -> OSException(errno, message = strerror())
-            }
+            throwErrnoPath(errno, path)
         }
     }
 
@@ -418,10 +429,7 @@ public actual object Syscall {
         val buf = allocArray<ByteVar>(PATH_MAX)
         val res = getcwd(buf, PATH_MAX)
         if (res == null) {
-            throw when (errno) {
-                EACCES -> TODO("EACESS")
-                else -> OSException(errno, message = strerror())
-            }
+            throwErrno(errno)
         }
         res.readZeroTerminated(PATH_MAX)
     }
@@ -435,10 +443,7 @@ public actual object Syscall {
         val buffer = alloc.allocArray<ByteVar>(PATH_MAX)
         val res = realpath(path, buffer)
         if (res == null) {
-            throw when (errno) {
-                ENOENT -> FileNotFoundException(path)
-                else -> OSException(errno, message = strerror())
-            }
+            throwErrnoPath(errno, path)
         }
 
         val ba = res.readZeroTerminated(PATH_MAX)
@@ -453,11 +458,7 @@ public actual object Syscall {
         val buffer = alloc.allocArray<ByteVar>(PATH_MAX)
         val res = readlink(path, buffer, PATH_MAX)
         if (res.isError) {
-            throw when (errno) {
-                EACCES -> TODO("EACESS")
-                ENOENT -> FileNotFoundException(path)
-                else -> OSException(errno, message = strerror())
-            }
+            throwErrnoPath(errno, path)
         }
 
         val ba = buffer.readZeroTerminated(res.toInt())
@@ -472,10 +473,7 @@ public actual object Syscall {
         val res = platform.posix.rename(from, to)
         // TODO: figure out error for ENOENT...
         if (res.isError) {
-            throw when (errno) {
-                EEXIST, ENOTEMPTY -> FileAlreadyExistsException(to)
-                else -> OSException(errno, message = strerror())
-            }
+            throwErrno(errno)
         }
     }
 
@@ -486,11 +484,7 @@ public actual object Syscall {
     public fun symlink(target: String, linkpath: String) {
         val res = platform.posix.symlink(target, linkpath)
         if (res.isError) {
-            throw when (res) {
-                EACCES -> TODO("EACCES")
-                EEXIST -> FileAlreadyExistsException(linkpath)
-                else -> OSException(errno, message = strerror())
-            }
+            throwErrnoPath(errno, linkpath)
         }
     }
 
@@ -520,7 +514,7 @@ public actual object Syscall {
 
         val code = getaddrinfo(node, service, hints.ptr, res.ptr)
         if (code.isError) {
-            throw OSException(errno = code)
+            TODO("GAI errors")
         }
 
         // safe (non-null) if this didn't error
@@ -542,10 +536,7 @@ public actual object Syscall {
     public fun socket(family: AddressFamily, type: SocketType, protocol: IPProtocol): FD {
         val sock = socket(family.number, type.number, protocol.number)
         if (sock.isError) {
-            throw when (errno) {
-                EACCES -> TODO("EACCES")
-                else -> OSException(errno, message = strerror())
-            }
+            throwErrno(errno)
         }
 
         return sock
@@ -595,7 +586,7 @@ public actual object Syscall {
      * connection could not be established for a network reason.
      */
     @Unsafe
-    public fun connect(sock: FD, info: InetConnectionInfo): Boolean {
+    public fun connect(sock: FD, info: InetConnectionInfo) {
         val res = memScoped {
             val struct: sockaddr
             val size: UInt
@@ -618,13 +609,8 @@ public actual object Syscall {
 
         // TODO: Separate EINPROGRESS out into a sealed return type?
         if (res.isError) {
-            when (errno) {
-                ECONNREFUSED, ENETUNREACH, ETIMEDOUT -> return false
-                else -> throw OSException(errno, message = strerror())
-            }
+            throwErrno(errno)
         }
-
-        return true
     }
 
     // this easily has the ability to be one of the grossest APIs in the entire library.
@@ -642,7 +628,7 @@ public actual object Syscall {
 
         val accepted = retry { accept(sock, addr.ptr.reinterpret(), sizePtr.ptr) }
         if (accepted.isError) {
-            throw OSException(errno, message = strerror())
+            throwErrno(errno)
         }
 
         // nb: this is duplicated partially from getaddrinfo()
@@ -698,7 +684,7 @@ public actual object Syscall {
         }
 
         if (res.isError) {
-            throw OSException(errno = errno, message = strerror())
+            throwErrno(errno)
         }
     }
 
@@ -710,7 +696,7 @@ public actual object Syscall {
     public fun listen(sock: FD, backlog: Int) {
         val res = platform.posix.listen(sock, backlog)
         if (res.isError) {
-            throw OSException(errno, message = strerror())
+            throwErrno(errno)
         }
     }
 
@@ -727,7 +713,7 @@ public actual object Syscall {
         }
 
         if (read.isError) {
-            throw OSException(errno = errno, message = strerror())
+            throwErrno(errno)
         }
 
         return read.toInt()
@@ -757,7 +743,7 @@ public actual object Syscall {
         val size = option.nativeSize()
         val err = setsockopt(sock, option.level, option.linuxOptionName, native, size.toUInt())
         if (err.isError) {
-            throw OSException(errno = errno, message = strerror())
+            throwErrno(errno)
         }
     }
 
@@ -773,7 +759,7 @@ public actual object Syscall {
             storage, size
         )
         if (res.isError) {
-            throw OSException(errno = errno, message = strerror())
+            throwErrno(errno)
         }
 
         option.fromNativeStructure(this, storage)
@@ -786,7 +772,7 @@ public actual object Syscall {
     public fun shutdown(sock: FD, how: Int) {
         val res = platform.posix.shutdown(sock, how)
         if (res.isError) {
-            throw OSException(errno, message = strerror())
+            throwErrno(errno)
         }
     }
 
@@ -816,7 +802,7 @@ public actual object Syscall {
         @Suppress("UNUSED_VARIABLE")
         val res = getpwuid_r(uid, passwd.ptr, buffer, bufSize.toULong(), starResult.ptr)
         if (starResult.value == null) {
-            throw OSException(errno, message = strerror())
+            throwErrno(errno)
         }
 
         return passwd
