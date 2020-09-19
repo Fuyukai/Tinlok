@@ -13,6 +13,7 @@ import tf.lotte.tinlok.ByteString
 import tf.lotte.tinlok.b
 import tf.lotte.tinlok.exc.FileAlreadyExistsException
 import tf.lotte.tinlok.exc.IsADirectoryException
+import tf.lotte.tinlok.fs.DirEntry
 import tf.lotte.tinlok.fs.FilesystemFile
 import tf.lotte.tinlok.fs.StandardOpenModes
 import tf.lotte.tinlok.io.use
@@ -60,16 +61,17 @@ public operator fun Path.div(other: ByteString): Path = resolveChild(other)
 public fun Path.withName(name: String): Path = withName(name.toByteString())
 
 
+// TODO: Maybe move this to scandir.
 // == Path I/O extensions == //
 /**
- * Flattens a Path tree into a listing of [Path].
+ * Flattens a Path tree into a listing of [DirEntry].
  *
  * This will be ordered in most components to least (so mostly deeply nested to least).
  */
-public fun Path.flattenTree(): List<Path> {
+public fun Path.flattenTree(): List<DirEntry> {
     // this descends into every directory without being recursive in itself.
     // this avoids death by stack overflow
-    val final = mutableListOf<Path>()
+    val final = mutableListOf<DirEntry>()
     val pending = ArrayDeque(listDir())
 
     // examine all items in pending. if it's a directory, add all child items onto pending
@@ -77,7 +79,7 @@ public fun Path.flattenTree(): List<Path> {
     // then on the next pass around pending those subdirectories are recursively examined
     for (item in pending) {
         if (item.isDirectory(followSymlinks = false)) {
-            for (subitem in item.listDir()) {
+            for (subitem in item.path.listDir()) {
                 pending.add(subitem)
             }
             final.add(item)
@@ -86,10 +88,9 @@ public fun Path.flattenTree(): List<Path> {
         }
     }
 
-    return final.sortedByDescending { it.rawComponents.size }
+    return final.sortedByDescending { it.path.rawComponents.size }
 }
 
-// todo cache the stat usages in flattenTree maybe?
 /**
  * Recursively deletes a directory.
  */
@@ -99,16 +100,16 @@ public fun Path.recursiveDelete() {
     // remove all entries in the tree from most deeply nested to least deeply nested
     for (i in flattened) {
         if (!i.isDirectory(followSymlinks = false)) {
-            i.unlink()
+            i.path.unlink()
         } else {
-            i.removeDirectory()
+            i.path.removeDirectory()
         }
     }
 
     this.removeDirectory()
 }
 
-// XXX: This is not particularly efficient allocation or system call wise...
+// XXX: This is not particularly efficient allocation wise...
 //      I'm justifying it by this being an uncommon operation.
 //      Somebody can feel free to optimise this.
 /**
@@ -135,8 +136,8 @@ public fun Path.recursiveCopy(to: Path) {
 
 
     for (old in allPaths) {
-        val new = old.reparent(fromAbsolute, to)
-        val linkTarget = old.linkTarget()
+        val new = old.path.reparent(fromAbsolute, to)
+        val linkTarget = old.path.linkTarget()
         when {
             // simply make a new symlink
             linkTarget != null -> new.symlinkTo(linkTarget)
@@ -146,7 +147,7 @@ public fun Path.recursiveCopy(to: Path) {
             }
             // just a file, copy it
             old.isRegularFile(followSymlinks = false) -> {
-                old.copyFile(new)
+                old.path.copyFile(new)
             }
         }
     }

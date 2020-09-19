@@ -333,7 +333,7 @@ public actual object Syscall {
 
         val res = if (followSymlinks) stat(path, pathStat.ptr) else lstat(path, pathStat.ptr)
         if (res.isError) {
-            if (res == ENOENT) return null
+            if (errno == ENOENT) return null
             else throwErrnoPath(errno, path)
         }
 

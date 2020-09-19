@@ -12,6 +12,7 @@ package tf.lotte.tinlok.fs.path
 
 import tf.lotte.tinlok.ByteString
 import tf.lotte.tinlok.exc.FileNotFoundException
+import tf.lotte.tinlok.fs.DirEntry
 import tf.lotte.tinlok.fs.FileOpenMode
 import tf.lotte.tinlok.fs.FilePermission
 import tf.lotte.tinlok.fs.FilesystemFile
@@ -116,9 +117,23 @@ public interface Path : PurePath {
     )
 
     /**
-     * Lists the files in this directory.
+     * Scans this directory, passing a [DirEntry] to the specified block. This is a safer and
+     * faster alternative to [listDir] as a new list does not need to be allocated, and dir
+     * entries are fresh.
      */
-    public fun listDir(): List<Path>
+    public fun scanDir(block: (DirEntry) -> Unit)
+
+    /**
+     * Lists the files in this directory.
+     *
+     * This is equivalent to
+     * ``val list = mutableListOf<DirEntry>(); path.scanDir { list.add(it) }``.
+     */
+    public fun listDir(): List<DirEntry> {
+        val items = mutableListOf<DirEntry>()
+        scanDir(items::add)
+        return items
+    }
 
     /**
      * Moves the file or folder at this path to the new path [path], returning the new path.

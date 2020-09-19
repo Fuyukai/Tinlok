@@ -159,15 +159,13 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
     }
 
     @OptIn(Unsafe::class)
-    override fun listDir(): List<Path> {
+    override fun scanDir(block: (DirEntry) -> Unit) {
         val path = this.unsafeToString()
         val dir = Syscall.opendir(path)
-        val items = mutableListOf<Path>()
-
-        val dot = b(".")
-        val dotdot = b("..")
-
         try {
+            val dot = b(".")
+            val dotdot = b("..")
+
             while (true) {
                 val next = Syscall.readdir(dir) ?: break
                 val item = next.pointed
@@ -179,10 +177,12 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
                 if (bs == dot) continue
                 if (bs == dotdot) continue
 
-                items.add(resolveChild(bs))
-            }
+                val child = resolveChild(bs)
+                val type = FileType.fromPosixType(item.d_type)
+                val entry = DirEntry(child, type)
+                block(entry)
 
-            return items
+            }
         } finally {
             Syscall.closedir(dir)
         }
@@ -294,8 +294,26 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
     }
 }
 
+// helper functions
 private inline fun PurePath.ensureLinuxPath(): LinuxPath {
     if (this is LinuxPath) return this
     if (this !is PosixPurePath) error("Not a POSIX path!")
     return LinuxPath(this)
+}
+
+// this is a gross map because DT_ entries are not contiguous
+private val fileTypeMapping = mapOf(
+    DT_BLK to FileType.BLOCK_DEVICE,
+    DT_CHR to FileType.CHARACTER_DEVICE,
+    DT_DIR to FileType.DIRECTORY,
+    DT_FIFO to FileType.FIFO,
+    DT_LNK to FileType.SYMLINK,
+    DT_REG to FileType.REGULAR_FILE,
+    DT_SOCK to FileType.UNIX_SOCKET,
+    DT_UNKNOWN to FileType.UNKNOWN,
+)
+
+@OptIn(ExperimentalUnsignedTypes::class)
+private fun FileType.Companion.fromPosixType(type: UByte): FileType {
+    return fileTypeMapping[type.toInt()] ?: FileType.UNKNOWN
 }
