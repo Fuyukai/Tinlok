@@ -315,24 +315,26 @@ public actual object Syscall {
 
     // == File Polling == //
     // region File Polling
+
+    /**
+     * Performs a stat/lstat() call without throwing, returning null instead.
+     */
+    @Unsafe
+    public fun __stat_safer(alloc: NativePlacement, path: String, followSymlinks: Boolean): stat? {
+        val pathStat = alloc.alloc<stat>()
+
+        val res = if (followSymlinks) stat(path, pathStat.ptr) else lstat(path, pathStat.ptr)
+        return if (res.isError) null
+        else pathStat
+    }
+
     /**
      * Gets statistics about a file.
      */
     @Unsafe
-    public fun stat(
-        alloc: NativePlacement, path: String, followSymlinks: Boolean
-    ): stat {
-        val pathStat = alloc.alloc<stat>()
-
-        val res =
-            if (followSymlinks) stat(path, pathStat.ptr)
-            else lstat(path, pathStat.ptr)
-
-        if (res.isError) {
-            throwErrnoPath(errno, path)
-        }
-
-        return pathStat
+    public fun stat(alloc: NativePlacement, path: String, followSymlinks: Boolean): stat {
+        return __stat_safer(alloc, path, followSymlinks)
+            ?: throwErrnoPath(errno, path)
     }
 
     /**

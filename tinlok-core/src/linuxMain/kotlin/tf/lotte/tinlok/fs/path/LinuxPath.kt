@@ -57,6 +57,21 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
     }
 
     @OptIn(Unsafe::class)
+    fun statSafe(followSymlinks: Boolean): Stat? = memScoped {
+        val strPath = pure.unsafeToString()
+        val pathStat = Syscall.__stat_safer(this, strPath, followSymlinks)
+            ?: return null
+
+        return Stat(
+            ownerUID = pathStat.st_uid.toInt(),
+            ownerGID = pathStat.st_gid.toInt(),
+            size = pathStat.st_size,
+            deviceId = pathStat.st_dev,
+            st_mode = pathStat.st_mode
+        )
+    }
+
+    @OptIn(Unsafe::class)
     fun stat(followSymlinks: Boolean): Stat = memScoped {
         val strPath = pure.unsafeToString()
         val pathStat = Syscall.stat(this, strPath, followSymlinks)
@@ -276,18 +291,6 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
 
     override fun hashCode(): Int {
         return pure.hashCode()
-    }
-}
-
-/**
- * Helper function for safe stat.
- */
-@OptIn(Unsafe::class)
-private inline fun LinuxPath.statSafe(followSymlinks: Boolean): Stat? {
-    return try {
-        stat(followSymlinks)
-    } catch (e: FileNotFoundException) {
-        null
     }
 }
 
