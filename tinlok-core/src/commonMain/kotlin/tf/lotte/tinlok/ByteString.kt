@@ -44,7 +44,7 @@ private constructor(
         /**
          * Creates a new [ByteString] from a raw [ByteStringHolder].
          */
-        internal fun fromRawHolder(holder: ByteStringHolder): ByteString = ByteString(holder)
+        public fun fromRawHolder(holder: ByteStringHolder): ByteString = ByteString(holder)
     }
 
     /** The size of this ByteString. */

@@ -126,7 +126,6 @@ public fun Path.recursiveCopy(to: Path) {
     val allPaths = fromAbsolute.flattenTree().asReversed()
 
     if (to.exists()) {
-        // simple check ensuring
         if (!to.isDirectory(followSymlinks = true)) {
             throw FileAlreadyExistsException(to.unsafeToString())
         }

@@ -38,4 +38,5 @@ Contents
 .. toctree::
    :maxdepth: 1
 
+   bytestring.rst
    paths/pure.rst
