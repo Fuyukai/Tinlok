@@ -1,36 +1,11 @@
 Tinlok
 ------
 
-**The Tinlok GitHub page is a temporary location.**
-
 Tinlok is a library that fills in the "missing pieces" from the Kotlin standard library on native
 platforms as well as adding useful optional extra libraries.
 
 Tinlok is entirely re-implementations of common standard library features for Native desktop only.
 It is not designed for the JVM, iOS or Android and support will not be added.
-
-What?
-=====
-
-Tinlok adds or is planning to contain the following modules and features:
-
-- ``tinlok-core``
- - Path helpers (inspired by Python's ``pathlib``)
- - Filesystem I/O
- - Network I/O
- - (Planned) Subprocessing
- - (Planned) Time/Date based on java.time
- - (Planned) Hashes (Blake2)
- - (Planned) Compression/decompression (zlib, gzip, lzma)
-
-- ``tinlok-async`` (Planned)
- - Suspending I/O extensions using ``kotlinx.coroutines``
-
-- ``tinlok-tls`` (Planned)
- - TLS extensions to networking I/O (sync and async)
-
-- ``tinlok-crypto`` (Planned)
- - Libsodium-based cryptography library
 
 Why?
 ====
