@@ -39,4 +39,6 @@ Contents
    :maxdepth: 1
 
    bytestring.rst
+   io-interfaces.rst
    paths/pure.rst
+   paths/io.rst
