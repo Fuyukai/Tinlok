@@ -16,6 +16,7 @@ import platform.posix.*
 import tf.lotte.tinlok.ByteString
 import tf.lotte.tinlok.exc.*
 import tf.lotte.tinlok.net.*
+import tf.lotte.tinlok.net.dns.GAIException
 import tf.lotte.tinlok.net.socket.LinuxSocketOption
 import tf.lotte.tinlok.util.Unsafe
 import tf.lotte.tinlok.util.toByteArray
@@ -130,6 +131,15 @@ public actual object Syscall {
         if (res.isError) throw Error("strerror returned errno, can't reasonably do anything")
         // gross!
         return buf.toKString()
+    }
+
+    /**
+     * Like strerror(), but for getaddrinfo return codes.
+     */
+    @Unsafe
+    public fun gai_strerror(errno: Int): String {
+        val res = platform.posix.gai_strerror(errno)
+        return res?.readZeroTerminated()?.toKString() ?: "Unknown error!"
     }
 
     /**
@@ -535,8 +545,8 @@ public actual object Syscall {
         hints.ai_protocol = protocol
 
         val code = getaddrinfo(node, service, hints.ptr, res.ptr)
-        if (code.isError) {
-            TODO("GAI errors")
+        if (code < 0) {
+            throw GAIException(errno = code, message = gai_strerror(code))
         }
 
         // safe (non-null) if this didn't error
@@ -699,7 +709,7 @@ public actual object Syscall {
                     struct = __ipv4_to_sockaddr(this, address.ip as IPv4Address, address.port)
                     size = sizeOf<sockaddr_in>().toUInt()
                 }
-                else -> TODO("Unknown address family")
+                else -> error("Unknown or unsupported address family: ${address.family}")
             }
 
             bind(sock, struct.ptr, size)
