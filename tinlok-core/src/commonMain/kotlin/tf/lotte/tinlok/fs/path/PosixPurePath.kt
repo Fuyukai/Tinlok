@@ -170,9 +170,8 @@ public open class PosixPurePath(rawParts: List<ByteString>) : PurePath {
         return joined.unwrap().decodeToString(throwOnInvalidSequence = true)
     }
 
-    // TODO: Maybe revist this implementation?
     override fun equals(other: Any?): Boolean {
-        if (other == null || other !is PurePath) return false
+        if (other == null || other !is PosixPurePath) return false
         return rawComponents == other.rawComponents
     }
 
