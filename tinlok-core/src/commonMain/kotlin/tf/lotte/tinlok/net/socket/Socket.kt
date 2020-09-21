@@ -10,12 +10,11 @@
 package tf.lotte.tinlok.net.socket
 
 import tf.lotte.tinlok.io.Closeable
-import tf.lotte.tinlok.net.ConnectionInfo
 
 /**
  * Base interface for all socket classes.
  */
-public interface Socket<I : ConnectionInfo, ADDR : SocketAddress<I>> : Closeable {
+public interface Socket : Closeable {
     /**
      * Sets the standard socket [option] on this socket.
      *

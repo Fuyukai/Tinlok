@@ -20,7 +20,7 @@ import tf.lotte.tinlok.util.Unsafe
  *
  * This is simply a [HalfCloseableStream] combined with a [Socket].
  */
-public interface TcpClientSocket : TcpSocket, ClientSocket<TcpConnectionInfo, TcpSocketAddress> {
+public interface TcpClientSocket : TcpSocket, ClientSocket<TcpConnectionInfo> {
     public companion object {
         /**
          * Creates a new [TcpClientSocket] from a platform socket.

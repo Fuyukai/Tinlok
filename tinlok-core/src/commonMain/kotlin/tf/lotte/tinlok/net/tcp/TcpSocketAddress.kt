@@ -28,7 +28,6 @@ public class TcpSocketAddress private constructor(
          * Resolves a [host] and [port] combination into a [TcpSocketAddress].
          *
          * @param resolver: The [AddressResolver] to resolve the address with.
-         * @param preferIpv6: If IPv6 should be preferred when resolving (default true).
          */
         @OptIn(Unsafe::class)
         public fun resolve(
@@ -37,7 +36,7 @@ public class TcpSocketAddress private constructor(
             val connections = resolver.getaddrinfo(
                 host = host, service = port, family = AddressFamily.AF_UNSPEC,
                 type = SocketType.SOCK_STREAM, protocol = IPProtocol.IPPROTO_TCP
-            ).map { it as TcpConnectionInfo }
+            ).filterIsInstance<TcpConnectionInfo>()
             return TcpSocketAddress(connections.toSet())
         }
     }

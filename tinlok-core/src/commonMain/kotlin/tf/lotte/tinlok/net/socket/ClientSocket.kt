@@ -17,8 +17,8 @@ import tf.lotte.tinlok.net.ConnectionInfo
  *
  * @param ADDR: The type of address this client socket uses.
  */
-public interface ClientSocket<I : ConnectionInfo, ADDR : SocketAddress<I>>
-    : HalfCloseableStream, Socket<I, ADDR> {
+public interface ClientSocket<I : ConnectionInfo>
+    : HalfCloseableStream, Socket {
     /** The remote address this socket is connected to. */
     public val remoteAddress: I
 }

@@ -16,15 +16,11 @@ import tf.lotte.tinlok.util.Unsafe
  * A server socket that synchronously produces new [ClientSocket] instances when
  * accepting.
  *
- *
+ * All [ServerSocket] instances wrap the address they bind to.
  */
-public interface ServerSocket<
-    I : ConnectionInfo,
-    ADDR : SocketAddress<I>,
-    T : ClientSocket<I, ADDR>
-    > : Socket<I, ADDR> {
+public interface ServerSocket<I : ConnectionInfo, T : ClientSocket<I>> : Socket {
     /**
-     * Binds this socket to the address.
+     * Binds this socket to its enclosed address.
      */
     public fun bind(backlog: Int = 128)  // old linux support for 128
 

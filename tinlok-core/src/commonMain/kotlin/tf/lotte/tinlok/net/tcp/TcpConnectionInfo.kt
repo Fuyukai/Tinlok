@@ -14,9 +14,7 @@ import tf.lotte.tinlok.net.*
 /**
  * Connection information for TCP sockets.
  */
-public class TcpConnectionInfo(
-    ip: IPAddress, port: Int,
-) : InetConnectionInfo(ip, port) {
+public class TcpConnectionInfo(ip: IPAddress, port: Int) : InetConnectionInfo(ip, port) {
     public companion object {
         /**
          * Creates a new [TcpConnectionInfo] representing the wildcard address, for binding a

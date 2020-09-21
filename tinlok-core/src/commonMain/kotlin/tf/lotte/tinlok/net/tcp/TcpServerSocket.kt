@@ -17,8 +17,7 @@ import tf.lotte.tinlok.util.Unsafe
  * Interface defining a TCP synchronous server socket that produces [TcpClientSocket]
  * instances on ``accept()``.
  */
-public interface TcpServerSocket :
-    ServerSocket<TcpConnectionInfo, TcpSocketAddress, TcpClientSocket> {
+public interface TcpServerSocket : ServerSocket<TcpConnectionInfo, TcpClientSocket> {
     public companion object {
         /**
          * Opens a new unbound [TcpServerSocket] from a platform socket.
