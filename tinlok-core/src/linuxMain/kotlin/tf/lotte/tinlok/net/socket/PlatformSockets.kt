@@ -11,6 +11,8 @@ package tf.lotte.tinlok.net.socket
 
 import platform.posix.ENETUNREACH
 import tf.lotte.tinlok.exc.OSException
+import tf.lotte.tinlok.net.AddressFamily
+import tf.lotte.tinlok.net.AllConnectionsFailedException
 import tf.lotte.tinlok.net.tcp.*
 import tf.lotte.tinlok.system.Syscall
 import tf.lotte.tinlok.util.Unsafe
@@ -21,6 +23,7 @@ public actual object PlatformSockets {
      * Creates a new unconnected [TcpClientSocket].
      */
     @Unsafe
+    @Throws(AllConnectionsFailedException::class, OSException::class)
     public actual fun newTcpSynchronousSocket(address: TcpSocketAddress): TcpClientSocket {
         // try every address in sequence
         // when kotlin's concurrency (memory) model gets better, i will implement happy eyeballs.
@@ -41,7 +44,7 @@ public actual object PlatformSockets {
 
                 // ENETUNREACH is raised when ipv6 is requested but the network doesn't support ipv6
                 // so silently eat the error
-                if (e.errno == ENETUNREACH) continue
+                if (e.errno == ENETUNREACH && info.family == AddressFamily.AF_INET6) continue
                 else throw e
             } catch (e: Throwable) {
                 // always close if connect() fails for other reasons
@@ -50,7 +53,7 @@ public actual object PlatformSockets {
             }
         }
 
-        TODO("Appropriate error for failed connections")
+        throw AllConnectionsFailedException(address)
     }
 
     /**
