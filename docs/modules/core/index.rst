@@ -9,7 +9,7 @@ The core module is the primary module for Tinlok. The core module contains:
 * Filesystem I/O
 * Network I/O
 * (Planned) Subprocessing
-* (Planned) Full time/date library
+* (Planned) Full time/date library based on Pendulum (not like ``kotlinx.datetime``)
 * (Planned) Hashing
 * (Planned) Compression/decompression (zlib, gzip, lzma)
 * (Planned) Maybe more?
@@ -40,5 +40,12 @@ Contents
 
    bytestring.rst
    io-interfaces.rst
+
    paths/pure.rst
    paths/io.rst
+
+   networking/network-enums.rst
+   networking/ipaddress.rst
+   networking/socketaddress.rst
+   networking/socket.rst
+   networking/tcp.rst

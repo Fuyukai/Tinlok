@@ -72,7 +72,7 @@ Joining two absolute paths together will just return the second absolute path:
     val usr = PosixPurePath("/usr")
     assert(etc.resolveChild(usr) == usr)
 
-The name of a pure path can be replaced using withName:
+The name of a pure path can be replaced using ``withName``:
 
 .. code-block:: kotlin
 
