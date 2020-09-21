@@ -1,10 +1,16 @@
-import org.jetbrains.dokka.gradle.DokkaTask
-import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
-import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+/*
+ * Copyright (C) 2020 Charlotte Skye.
+ *
+ * This file is part of Tinlok.
+ *
+ * Tinlok is dually released under the GNU Lesser General Public License,
+ * Version 3 or later, or the Mozilla Public License 2.0.
+ */
 
 plugins {
     id("org.jetbrains.kotlin.multiplatform").version("1.4.10").apply(false)
     id("org.jetbrains.dokka").version("1.4.0").apply(true)
+    id("maven-publish")
 }
 
 allprojects {
@@ -13,6 +19,9 @@ allprojects {
         mavenLocal()
         jcenter()
     }
+
+    group = "tf.lotte.tinlok"
+    version = "1.0.0"
 }
 
 subprojects {
@@ -22,9 +31,8 @@ subprojects {
     apply(plugin = "org.jetbrains.kotlin.multiplatform")
     apply(plugin = "org.jetbrains.dokka")
 
-    group = "tf.lotte.tinlok"
-    version = "1.0.0"
-
+    // core kotlin configuration
+    // (this is collapsed in my IDE)
     configure<KotlinMultiplatformExtension> {
         explicitApi = ExplicitApiMode.Strict
 
@@ -73,7 +81,8 @@ subprojects {
         }
     }
 
-
+    // core dokka configuration
+    // (equally collapsed)
     tasks.named<DokkaTask>("dokkaHtml") {
         dokkaSourceSets {
             configureEach {
