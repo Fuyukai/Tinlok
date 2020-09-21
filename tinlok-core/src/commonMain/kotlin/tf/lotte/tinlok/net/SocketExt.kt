@@ -11,8 +11,8 @@ package tf.lotte.tinlok.net
 
 import tf.lotte.tinlok.Sys
 import tf.lotte.tinlok.io.use
+import tf.lotte.tinlok.net.socket.AcceptingSeverSocket
 import tf.lotte.tinlok.net.socket.ClientSocket
-import tf.lotte.tinlok.net.socket.ServerSocket
 import tf.lotte.tinlok.net.socket.StandardSocketOption
 import tf.lotte.tinlok.net.tcp.TcpClientSocket
 import tf.lotte.tinlok.net.tcp.TcpConnectionInfo
@@ -76,7 +76,7 @@ public inline fun <R> TcpServerSocket.Companion.bind(
  * the specified lambda [block]. The connection will be automatically closed when the bloc
  */
 @OptIn(Unsafe::class)
-public inline fun <R, I : CI, T : ClientSocket<I>> ServerSocket<I, T>.accept(
+public inline fun <R, I : CI, T : ClientSocket<I>> AcceptingSeverSocket<I, T>.accept(
     block: (T) -> R
 ): R {
     return unsafeAccept().use(block)

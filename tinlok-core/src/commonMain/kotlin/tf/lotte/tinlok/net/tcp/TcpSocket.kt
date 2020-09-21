@@ -14,4 +14,4 @@ import tf.lotte.tinlok.net.socket.Socket
 /**
  * Base interface for TCP sockets. Allows setting TCP-specific socket options.
  */
-public interface TcpSocket : Socket<TcpConnectionInfo, TcpSocketAddress>
+public interface TcpSocket : Socket

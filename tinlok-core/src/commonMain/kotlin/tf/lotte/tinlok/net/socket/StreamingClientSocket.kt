@@ -9,14 +9,11 @@
 
 package tf.lotte.tinlok.net.socket
 
+import tf.lotte.tinlok.io.HalfCloseableStream
 import tf.lotte.tinlok.net.ConnectionInfo
 
 /**
- * A client socket that performs I/O synchronously.
- *
- * @param ADDR: The type of address this client socket uses.
+ * Defines a client socket that is also a [HalfCloseableStream]. This is used for SOCK_STREAM
+ * based sockets.
  */
-public interface ClientSocket<I : ConnectionInfo?> : Socket {
-    /** The remote address this socket is connected to. */
-    public val remoteAddress: I
-}
+public interface StreamingClientSocket<I: ConnectionInfo?> : ClientSocket<I>, HalfCloseableStream

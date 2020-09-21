@@ -9,26 +9,14 @@
 
 package tf.lotte.tinlok.net.socket
 
-import tf.lotte.tinlok.net.ConnectionInfo
-import tf.lotte.tinlok.util.Unsafe
-
 /**
- * A server socket that synchronously produces new [ClientSocket] instances when
- * accepting.
+ * A server socket that can be bound to an address.
  *
  * All [ServerSocket] instances wrap the address they bind to.
  */
-public interface ServerSocket<I : ConnectionInfo, T : ClientSocket<I>> : Socket {
+public interface ServerSocket : Socket {
     /**
      * Binds this socket to its enclosed address.
      */
     public fun bind(backlog: Int = 128)  // old linux support for 128
-
-    /**
-     * Accepts a new connection, returning a synchronous client socket for the incoming connection.
-     *
-     * This method is unsafe as it can leak file descriptors.
-     */
-    @Unsafe
-    public fun unsafeAccept(): T
 }
