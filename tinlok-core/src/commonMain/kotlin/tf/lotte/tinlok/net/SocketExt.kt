@@ -13,7 +13,6 @@ import tf.lotte.tinlok.Sys
 import tf.lotte.tinlok.io.use
 import tf.lotte.tinlok.net.socket.ClientSocket
 import tf.lotte.tinlok.net.socket.ServerSocket
-import tf.lotte.tinlok.net.socket.SocketAddress
 import tf.lotte.tinlok.net.socket.StandardSocketOption
 import tf.lotte.tinlok.net.tcp.TcpClientSocket
 import tf.lotte.tinlok.net.tcp.TcpConnectionInfo
@@ -22,7 +21,6 @@ import tf.lotte.tinlok.net.tcp.TcpSocketAddress
 import tf.lotte.tinlok.util.Unsafe
 
 private typealias CI = ConnectionInfo
-private typealias ADD<I> = SocketAddress<I>
 
 // == TCP socket helper functions == //
 
