@@ -30,7 +30,6 @@ public actual object PlatformSockets {
         // this swallows ENETUNREACH, and various other errors, but that's a valid tradeoff for now.
 
         // naiive algorithm
-        // TODO: Maybe re-throw a nicer error on connect() errno?
         for (info in address) {
             val socket = Syscall.socket(info.family, info.type, info.protocol)
             try {
