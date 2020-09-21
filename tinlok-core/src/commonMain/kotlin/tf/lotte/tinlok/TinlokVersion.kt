@@ -15,6 +15,6 @@ package tf.lotte.tinlok
 public class TinlokVersion(public val major: Int, public val minor: Int, public val patch: Int) {
     public companion object {
         /** The current version. */
-        public val CURRENT: TinlokVersion = TinlokVersion(1, 0, 0)
+        public val CURRENT: TinlokVersion = TinlokVersion(1, 1, 0)
     }
 }
