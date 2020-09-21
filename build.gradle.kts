@@ -7,6 +7,10 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
+import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+
 plugins {
     id("org.jetbrains.kotlin.multiplatform").version("1.4.10").apply(false)
     id("org.jetbrains.dokka").version("1.4.0").apply(true)

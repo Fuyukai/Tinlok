@@ -13,7 +13,7 @@ plugins {
 }
 
 kotlin {
-    linuxX64 {
+    linuxX64() {
         val linuxX64Main by sourceSets.getting {
             dependencies {
                 // statically compiled IPv6 helper
@@ -22,7 +22,7 @@ kotlin {
         }
     }
 
-    linuxArm64 {
+    linuxArm64() {
         val linuxArm64Main by sourceSets.getting {
             dependencies {
                 implementation(project(":tinlok-static-ipv6"))
