@@ -18,6 +18,9 @@ kotlin {
             dependencies {
                 // statically compiled IPv6 helper
                 implementation(project(":tinlok-static-ipv6"))
+
+                // statically compiled monocypher library
+                implementation(project(":tinlok-static-monocypher"))
             }
         }
     }
@@ -26,6 +29,7 @@ kotlin {
         val linuxArm64Main by sourceSets.getting {
             dependencies {
                 implementation(project(":tinlok-static-ipv6"))
+                implementation(project(":tinlok-static-monocypher"))
             }
         }
     }
