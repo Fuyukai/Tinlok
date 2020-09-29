@@ -9,10 +9,10 @@
 
 package tf.lotte.tinlok.fs
 
-import tf.lotte.tinlok.b
 import tf.lotte.tinlok.fs.path.*
 import tf.lotte.tinlok.io.peek
-import tf.lotte.tinlok.substring
+import tf.lotte.tinlok.types.bytestring.b
+import tf.lotte.tinlok.types.bytestring.substring
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull

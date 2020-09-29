@@ -7,7 +7,7 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
-package tf.lotte.tinlok
+package tf.lotte.tinlok.types.bytestring
 
 // TODO: This is not very efficient.
 //  I believe a proper search alg would be faster. But that's for another day.

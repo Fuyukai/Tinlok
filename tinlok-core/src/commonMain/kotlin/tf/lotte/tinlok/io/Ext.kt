@@ -9,7 +9,7 @@
 
 package tf.lotte.tinlok.io
 
-import tf.lotte.tinlok.ByteString
+import tf.lotte.tinlok.types.bytestring.ByteString
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract

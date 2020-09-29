@@ -15,10 +15,10 @@ import kotlinx.cinterop.usePinned
 import platform.posix.PATH_MAX
 import platform.posix.getenv
 import platform.posix.mkdtemp
-import tf.lotte.tinlok.ByteString
-import tf.lotte.tinlok.b
 import tf.lotte.tinlok.system.Syscall
 import tf.lotte.tinlok.system.readZeroTerminated
+import tf.lotte.tinlok.types.bytestring.ByteString
+import tf.lotte.tinlok.types.bytestring.b
 import tf.lotte.tinlok.util.Unsafe
 
 public actual typealias PlatformPurePath = PosixPurePath

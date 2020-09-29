@@ -10,12 +10,12 @@
 
 package tf.lotte.tinlok.fs.path
 
-import tf.lotte.tinlok.ByteString
 import tf.lotte.tinlok.exc.FileNotFoundException
 import tf.lotte.tinlok.fs.DirEntry
 import tf.lotte.tinlok.fs.FileOpenMode
 import tf.lotte.tinlok.fs.FilePermission
 import tf.lotte.tinlok.fs.FilesystemFile
+import tf.lotte.tinlok.types.bytestring.ByteString
 import tf.lotte.tinlok.util.Unsafe
 
 /**

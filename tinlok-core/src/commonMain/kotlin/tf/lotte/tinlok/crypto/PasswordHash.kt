@@ -9,8 +9,6 @@
 
 package tf.lotte.tinlok.crypto
 
-import tf.lotte.tinlok.ByteString
-
 /**
  * Represents a password hash (NOT an integrity hash). This is useful for either encryption keys
  * or secure password storage in a database.

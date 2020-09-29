@@ -13,14 +13,14 @@ import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.pointed
 import kotlinx.cinterop.toKString
 import platform.posix.*
-import tf.lotte.tinlok.ByteString
-import tf.lotte.tinlok.b
 import tf.lotte.tinlok.exc.FileNotFoundException
 import tf.lotte.tinlok.exc.IsADirectoryException
 import tf.lotte.tinlok.exc.OSException
 import tf.lotte.tinlok.fs.*
 import tf.lotte.tinlok.system.Syscall
 import tf.lotte.tinlok.system.readZeroTerminated
+import tf.lotte.tinlok.types.bytestring.ByteString
+import tf.lotte.tinlok.types.bytestring.b
 import tf.lotte.tinlok.util.Unsafe
 
 /**

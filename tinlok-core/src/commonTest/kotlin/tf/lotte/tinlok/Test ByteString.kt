@@ -9,6 +9,9 @@
 
 package tf.lotte.tinlok
 
+import tf.lotte.tinlok.types.bytestring.b
+import tf.lotte.tinlok.types.bytestring.join
+import tf.lotte.tinlok.types.bytestring.split
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

@@ -9,7 +9,7 @@
 
 package tf.lotte.tinlok.io
 
-import tf.lotte.tinlok.ByteString
+import tf.lotte.tinlok.types.bytestring.ByteString
 
 /**
  * Represents any object that is readable, consuming [ByteString] objects.

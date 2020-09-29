@@ -11,7 +11,7 @@
 
 package tf.lotte.tinlok.fs.path
 
-import tf.lotte.tinlok.*
+import tf.lotte.tinlok.types.bytestring.*
 
 // == Helper creators == //
 /**

@@ -9,9 +9,9 @@
 
 package tf.lotte.tinlok.crypto
 
-import tf.lotte.tinlok.ByteString
 import tf.lotte.tinlok.io.use
-import tf.lotte.tinlok.toByteString
+import tf.lotte.tinlok.types.bytestring.ByteString
+import tf.lotte.tinlok.types.bytestring.toByteString
 import tf.lotte.tinlok.util.Unsafe
 
 /**

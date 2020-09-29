@@ -13,11 +13,11 @@ package tf.lotte.tinlok.system
 
 import kotlinx.cinterop.*
 import platform.posix.*
-import tf.lotte.tinlok.ByteString
 import tf.lotte.tinlok.exc.*
 import tf.lotte.tinlok.net.*
 import tf.lotte.tinlok.net.dns.GAIException
 import tf.lotte.tinlok.net.socket.LinuxSocketOption
+import tf.lotte.tinlok.types.bytestring.ByteString
 import tf.lotte.tinlok.util.Unsafe
 import tf.lotte.tinlok.util.toByteArray
 import tf.lotte.tinlok.util.toUInt

@@ -12,8 +12,8 @@
 package tf.lotte.tinlok.fs.path
 
 import tf.lotte.tinlok.Sys
-import tf.lotte.tinlok.b
 import tf.lotte.tinlok.fs.StandardOpenModes
+import tf.lotte.tinlok.types.bytestring.b
 import tf.lotte.tinlok.util.Unsafe
 import kotlin.test.Test
 import kotlin.test.assertEquals

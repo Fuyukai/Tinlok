@@ -9,8 +9,6 @@
 
 package tf.lotte.tinlok.types.bytestring
 
-import tf.lotte.tinlok.ByteString
-
 /**
  * Represents a backing implementation for a [ByteString].
  */

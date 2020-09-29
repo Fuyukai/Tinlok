@@ -9,7 +9,7 @@
 
 package tf.lotte.tinlok.fs.path
 
-import tf.lotte.tinlok.ByteString
+import tf.lotte.tinlok.types.bytestring.ByteString
 import tf.lotte.tinlok.util.Unsafe
 
 /**

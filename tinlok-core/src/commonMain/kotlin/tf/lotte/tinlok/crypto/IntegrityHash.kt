@@ -9,7 +9,7 @@
 
 package tf.lotte.tinlok.crypto
 
-import tf.lotte.tinlok.ByteString
+import tf.lotte.tinlok.types.bytestring.ByteString
 
 /**
  * Represents an integrity hash (NOT a password hash).

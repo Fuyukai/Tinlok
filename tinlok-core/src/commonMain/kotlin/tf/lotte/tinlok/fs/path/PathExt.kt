@@ -9,15 +9,15 @@
 
 package tf.lotte.tinlok.fs.path
 
-import tf.lotte.tinlok.ByteString
-import tf.lotte.tinlok.b
 import tf.lotte.tinlok.exc.FileAlreadyExistsException
 import tf.lotte.tinlok.exc.IsADirectoryException
 import tf.lotte.tinlok.fs.DirEntry
 import tf.lotte.tinlok.fs.FilesystemFile
 import tf.lotte.tinlok.fs.StandardOpenModes
 import tf.lotte.tinlok.io.use
-import tf.lotte.tinlok.toByteString
+import tf.lotte.tinlok.types.bytestring.ByteString
+import tf.lotte.tinlok.types.bytestring.b
+import tf.lotte.tinlok.types.bytestring.toByteString
 import tf.lotte.tinlok.util.Unsafe
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind

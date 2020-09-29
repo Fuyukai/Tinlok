@@ -7,10 +7,7 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
-package tf.lotte.tinlok
-
-import tf.lotte.tinlok.types.bytestring.ByteArrayByteStringHolder
-import tf.lotte.tinlok.types.bytestring.ByteStringHolder
+package tf.lotte.tinlok.types.bytestring
 
 
 /**
