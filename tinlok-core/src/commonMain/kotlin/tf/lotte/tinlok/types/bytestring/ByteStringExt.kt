@@ -95,6 +95,64 @@ public fun Collection<ByteString>.join(delim: ByteString): ByteString {
     return ByteString.fromUncopied(final)
 }
 
+private val HEX_ALPHABET =
+    arrayOf(
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+        'a', 'b', 'c', 'd', 'e', 'f'
+    )
+
+/**
+ * Creates a new hex-encoded string from this ByteString.
+ */
+@OptIn(ExperimentalUnsignedTypes::class)
+public fun ByteString.hexlify(): String {
+    if (isEmpty()) return ""
+
+    val buf = StringBuilder(this.size * 2)
+    for (byte in this) {
+        val ubyte = byte.toUByte()
+        val upper = HEX_ALPHABET[((ubyte and 0xF0u).toInt()).ushr(4)]
+        val lower = HEX_ALPHABET[(ubyte and 0x0Fu).toInt()]
+        buf.append(upper)
+        buf.append(lower)
+    }
+
+    return buf.toString()
+}
+
+internal fun Char.toInt16(): Int {
+    return when (this) {
+        'a', 'A' -> 10
+        'b', 'B' -> 11
+        'c', 'C' -> 12
+        'd', 'D' -> 13
+        'e', 'E' -> 14
+        'f', 'F' -> 15
+        else -> toInt()  // real numbers
+    }
+}
+
+/**
+ * Decodes a hex-encoded string from this String.
+ */
+public fun String.unhexlify(): ByteString {
+    require((length.rem(2)) == 0) { "Hex string length was not a multiple of two!" }
+    val buf = ByteArray(length / 2)
+    var cursor: Int = 0
+
+    val iterator = this.iterator()
+    while (true) {
+        if (!iterator.hasNext()) break
+        val first = iterator.next().toInt16().shl(4)
+        val second = iterator.next().toInt16()
+
+        val byte = (first or second).toByte()
+        buf[cursor] = byte
+        cursor += 1
+    }
+
+    return ByteString.fromUncopied(buf)
+}
 
 /**
  * Creates a new [ByteString] from this [String].

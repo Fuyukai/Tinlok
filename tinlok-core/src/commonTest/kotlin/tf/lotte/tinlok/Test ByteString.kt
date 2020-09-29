@@ -9,11 +9,10 @@
 
 package tf.lotte.tinlok
 
-import tf.lotte.tinlok.types.bytestring.b
-import tf.lotte.tinlok.types.bytestring.join
-import tf.lotte.tinlok.types.bytestring.split
+import tf.lotte.tinlok.types.bytestring.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFails
 import kotlin.test.assertTrue
 
 /**
@@ -64,4 +63,23 @@ class `Test ByteString` {
         assertEquals(joinedTwo, expectedTwo)
     }
 
+    @Test
+    fun `Test ByteString hexlify`() {
+        val str = b("jpN")
+        val hex = str.hexlify()
+
+        assertEquals(hex, "6a704e")
+    }
+
+    @Test
+    fun `Test ByteString unhexlify`() {
+        assertEquals("6a704E".unhexlify(), b("jpN"))
+        // empty string
+        assertEquals("".unhexlify(), b(""))
+
+        // non-multiples of two
+        assertFails { "a".unhexlify() }
+        // non-hex
+        assertFails { "q".unhexlify() }
+    }
 }
