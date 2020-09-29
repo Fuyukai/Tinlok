@@ -10,6 +10,7 @@
 package tf.lotte.tinlok.crypto
 
 import tf.lotte.tinlok.types.bytestring.ByteString
+import tf.lotte.tinlok.types.bytestring.hexlify
 
 /**
  * Represents an integrity hash (NOT a password hash).
@@ -26,4 +27,10 @@ public inline class IntegrityHash(public val bytes: ByteString) {
         val second = other.unwrap().toUByteArray()
         return CryptographyProvider.current().secureCompare(first, second)
     }
+
+    /** Shortcut for ``verify(other.bytes)``. */
+    public fun verify(other: IntegrityHash): Boolean = verify(other.bytes)
+
+    /** Creates a new hex digest of this integrity hash. */
+    public fun hexdigest(): String = bytes.hexlify()
 }
