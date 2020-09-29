@@ -122,6 +122,13 @@ private constructor(
         return backing.unwrap()
     }
 
+    /**
+     * Unwraps this [ByteString], returning a copy of the underlying array.
+     */
+    public fun unwrapCopy(): ByteArray {
+        return backing.unwrap().copyOf()
+    }
+
     override fun iterator(): Iterator<Byte> {
         return backing.iterator()
     }

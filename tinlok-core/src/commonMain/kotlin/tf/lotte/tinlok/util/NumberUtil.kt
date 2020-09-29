@@ -17,7 +17,7 @@ package tf.lotte.tinlok.util
  * Gets the upper byte of this Int.
  */
 public inline val Int.upperByte: Int
-    get() = (this shr 24) and 0xFF
+    get() = (this ushr 24) and 0xFF
 
 /**
  * Gets the upper byte of this UInt.
@@ -41,7 +41,7 @@ public inline val UInt.lowerByte: UInt
  * Gets the second byte of this Int.
  */
 public inline val Int.byte2: Int
-    get() = (this shr 16) and 0xFF
+    get() = (this ushr 16) and 0xFF
 
 
 /**
@@ -55,7 +55,7 @@ public inline val UInt.byte2: UInt
  * Gets the third byte of this Int.
  */
 public inline val Int.byte3: Int
-    get() = (this shr 8) and 0xFF
+    get() = (this ushr 8) and 0xFF
 
 /**
  * Gets the third byte of this UInt.
@@ -72,11 +72,25 @@ public inline fun Int.toByteArray(): ByteArray {
 }
 
 /**
+ * Decodes this int into a [ByteArray] in little endian mode.
+ */
+public inline fun Int.toByteArrayLE(): ByteArray {
+    return byteArrayOf(lowerByte.toByte(), byte3.toByte(), byte2.toByte(), upperByte.toByte())
+}
+
+/**
  * Decodes this uint into a ByteArray in big endian mode.
  */
 @OptIn(ExperimentalUnsignedTypes::class)  // ?
 public inline fun UInt.toByteArray(): ByteArray {
     return byteArrayOf(upperByte.toByte(), byte2.toByte(), byte3.toByte(), lowerByte.toByte())
+}
+
+/**
+ * Decodes this int into a [ByteArray] in little endian mode.
+ */
+public inline fun UInt.toByteArrayLE(): ByteArray {
+    return byteArrayOf(lowerByte.toByte(), byte3.toByte(), byte2.toByte(), upperByte.toByte())
 }
 
 
@@ -94,6 +108,17 @@ public inline fun ByteArray.toInt(): Int {
 }
 
 /**
+ * Decodes a size-4 byte array to an int in little endian mode.
+ */
+public inline fun ByteArray.toIntLE(): Int {
+    return (((this[3].toInt()) shl 24)
+        or ((this[2].toInt()) shl 16)
+        or ((this[1].toInt()) shl 8)
+        or (this[0].toInt())
+        )
+}
+
+/**
  * Decodes a size-4 unsigned byte array to a uint in big endian mode.
  */
 public inline fun UByteArray.toUInt(): UInt {
@@ -101,6 +126,17 @@ public inline fun UByteArray.toUInt(): UInt {
         or ((this[1].toUInt()) shl 16)
         or ((this[2].toUInt()) shl 8)
         or (this[3].toUInt())
+        )
+}
+
+/**
+ * Decodes a size-4 unsigned byte array to a uint in big endian mode.
+ */
+public inline fun UByteArray.toUIntLE(): UInt {
+    return (((this[3].toUInt()) shl 24)
+        or ((this[2].toUInt()) shl 16)
+        or ((this[1].toUInt()) shl 8)
+        or (this[0].toUInt())
         )
 }
 

@@ -79,6 +79,7 @@ subprojects {
 
             all {
                 languageSettings.apply {
+                    enableLanguageFeature("InlineClasses")
                     useExperimentalAnnotation("kotlin.RequiresOptIn")
                 }
             }
