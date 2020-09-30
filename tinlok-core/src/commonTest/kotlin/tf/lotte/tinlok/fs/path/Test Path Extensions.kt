@@ -68,10 +68,10 @@ class `Test Path Extensions` {
         val copyChild = copyTo.resolveChild("child")
         assertTrue(copyChild.exists())
         val one = copyChild.resolveChild("one.txt")
-        assertEquals(one.readAllString(), "one!")
+        assertEquals(one.readAllText(), "one!")
         val two = copyChild.resolveChild("two.txt")
         assertTrue(two.isLink())
-        assertEquals(two.readAllString(), "one!")
+        assertEquals(two.readAllText(), "one!")
     }
 
     @Test
@@ -80,7 +80,7 @@ class `Test Path Extensions` {
         val fileA = it.resolveChild("fileA")
         fileA.writeString("test!", atomic = true)
         assertTrue(fileA.exists())
-        val contentA = fileA.readAllString()
+        val contentA = fileA.readAllText()
         assertEquals(contentA, "test!")
 
         // ensure attempting to write over a directory throws the right error

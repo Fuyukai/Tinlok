@@ -278,7 +278,7 @@ public fun Path.readAllBytes(): ByteString =
 /**
  * Reads all of the bytes from the file represented by this Path, and decode it into a [String].
  */
-public fun Path.readAllString(): String = readAllBytes().decode()
+public fun Path.readAllText(): String = readAllBytes().decode()
 
 /**
  * Creates a new temporary directory and calls the provided lambda with its path. The
