@@ -36,18 +36,6 @@ defines several:
 * ``HalfCloseableStream`` is a ``BidirectionalStream`` that can have the writing part closed
   independently of the reading part.
 
-Strings
--------
-
-Whilst all of the I/O interfaces produce and consume ``ByteString`` objects, there also exists
-interfaces defining objects that produce and consume regular Kotlin ``String`` objects.
-
-* ``StringReadable`` is a ``Readable`` that can **also** produce ``String`` objects.
-
-* ``StringWriteable`` is a ``Writeable`` that can **also** consume ``String`` objects.
-
-String streams similarly exist for each combination of stream objects.
-
 Summary
 -------
 

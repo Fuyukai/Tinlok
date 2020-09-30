@@ -10,14 +10,14 @@
 package tf.lotte.tinlok.fs
 
 import tf.lotte.tinlok.fs.path.Path
-import tf.lotte.tinlok.io.BidirectionalStringStream
+import tf.lotte.tinlok.io.BidirectionalStream
 import tf.lotte.tinlok.io.Seekable
 import tf.lotte.tinlok.types.bytestring.ByteString
 
 /**
  * Represents a file on the filesystem.
  */
-public interface FilesystemFile : BidirectionalStringStream, Seekable {
+public interface FilesystemFile : BidirectionalStream, Seekable {
     /** If this file is still open. */
     public val isOpen: Boolean
 
