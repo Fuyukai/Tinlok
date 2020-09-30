@@ -19,6 +19,9 @@ import tf.lotte.tinlok.net.tcp.TcpConnectionInfo
 import tf.lotte.tinlok.net.tcp.TcpServerSocket
 import tf.lotte.tinlok.net.tcp.TcpSocketAddress
 import tf.lotte.tinlok.util.Unsafe
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 private typealias CI = ConnectionInfo
 
@@ -28,10 +31,14 @@ private typealias CI = ConnectionInfo
  * Opens a new TCP connection to the specified address, using the default socket options, passing
  * the created socket to the specified lambda.
  */
-@OptIn(Unsafe::class)
+@OptIn(Unsafe::class, ExperimentalContracts::class)
 public inline fun <R> TcpClientSocket.Companion.connect(
     address: TcpSocketAddress, block: (TcpClientSocket) -> R
 ): R {
+    contract {
+        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+    }
+
     val sock = unsafeOpen(address)
     // TODO: TCP_NODELAY and TCP_NOTSENT_LOWAT if needed
 
@@ -41,11 +48,15 @@ public inline fun <R> TcpClientSocket.Companion.connect(
 /**
  * Creates a new unbound TCP server socket.
  */
-@OptIn(Unsafe::class)
+@OptIn(Unsafe::class, ExperimentalContracts::class)
 public inline fun <R> TcpServerSocket.Companion.open(
     address: TcpConnectionInfo,
     block: (TcpServerSocket) -> R
 ): R {
+    contract {
+        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+    }
+
     val sock = unsafeOpen(address)
     return sock.use(block)
 }
@@ -55,10 +66,14 @@ public inline fun <R> TcpServerSocket.Companion.open(
  * [backlog], using the default socket options, passing the created socket to the specified
  * lambda.
  */
-@OptIn(Unsafe::class)
+@OptIn(Unsafe::class, ExperimentalContracts::class)
 public inline fun <R> TcpServerSocket.Companion.bind(
     address: TcpConnectionInfo, backlog: Int = 128, block: (TcpServerSocket) -> R
 ): R {
+    contract {
+        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+    }
+
     return TcpServerSocket.open(address) {
         // Always set REUSEADDR on non-Windows
         if (!Sys.osInfo.isWindows) {
@@ -75,9 +90,13 @@ public inline fun <R> TcpServerSocket.Companion.bind(
  * Accepts a new connection, passing a synchronous client socket for the incoming connection to
  * the specified lambda [block]. The connection will be automatically closed when the bloc
  */
-@OptIn(Unsafe::class)
+@OptIn(Unsafe::class, ExperimentalContracts::class)
 public inline fun <R, I : CI, T : ClientSocket<I>> AcceptingSeverSocket<I, T>.accept(
     block: (T) -> R
 ): R {
+    contract {
+        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+    }
+
     return unsafeAccept().use(block)
 }
