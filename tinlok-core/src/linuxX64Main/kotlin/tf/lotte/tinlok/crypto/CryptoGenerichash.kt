@@ -12,15 +12,14 @@ package tf.lotte.tinlok.crypto
 import kotlinx.cinterop.*
 import tf.lotte.tinlok.interop.libsodium.*
 import tf.lotte.tinlok.types.bytestring.ByteString
-import tf.lotte.tinlok.util.Unsafe
 
 /**
  * Implements an integrity hasher using crypto_generichash.
  */
 @OptIn(ExperimentalUnsignedTypes::class)
-@Unsafe
-public class CryptoGenerichash(key: UByteArray = ubyteArrayOf()) : IntegrityHasher {
-    private val arena = Arena()
+public class CryptoGenerichash(
+    key: UByteArray = ubyteArrayOf(), private val allocator: NativePlacement
+) : IntegrityHasher {
     private var usable: Boolean = false
     private val context: crypto_generichash_state
 
@@ -29,14 +28,22 @@ public class CryptoGenerichash(key: UByteArray = ubyteArrayOf()) : IntegrityHash
             "Key is too big!"
         }
 
-        context = arena.alloc()
+        if (sodium_init() == -1) {
+            TODO("Failed to initialise libsodium")
+        }
+
+        context = allocator.alloc()
         key.usePinned {
-            crypto_generichash_init(
+            val res = crypto_generichash_init(
                 context.ptr,
                 key = it.addressOf(0), keylen = key.size.toULong(),
                 outlen = crypto_generichash_BYTES.toULong()
             )
+
+            if (res != 0) TODO("crypto error")
         }
+
+        usable = true
     }
 
     override fun feed(data: ByteString) {
@@ -44,7 +51,11 @@ public class CryptoGenerichash(key: UByteArray = ubyteArrayOf()) : IntegrityHash
 
         val realData = data.unwrap().toUByteArray()
         realData.usePinned {
-            crypto_generichash_update(context.ptr, it.addressOf(0), realData.size.toULong())
+            val res = crypto_generichash_update(
+                context.ptr, it.addressOf(0), realData.size.toULong()
+            )
+
+            if (res != 0) TODO("crypto error")
         }
     }
 
@@ -53,18 +64,15 @@ public class CryptoGenerichash(key: UByteArray = ubyteArrayOf()) : IntegrityHash
 
         val final = UByteArray(crypto_generichash_BYTES.toInt())
         final.usePinned {
-            crypto_generichash_final(context.ptr, it.addressOf(0), final.size.toULong())
+            val res = crypto_generichash_final(
+                context.ptr, it.addressOf(0), final.size.toULong()
+            )
+
+            if (res != 0) TODO("crypto error")
         }
+        usable = false
+
         val bytes = ByteString.fromUncopied(final.toByteArray())
-
-        usable = false
-        arena.clear()
-
         return IntegrityHash(bytes)
-    }
-
-    override fun close() {
-        usable = false
-        arena.clear()
     }
 }

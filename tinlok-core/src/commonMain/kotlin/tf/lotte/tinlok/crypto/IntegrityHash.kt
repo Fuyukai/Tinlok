@@ -23,9 +23,7 @@ public inline class IntegrityHash(public val bytes: ByteString) {
      * You should always use this to compare two hashes together, as this will run in constant time.
      */
     public fun verify(other: ByteString): Boolean {
-        val first = bytes.unwrap().toUByteArray()
-        val second = other.unwrap().toUByteArray()
-        return CryptographyProvider.current().secureCompare(first, second)
+        return bytes.constantTimeCompare(other)
     }
 
     /** Shortcut for ``verify(other.bytes)``. */

@@ -9,28 +9,13 @@
 
 package tf.lotte.tinlok.crypto
 
-import tf.lotte.tinlok.io.use
 import tf.lotte.tinlok.types.bytestring.ByteString
 import tf.lotte.tinlok.types.bytestring.toByteString
-import tf.lotte.tinlok.util.Unsafe
 
-/**
- * High-level helper for getting an integrity hasher and safely closing it. The hasher will be
- * passed to the specified [block]; it is expected you return your hash from this lambda.
- *
- * If [algorithm] is null, the default algorithm will be used.
- */
-@OptIn(Unsafe::class)
-public inline fun <R> IntegrityHasher.Companion.hash(
-    algorithm: String? = null, block: (IntegrityHasher) -> R
-): R {
-    val hasher = unsafeGetInstance(algorithm)
-    return hasher.use(block)
-}
-
+// == Blake2b shortcuts == //
 /** Creates a new [IntegrityHash] for this [ByteString]. */
 public fun ByteString.integrityHash(algorithm: String? = null): IntegrityHash {
-    return IntegrityHasher.hash(algorithm) {
+    return IntegrityHasher.blake2b {
         it.feed(this)
         it.hash()
     }
