@@ -19,4 +19,4 @@ include("tinlok-core")
 
 // static libraries
 include("tinlok-static-ipv6")
-include("tinlok-static-libsodium")
+include("tinlok-static-monocypher")

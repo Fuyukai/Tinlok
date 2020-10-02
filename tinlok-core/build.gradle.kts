@@ -17,7 +17,7 @@ kotlin {
         val linuxX64Main by sourceSets.getting {
             dependencies {
                 implementation(project(":tinlok-static-ipv6"))
-                implementation(project(":tinlok-static-libsodium"))
+                implementation(project(":tinlok-static-monocypher"))
             }
         }
     }
@@ -26,7 +26,7 @@ kotlin {
         val linuxArm64Main by sourceSets.getting {
             dependencies {
                 implementation(project(":tinlok-static-ipv6"))
-                implementation(project(":tinlok-static-libsodium"))
+                implementation(project(":tinlok-static-monocypher"))
             }
         }
     }

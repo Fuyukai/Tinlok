@@ -7,9 +7,4 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
-package tf.lotte.tinlok.crypto
-
-/**
- * Verifies if two UByteArray's with a length of 64 are the same.
- */
-public expect fun crypto_verify64(first: UByteArray, second: UByteArray): Boolean
+// File required for konanc to generate the tinlok-static-libsodium.klib file with our .a included.
