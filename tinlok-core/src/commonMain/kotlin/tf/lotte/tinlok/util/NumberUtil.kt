@@ -119,6 +119,21 @@ public inline fun ByteArray.toIntLE(): Int {
 }
 
 /**
+ * Decodes a size-8 byte array to a long in big endian mode.
+ */
+public inline fun ByteArray.toLong(): Long {
+    return (((this[0].toLong()) shl 56)
+        or ((this[1].toLong()) shl 48)
+        or ((this[2].toLong()) shl 40)
+        or ((this[3].toLong()) shl 32)
+        or ((this[4].toLong()) shl 24)
+        or ((this[5].toLong()) shl 16)
+        or ((this[6].toLong()) shl 8)
+        or (this[7].toLong())
+        )
+}
+
+/**
  * Decodes a size-4 unsigned byte array to a uint in big endian mode.
  */
 public inline fun UByteArray.toUInt(): UInt {
