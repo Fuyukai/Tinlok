@@ -75,14 +75,13 @@ public actual object PlatformPaths {
     @Unsafe
     public actual fun makeTempDirectory(prefix: String): Path {
         // lol at this function literally replacing XXXXXX
-        // ALSO THIS CORRUPTS MEMORY IF YOU DON'T PIN IT
+        // TODO: Valgrind gets really mad at this function. Make it use our own function.
         val template = "/tmp/$prefix-XXXXXX".encodeToByteArray()
         val path = template.usePinned {
             mkdtemp(it.addressOf(0)) ?: TODO("mkdtemp error")
         }
 
-        val ba = path.readZeroTerminated(PATH_MAX)
-        val bs = ByteString.fromByteArray(ba)
+        val bs = ByteString.fromByteArray(template)
         return path(bs)
     }
 
