@@ -21,6 +21,7 @@ possible.
    notes/note-stability.rst
    notes/note-issues.rst
    notes/note-dokka.rst
+   notes/changelog.rst
 
 .. toctree::
    :maxdepth: 1
