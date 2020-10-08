@@ -18,6 +18,10 @@ Changelog
 
  - Remove the ``String``-based streams. These need a design rework.
 
+ - Add hex-encoding for ``ByteString`` objects.
+
+ - Add Base64 encoding for ``ByteString`` objects.
+
 1.0.0
 ------
 
