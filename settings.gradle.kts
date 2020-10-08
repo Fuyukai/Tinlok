@@ -20,3 +20,4 @@ include("tinlok-core")
 // static libraries
 include("tinlok-static-ipv6")
 include("tinlok-static-monocypher")
+include("tinlok-static-libtls")
