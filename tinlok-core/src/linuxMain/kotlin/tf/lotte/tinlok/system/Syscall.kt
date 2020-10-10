@@ -685,7 +685,7 @@ public actual object Syscall {
                 throwErrno(errno)
             } else if (pres == 0) {
                 // socket timed out
-                throw TimeoutException("connect to $info timed out")
+                throw TimeoutException()
             }
 
             // success
