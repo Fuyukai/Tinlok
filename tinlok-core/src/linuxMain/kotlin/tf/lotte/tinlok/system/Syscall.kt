@@ -105,6 +105,7 @@ public actual object Syscall {
             ECONNRESET -> ConnectionResetException()
             ECONNABORTED -> ConnectionAbortedException()
             ECONNREFUSED -> ConnectionRefusedException()
+            ETIMEDOUT -> TimeoutException()
 
             else -> OSException(errno = errno, message = strerror(errno))
         }
@@ -614,12 +615,12 @@ public actual object Syscall {
     /**
      * Connects a socket to an address.
      *
-     * This will only throw when the error is misuse related. It will return false if the
-     * connection could not be established for a network reason.
+     * The [timeout] param defines how long to wait when connecting, in milliseconds. A
+     * reasonable default of 30 seconds is set.
      */
     @Unsafe
-    public fun connect(sock: FD, info: InetConnectionInfo) {
-        val res = memScoped {
+    public fun __connect_blocking(sock: FD, info: InetConnectionInfo, timeout: Int = 30_000) {
+        memScoped {
             val struct: sockaddr
             val size: UInt
 
@@ -635,13 +636,66 @@ public actual object Syscall {
                 else -> TODO()
             }
 
-            // TODO: Change this to an [e]poll() based solution for timeouts.
-            retry { connect(sock, struct.ptr, size) }
-        }
+            // less than zero timeouts go on the fast path, which is a standard blocking connect
+            if (timeout < 0) {
+                val res = connect(sock, struct.ptr, size)
+                if (res.isError) {
+                throwErrno(errno)
+                }
+                return
+            }
 
-        // TODO: Separate EINPROGRESS out into a sealed return type?
-        if (res.isError) {
-            throwErrno(errno)
+            // actual timeout, so we go onto the complicated path
+            // set non-blocking so we can do timeouts
+            val origin = fcntl(sock, F_GETFL)
+            if (origin.isError) {
+                throwErrno(errno)
+            }
+
+            // inside a run {} block to prevent polluting my local variables...
+            run {
+                val fcres = fcntl(sock, F_SETFL, origin.or(O_NONBLOCK))
+                if (fcres.isError) {
+                    throwErrno(errno)
+                }
+            }
+
+            // actually run the connect
+            val res = connect(sock, struct.ptr, size)
+            if (res == 0) {
+                // immediately succeeded, set blocking and return
+                val r = fcntl(sock, F_SETFL, origin)
+                if (r.isError) {
+                    throwErrno(errno)
+                }
+
+                return
+            } else if (res.isError && (errno != EINTR && errno != EINPROGRESS)) {
+                throwErrno(errno)
+            }
+
+            // need to poll() until the socket is writeable
+            val pollfd = allocArray<pollfd>(1)
+            pollfd[0].fd = sock
+            pollfd[0].events = (POLLOUT).toShort()
+
+            // TODO: Add a proper timeout decrement on eintr.
+            val pres = retry { poll(pollfd, 1, timeout) }
+            if (pres.isError) {
+                throwErrno(errno)
+            } else if (pres == 0) {
+                // socket timed out
+                throw TimeoutException("connect to $info timed out")
+            }
+
+            // success
+            // don't bother checking pollfd because we only used one socket anyway so we know
+            // which one succeeded
+            // and we also gotta set the socket to blocking mode again
+            val r = fcntl(sock, F_SETFL, origin)
+            if (r.isError) {
+                throwErrno(errno)
+            }
         }
     }
 

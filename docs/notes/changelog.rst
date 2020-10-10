@@ -22,6 +22,8 @@ Changelog
 
  - Add Base64 encoding for ``ByteString`` objects.
 
+ - Add ``poll()`` based timeout for TCP sockets when connecting.
+
 1.0.0
 ------
 

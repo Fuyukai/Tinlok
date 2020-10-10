@@ -10,6 +10,7 @@
 package tf.lotte.tinlok.net
 
 import tf.lotte.tinlok.Sys
+import tf.lotte.tinlok.exc.OSException
 import tf.lotte.tinlok.io.use
 import tf.lotte.tinlok.net.socket.AcceptingSeverSocket
 import tf.lotte.tinlok.net.socket.ClientSocket
@@ -28,18 +29,20 @@ private typealias CI = ConnectionInfo
 // == TCP socket helper functions == //
 
 /**
- * Opens a new TCP connection to the specified address, using the default socket options, passing
- * the created socket to the specified lambda.
+ * Opens a new TCP connection to the specified [address], using the default socket options, passing
+ * the created socket to the specified lambda, and timing out after [timeout] milliseconds. If
+ * [timeout] is negative, no timeout will be used and a standard blocking connect will be issued.
  */
 @OptIn(Unsafe::class, ExperimentalContracts::class)
+@Throws(OSException::class)
 public inline fun <R> TcpClientSocket.Companion.connect(
-    address: TcpSocketAddress, block: (TcpClientSocket) -> R
+    address: TcpSocketAddress, timeout: Int = 30_000, block: (TcpClientSocket) -> R
 ): R {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
 
-    val sock = unsafeOpen(address)
+    val sock = unsafeOpen(address, timeout)
     // TODO: TCP_NODELAY and TCP_NOTSENT_LOWAT if needed
 
     return sock.use(block)

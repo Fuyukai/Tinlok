@@ -39,6 +39,13 @@ public class TcpSocketAddress private constructor(
             ).filterIsInstance<TcpConnectionInfo>()
             return TcpSocketAddress(connections.toSet())
         }
+
+        /**
+         * Creates a new [TcpSocketAddress] from a singular [TcpConnectionInfo].
+         */
+        public fun of(info: TcpConnectionInfo): TcpSocketAddress {
+            return TcpSocketAddress(setOf(info))
+        }
     }
 
 

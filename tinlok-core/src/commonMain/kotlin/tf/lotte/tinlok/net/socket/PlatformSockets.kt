@@ -24,7 +24,7 @@ public expect object PlatformSockets {
      * Creates a new unconnected [TcpClientSocket].
      */
     @Unsafe
-    public fun newTcpSynchronousSocket(address: TcpSocketAddress): TcpClientSocket
+    public fun newTcpSynchronousSocket(address: TcpSocketAddress, timeout: Int): TcpClientSocket
 
     /**
      * Creates a new [TcpServerSocket].

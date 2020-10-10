@@ -122,3 +122,13 @@ actual constructor(cause: Throwable?) : ConnectionException(
 ) {
     public actual constructor() : this(null)
 }
+
+/**
+ * Thrown when a timeout happens on a connection. Corresponds to ETIMEDOUT.
+ */
+public actual class TimeoutException
+actual constructor(cause: Throwable?) : ConnectionException(
+    errno = ETIMEDOUT, message = Syscall.strerror(ETIMEDOUT), cause = cause
+) {
+    public actual constructor() : this(null)
+}

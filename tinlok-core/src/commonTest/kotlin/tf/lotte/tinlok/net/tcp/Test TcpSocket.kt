@@ -10,8 +10,11 @@
 package tf.lotte.tinlok.net.tcp
 
 import tf.lotte.tinlok._workarounds.__Workaround_TcpSocketTests
+import tf.lotte.tinlok.exc.TimeoutException
+import tf.lotte.tinlok.net.IPv4Address
 import tf.lotte.tinlok.net.connect
 import kotlin.test.Test
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -50,5 +53,20 @@ class `Test TcpSocket` {
     @Test
     fun `Test socket accept`() {
         __Workaround_TcpSocketTests.testSocketAccept()
+    }
+
+    /**
+     * Ensures timeing out works properly.
+     */
+    @Test
+    fun `Test socket connect timeout`() {
+        // random port, should ideally never connect
+        val ip = IPv4Address.of("127.0.0.1")
+        val address = TcpSocketAddress.of(TcpConnectionInfo(ip, 22334))
+
+        assertFailsWith<TimeoutException> {
+            TcpClientSocket.connect(address, timeout = 1_000) {}
+        }
+
     }
 }

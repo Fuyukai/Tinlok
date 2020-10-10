@@ -45,6 +45,16 @@ protocol.
         it.readUpTo(4096)
     }
 
+Tinlok adds support for allowing ``connect`` calls to timeout, by passing an optional ``timeout``
+parameter to the call. The timeout is specified in milliseconds.
+
+.. code-block:: kotlin
+
+    val millis = 30_000
+    TcpClientSocket.connect(address, timeout = millis) {
+        ...
+    }
+
 Server Sockets
 --------------
 

@@ -24,7 +24,9 @@ public actual object PlatformSockets {
      */
     @Unsafe
     @Throws(AllConnectionsFailedException::class, OSException::class)
-    public actual fun newTcpSynchronousSocket(address: TcpSocketAddress): TcpClientSocket {
+    public actual fun newTcpSynchronousSocket
+        (address: TcpSocketAddress, timeout: Int
+        ): TcpClientSocket {
         // try every address in sequence
         // when kotlin's concurrency (memory) model gets better, i will implement happy eyeballs.
         // this swallows ENETUNREACH, and various other errors, but that's a valid tradeoff for now.
@@ -33,7 +35,7 @@ public actual object PlatformSockets {
         for (info in address) {
             val socket = Syscall.socket(info.family, info.type, info.protocol)
             try {
-                Syscall.connect(socket, info)
+                Syscall.__connect_blocking(socket, info, timeout)
 
                 // no error was hit during connect, we are now connected
                 return LinuxTcpSocket(socket, info)

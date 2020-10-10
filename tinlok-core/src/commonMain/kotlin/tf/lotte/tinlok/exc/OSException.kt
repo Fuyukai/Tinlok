@@ -123,3 +123,10 @@ public expect class ConnectionRefusedException(cause: Throwable?) : ConnectionEx
 public expect class ConnectionResetException(cause: Throwable?) : ConnectionException {
     public constructor()
 }
+
+/**
+ * Thrown when a timeout happens on a connection. Corresponds to ETIMEDOUT.
+ */
+public expect class TimeoutException(cause: Throwable?) : ConnectionException {
+    public constructor()
+}
