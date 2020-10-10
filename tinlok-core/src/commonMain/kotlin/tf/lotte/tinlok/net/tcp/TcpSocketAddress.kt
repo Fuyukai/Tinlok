@@ -21,6 +21,7 @@ import tf.lotte.tinlok.util.Unsafe
  * A socket address for TCP sockets.
  */
 public class TcpSocketAddress private constructor(
+    override val hostname: String?,
     private val connections: Set<TcpConnectionInfo>,
 ) : SocketAddress<TcpConnectionInfo>(), Set<TcpConnectionInfo> by connections {
     public companion object {
@@ -37,14 +38,14 @@ public class TcpSocketAddress private constructor(
                 host = host, service = port, family = AddressFamily.AF_UNSPEC,
                 type = SocketType.SOCK_STREAM, protocol = IPProtocol.IPPROTO_TCP
             ).filterIsInstance<TcpConnectionInfo>()
-            return TcpSocketAddress(connections.toSet())
+            return TcpSocketAddress(host, connections.toSet())
         }
 
         /**
          * Creates a new [TcpSocketAddress] from a singular [TcpConnectionInfo].
          */
-        public fun of(info: TcpConnectionInfo): TcpSocketAddress {
-            return TcpSocketAddress(setOf(info))
+        public fun of(info: TcpConnectionInfo, host: String? = null): TcpSocketAddress {
+            return TcpSocketAddress(host ?: info.ip.toString(), setOf(info))
         }
     }
 

@@ -21,6 +21,7 @@ import tf.lotte.tinlok.util.Unsafe
  * A socket address for UDP sockets.
  */
 public class UdpSocketAddress private constructor(
+    override val hostname: String?,
     private val connections: Set<UdpConnectionInfo>,
 ) : SocketAddress<UdpConnectionInfo>(), Set<UdpConnectionInfo> by connections {
     public companion object {
@@ -37,7 +38,7 @@ public class UdpSocketAddress private constructor(
                 host = host, service = port, family = AddressFamily.AF_UNSPEC,
                 type = SocketType.SOCK_DGRAM, protocol = IPProtocol.IPPROTO_UDP
             ).filterIsInstance<UdpConnectionInfo>()
-            return UdpSocketAddress(connections.toSet())
+            return UdpSocketAddress(host, connections.toSet())
         }
     }
 
