@@ -12,6 +12,9 @@
 
 package tf.lotte.tinlok.util
 
+
+
+
 // safe conversion
 /**
  * Gets the upper byte of this Int.

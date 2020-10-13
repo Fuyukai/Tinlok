@@ -9,6 +9,8 @@
 
 package tf.lotte.tinlok.io
 
+import tf.lotte.tinlok.util.Closeable
+
 /**
  * Interface for any object that can be written to or closed (e.g. a socket).
  */

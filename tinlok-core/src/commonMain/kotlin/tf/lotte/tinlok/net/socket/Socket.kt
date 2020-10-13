@@ -9,7 +9,7 @@
 
 package tf.lotte.tinlok.net.socket
 
-import tf.lotte.tinlok.io.Closeable
+import tf.lotte.tinlok.util.Closeable
 
 /**
  * Base interface for all socket classes.

@@ -10,27 +10,7 @@
 package tf.lotte.tinlok.io
 
 import tf.lotte.tinlok.types.bytestring.ByteString
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.InvocationKind
-import kotlin.contracts.contract
 
-// misc extensions
-/**
- * Using the specified [Closeable], runs the lambda [block] and automatically closes the object
- * afterwards.
- */
-@OptIn(ExperimentalContracts::class)
-public inline fun <T : Closeable, R> T.use(block: (T) -> R): R {
-    contract {
-        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
-    }
-
-    try {
-        return block(this)
-    } finally {
-        close()
-    }
-}
 
 /**
  * Peeks no more than the specified number of bytes without advancing the cursor position.

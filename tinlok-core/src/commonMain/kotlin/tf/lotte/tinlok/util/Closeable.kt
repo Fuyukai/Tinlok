@@ -7,7 +7,7 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
-package tf.lotte.tinlok.io
+package tf.lotte.tinlok.util
 
 /**
  * Represents any object that is closeable.
@@ -20,4 +20,3 @@ public interface Closeable {
      */
     public fun close()
 }
-
