@@ -32,17 +32,21 @@ are statically included into the relevant klibs for maximum ease of use.
 * `Monocypher <https://monocypher.org/>`_, licenced under the 2-clause BSD licence. Used for core
    cryptography operations.
 
-* `libtls <https://www.libressl.org/>`_, licenced under the ISC licence. Used for core TLS support.
+OpenSSL
+-------
 
-  - ``libtls`` in its present form contains code from the OpenSSL project, which is
-    under the OpenSSL/SSLeay licence which is normally incompatible with the LGPL. However, under
-    the GPL Section 7 (Additional Terms), we give permission for any code in Tinlok to be linked
-    with OpenSSL code. It is recommended that you do the same.
+The current TLS support in Tinlok uses the ``libtls`` library, which was written by the LibreSSL
+devs.
 
-  - (Non-legal:) This clause is intended to be permanent; even if we switch away from using LibreSSL
-    in the future the extra permission should be granted for all future versions, simply because
-    OpenSSL (in forms pre-relicence such as in LibreSSL) is a useful library.
+* ``libtls`` from LibreSSL contains code from the OpenSSL project pre-relicence, which is
+  under the OpenSSL/SSLeay licence which is normally incompatible with the LGPL. However, under
+  the GPL Section 7 (Additional Terms), we give permission for any code in Tinlok to be linked
+  with OpenSSL code. It is recommended that you do the same.
 
+* The `LibreTLS`_ project, however, exists as a port of ``libtls`` (ISC) to modern OpenSSL
+  (Apache 2.0) which avoids these licencing concerns. ``tinlok-tls-libtls`` is fully compatible
+  with this library.
 
 .. _GNU Lesser General Public License version 3.0 or later: https://www.gnu.org/licenses/lgpl-3.0.en.html
 .. _Mozilla Public License Version 2.0 or later: https://www.mozilla.org/en-US/MPL/2.0/
+.. _LibreTLS: https://git.causal.agency/libretls/about/
