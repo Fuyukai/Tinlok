@@ -23,7 +23,10 @@ kotlin {
     }
 
     linuxArm64() {
+        val linuxMain by sourceSets.getting
         val linuxArm64Main by sourceSets.getting {
+            dependsOn(linuxMain)
+
             dependencies {
                 implementation(project(":tinlok-static-ipv6"))
                 implementation(project(":tinlok-static-monocypher"))

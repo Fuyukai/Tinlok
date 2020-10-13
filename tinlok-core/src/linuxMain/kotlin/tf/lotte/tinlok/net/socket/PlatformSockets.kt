@@ -14,19 +14,21 @@ import tf.lotte.tinlok.exc.OSException
 import tf.lotte.tinlok.net.AddressFamily
 import tf.lotte.tinlok.net.AllConnectionsFailedException
 import tf.lotte.tinlok.net.tcp.*
+import tf.lotte.tinlok.system.FD
 import tf.lotte.tinlok.system.Syscall
 import tf.lotte.tinlok.util.Unsafe
 
 @Unsafe
 public actual object PlatformSockets {
     /**
-     * Creates a new unconnected [TcpClientSocket].
+     * Attempts a TCP connection, returning a pair of (fd, TcpConnectionInfo) for the successful
+     * connection attempt.
      */
     @Unsafe
     @Throws(AllConnectionsFailedException::class, OSException::class)
-    public actual fun newTcpSynchronousSocket
-        (address: TcpSocketAddress, timeout: Int
-        ): TcpClientSocket {
+    public fun tryTcpConnect(
+        address: TcpSocketAddress, timeout: Int
+    ): Pair<FD, TcpConnectionInfo> {
         // try every address in sequence
         // when kotlin's concurrency (memory) model gets better, i will implement happy eyeballs.
         // this swallows ENETUNREACH, and various other errors, but that's a valid tradeoff for now.
@@ -38,7 +40,7 @@ public actual object PlatformSockets {
                 Syscall.__connect_blocking(socket, info, timeout)
 
                 // no error was hit during connect, we are now connected
-                return LinuxTcpSocket(socket, info)
+                return Pair(socket, info)
             } catch (e: OSException) {
                 // unconditionally close, we can't really do anything
                 Syscall.close(socket)
@@ -55,6 +57,18 @@ public actual object PlatformSockets {
         }
 
         throw AllConnectionsFailedException(address)
+    }
+
+    /**
+     * Creates a new connected [TcpClientSocket].
+     */
+    @Unsafe
+    @Throws(AllConnectionsFailedException::class, OSException::class)
+    public actual fun newTcpSynchronousSocket(
+        address: TcpSocketAddress, timeout: Int
+    ): TcpClientSocket {
+        val (fd, info) = tryTcpConnect(address, timeout)
+        return LinuxTcpSocket(fd, info)
     }
 
     /**

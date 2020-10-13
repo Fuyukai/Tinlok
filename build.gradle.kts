@@ -42,7 +42,7 @@ subprojects {
 
         // linux targets
         linuxX64()
-        linuxArm64()
+        // linuxArm64()  // only enabled in specific sub-buildscripts
 
         // temp disabled
         // darwin targets
@@ -75,7 +75,6 @@ subprojects {
             // linux sourcesets all share a sourceset
             val linuxMain by creating { dependsOn(nativeMain) }
             val linuxX64Main by getting { dependsOn(linuxMain) }
-            val linuxArm64Main by getting { dependsOn(linuxMain) }
 
             all {
                 languageSettings.apply {

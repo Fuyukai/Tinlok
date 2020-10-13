@@ -15,7 +15,11 @@ pluginManagement {
 }
 
 rootProject.name = "tinlok"
+// core
 include("tinlok-core")
+
+// extra modules
+include("tinlok-tls-libtls")
 
 // static libraries
 include("tinlok-static-ipv6")

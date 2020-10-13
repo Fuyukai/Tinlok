@@ -23,8 +23,7 @@ import tf.lotte.tinlok.util.Unsafe
 public interface TcpClientSocket : TcpSocket, StreamingClientSocket<TcpConnectionInfo> {
     public companion object {
         /**
-         * Creates a new [TcpClientSocket] from a platform socket, using the specified [address]
-         * and [timeout].
+         * Creates a new connected [TcpClientSocket] using the specified [address] and [timeout].
          *
          * This method is unsafe as it can leak file descriptors.
          */
