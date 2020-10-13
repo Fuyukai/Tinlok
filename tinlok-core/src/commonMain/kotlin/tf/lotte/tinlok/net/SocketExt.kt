@@ -18,6 +18,7 @@ import tf.lotte.tinlok.net.tcp.TcpClientSocket
 import tf.lotte.tinlok.net.tcp.TcpConnectionInfo
 import tf.lotte.tinlok.net.tcp.TcpServerSocket
 import tf.lotte.tinlok.net.tcp.TcpSocketAddress
+import tf.lotte.tinlok.util.ClosingScope
 import tf.lotte.tinlok.util.Unsafe
 import tf.lotte.tinlok.util.use
 import kotlin.contracts.ExperimentalContracts
@@ -46,6 +47,20 @@ public inline fun <R> TcpClientSocket.Companion.connect(
     // TODO: TCP_NODELAY and TCP_NOTSENT_LOWAT if needed
 
     return sock.use(block)
+}
+
+/**
+ * Opens a new TCP connection to the specified [address], using the default socket options, and
+ * and timing out after [timeout] milliseconds. If [timeout] is negative, no timeout will be used
+ * and a standard blocking connect will be issued.
+ */
+@OptIn(Unsafe::class)
+public fun TcpClientSocket.Companion.connect(
+    scope: ClosingScope, address: TcpSocketAddress, timeout: Int = 30_000
+): TcpClientSocket {
+    val sock = unsafeOpen(address, timeout)
+    scope.add(sock)
+    return sock
 }
 
 /**
@@ -91,7 +106,8 @@ public inline fun <R> TcpServerSocket.Companion.bind(
 // == Server socket helpers == //
 /**
  * Accepts a new connection, passing a synchronous client socket for the incoming connection to
- * the specified lambda [block]. The connection will be automatically closed when the bloc
+ * the specified lambda [block]. The connection will be automatically closed when the block
+ * returns.
  */
 @OptIn(Unsafe::class, ExperimentalContracts::class)
 public inline fun <R, I : CI, T : ClientSocket<I>> AcceptingSeverSocket<I, T>.accept(
@@ -102,4 +118,15 @@ public inline fun <R, I : CI, T : ClientSocket<I>> AcceptingSeverSocket<I, T>.ac
     }
 
     return unsafeAccept().use(block)
+}
+
+/**
+ * Accepts a new connection, returning a new synchronous client socket, and adding it to the
+ * specified [scope] for automatic closing.
+ */
+@OptIn(Unsafe::class)
+public fun <I: CI, T: ClientSocket<I>> AcceptingSeverSocket<I, T>.accept(scope: ClosingScope): T {
+    val sock = unsafeAccept()
+    scope.add(sock)
+    return sock
 }

@@ -17,6 +17,7 @@ import tf.lotte.tinlok.fs.StandardOpenModes
 import tf.lotte.tinlok.types.bytestring.ByteString
 import tf.lotte.tinlok.types.bytestring.b
 import tf.lotte.tinlok.types.bytestring.toByteString
+import tf.lotte.tinlok.util.ClosingScope
 import tf.lotte.tinlok.util.Unsafe
 import tf.lotte.tinlok.util.use
 import kotlin.contracts.ExperimentalContracts
@@ -219,6 +220,16 @@ public inline fun <R> Path.open(vararg modes: StandardOpenModes, block: (Filesys
 }
 
 /**
+ * Opens a path for file I/O, adding it to the specified [scope] for automatic closing.
+ */
+@OptIn(Unsafe::class)
+public fun Path.open(scope: ClosingScope, vararg modes: StandardOpenModes): FilesystemFile {
+    val file = unsafeOpen(*modes)
+    scope.add(file)
+    return file
+}
+
+/**
  * Writes the specified [ByteString] [bs] to the file represented by this [Path]. The file will be
  * created if it doesn't exist.
  *
@@ -291,9 +302,16 @@ public inline fun <R> Path.Companion.makeTempDirectory(prefix: String, block: (P
     }
 
     val dir = PlatformPaths.makeTempDirectory(prefix)
-    try {
-        return block(dir)
-    } finally {
-        dir.recursiveDelete()
-    }
+    return AutodeletePath(dir).use(block)
+}
+
+/**
+ * Creates a new temporary directory,
+ */
+@OptIn(Unsafe::class)
+public fun Path.Companion.makeTempDirectory(scope: ClosingScope, prefix: String): Path {
+    val dir = PlatformPaths.makeTempDirectory(prefix)
+    val adir = AutodeletePath(dir)
+    scope.add(adir)
+    return adir
 }
