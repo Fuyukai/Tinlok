@@ -37,21 +37,7 @@ socket will accept.
 Safety
 ------
 
-For safety purposes, several functions are provided a lambda which are then passed an open
-socket, instead of directly returning a socket. Usually, this is because failure to close a
-socket will lead to the socket's fd living forever and the easiest way to design APIs to enforce
-closure is to run at the end of a passed-in lambda's execution.
-
-Usually, these functions are safe inline extension functions that call the unsafe function
-within, thus having near-zero performance impact.
-
-Functions that do this include:
-
-* ``AcceptingServerSocket.accept``
-* ``TcpClientSocket.connect``
-* ``TcpServerSocket.open``
-
-This is a non-exhaustive list.
+See :ref:`closingscope` for more information about how socket safety is enforced.
 
 TCP
 ---

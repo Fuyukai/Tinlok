@@ -8,9 +8,8 @@ The core module is the primary module for Tinlok. The core module contains:
 * Path helpers (inspired by Python's ``pathlib``)
 * Filesystem I/O
 * Network I/O
+* High-level cryptography
 * (Planned) Subprocessing
-* (Planned) Full time/date library based on Pendulum (not like ``kotlinx.datetime``)
-* (Planned) Hashing
 * (Planned) Compression/decompression (zlib, gzip, lzma)
 * (Planned) Maybe more?
 
@@ -38,8 +37,11 @@ Contents
 .. toctree::
    :maxdepth: 1
 
+   closingscope.rst
    bytestring.rst
    io-interfaces.rst
+
+   cryptography.rst
 
    paths/pure.rst
    paths/io.rst

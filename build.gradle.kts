@@ -7,13 +7,12 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
-import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 plugins {
     id("org.jetbrains.kotlin.multiplatform").version("1.4.10").apply(false)
-    id("org.jetbrains.dokka").version("1.4.0").apply(true)
+    /*id("org.jetbrains.dokka").version("1.4.0").apply(true)*/
     id("maven-publish")
 }
 
@@ -33,7 +32,7 @@ subprojects {
     if (this.name.startsWith("tinlok-static")) return@subprojects
 
     apply(plugin = "org.jetbrains.kotlin.multiplatform")
-    apply(plugin = "org.jetbrains.dokka")
+    //apply(plugin = "org.jetbrains.dokka")
 
     // core kotlin configuration
     // (this is collapsed in my IDE)
@@ -87,32 +86,32 @@ subprojects {
 
     // core dokka configuration
     // (equally collapsed)
-    tasks.named<DokkaTask>("dokkaHtml") {
+    /*tasks.named<DokkaTask>("dokkaHtml") {
         dokkaSourceSets {
             configureEach {
                 includeNonPublic.set(true)
             }
         }
-    }
+    }*/
 }
 
-val clean = tasks.register<Exec>("sphinxClean") {
+val sphinxClean = tasks.register<Exec>("sphinxClean") {
     group = "documentation"
     workingDir = project.rootDir.resolve("docs")
     commandLine("poetry run make clean".split(" "))
 }
 
-val sphinxCopy = tasks.register<Sync>("sphinxCopy") {
+/*val sphinxCopy = tasks.register<Sync>("sphinxCopy") {
     group = "documentation"
     dependsOn(tasks.named("dokkaHtmlMultiModule"), clean)
 
     from("${project.buildDir}/dokka/htmlMultiModule")
     into("${project.rootDir}/docs/_external/_dokka")
-}
+}*/
 
 tasks.register<Exec>("sphinxBuild") {
     group = "documentation"
-    dependsOn(sphinxCopy)
+    dependsOn(sphinxClean)
     workingDir = project.rootDir.resolve("docs")
     commandLine("poetry run make html".split(" "))
 }

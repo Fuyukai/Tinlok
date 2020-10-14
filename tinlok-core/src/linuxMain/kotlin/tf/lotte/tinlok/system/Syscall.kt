@@ -239,7 +239,6 @@ public actual object Syscall {
         }
 
         if (readCount.isError) {
-            // TODO: EAGAIN
             when (errno) {
                 EAGAIN -> TODO("EAGAIN")
                 else -> throwErrno(errno)
@@ -633,7 +632,7 @@ public actual object Syscall {
                     struct = __ipv4_to_sockaddr(this, info.ip as IPv4Address, info.port)
                     size = sizeOf<sockaddr_in>().toUInt()
                 }
-                else -> TODO()
+                else -> throw UnsupportedOperationException("Don't know how to use $info")
             }
 
             // less than zero timeouts go on the fast path, which is a standard blocking connect

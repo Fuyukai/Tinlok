@@ -16,7 +16,7 @@ import tf.lotte.tinlok.types.bytestring.ByteString
  */
 public class Argon2iHash internal constructor(
     /** The derived final hash. */
-    derived: ByteString,
+    public val derived: ByteString,
     /** The salt used when hashing. */
     public val salt: ByteString,
     /** The number of memory blocks. */
@@ -24,10 +24,6 @@ public class Argon2iHash internal constructor(
     /** The number of iterations. */
     public val iterations: Int,
 ) {
-    /** The derived final hash, as a property. */
-    public var derived: ByteString = derived
-        private set
-
     /**
      * Verifies if this password hash matches a password.
      */
@@ -37,8 +33,8 @@ public class Argon2iHash internal constructor(
             password, salt.unwrap().toUByteArray(), blocks, iterations
         )
         return crypto_verify64(
-            derived.unwrap().toUByteArray(),
-            nextHash.derived.unwrap().toUByteArray()
+            derived.toUByteArray(),
+            nextHash.derived.toUByteArray()
         )
     }
 }

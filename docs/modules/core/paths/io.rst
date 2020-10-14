@@ -25,7 +25,7 @@ object:
 
 .. warning::
 
-    You can only create a ``Path`` from a platform ``PurePath``. This is enforced with typing.
+    You can only create a ``Path`` from a platform ``PurePath``.
 
 File I/O
 --------
@@ -60,8 +60,10 @@ If you don't wish to read whole files into memory, you can open the path using `
 
 
 ``open`` provides a ``FilesystemFile`` to a lambda which is a union of
-``BidirectionalStringStream | Seekable``. The file will always be closed at the end of the
-lambda.
+``BidirectionalStream | Seekable``.
+
+There also exists an overloaded ``Path.open`` that takes a ``ClosingScope``. See
+:ref:`closingscope` for more information.
 
 Filesystem interaction
 ----------------------

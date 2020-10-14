@@ -126,6 +126,14 @@ private constructor(
         return backing.unwrap().copyOf()
     }
 
+    /**
+     * Creates a new [UByteArray] from the contents of this [ByteString], copying directly from
+     * the internal storage to the new array.
+     */
+    public fun toUByteArray(): UByteArray {
+        return backing.unwrap().toUByteArray()
+    }
+
     override fun iterator(): Iterator<Byte> {
         return backing.iterator()
     }

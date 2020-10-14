@@ -12,6 +12,7 @@ package tf.lotte.tinlok.crypto
 
 import tf.lotte.tinlok.types.bytestring.ByteString
 import tf.lotte.tinlok.util.Closeable
+import tf.lotte.tinlok.util.ClosingScope
 import tf.lotte.tinlok.util.use
 
 /**
@@ -42,4 +43,26 @@ public operator fun <R> Blake2b.Companion.invoke(
 {
     val hasher = Blake2b(key)
     return hasher.use(block)
+}
+
+/**
+ * Creates a new [Blake2b] instance with the specified [key], adding it to the specified closing
+ * [scope].
+ */
+@OptIn(ExperimentalUnsignedTypes::class)
+public operator fun Blake2b.Companion.invoke(
+    scope: ClosingScope, key: UByteArray = ubyteArrayOf()
+): Blake2b {
+    val hasher = Blake2b(key)
+    scope.add(hasher)
+    return hasher
+}
+
+/**
+ * Creates a [Blake2bHash] for the contents of this [ByteString].
+ */
+@OptIn(ExperimentalUnsignedTypes::class)
+public fun ByteString.blake2b(key: UByteArray = ubyteArrayOf()): Blake2bHash = Blake2b {
+    it.feed(this)
+    it.hash()
 }

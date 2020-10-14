@@ -32,5 +32,6 @@ Style
 * Use ``try/finally``, ``memScoped``, and inline functions passed a lambda whenever possible for
   resource management.
 
-* If introducing an external C dependency (avoid this when possible), it should be be a
-  single-header or a similarly minimal library, and statically linked.
+
+.. _GitHub: https://github.com/Constellarise/Tinlok
+.. _Heptapod: https://foss.heptapod.net/
