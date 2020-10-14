@@ -7,14 +7,15 @@ very minor releases.
 At some point in the future, a ``Stable`` annotation may be introduced to designate APIs that are
 sufficiently stable that they will get a deprecation cycle instead of being ripped out.
 
-Less Afraid Versioning
-----------------------
+Tinlok versioning
+-----------------
 
-Tinlok follows a new versioning scheme called Less Afraid Versioning, which prioritises API
-soundness over the arbitrary notion of API stability. After all, every change breaks somebody's
-workflow; who are you to say if your version is arbitrarily backwards compatible or not?
+Tinlok follows my own versioning scheme which prioritises API soundness over the arbitrary notion
+of API stability. One day, somebody could decide behaviour you depend on is actually a bug and
+break it and it would be perfectly fine under most versioning schemes, and eventually everyone
+ends up with Chrome versioning anyway, so I just skip all the way to breaking things.
 
-Less Afraid Versioning version numbers consist of three parts:
+Tinlok version numbers consist of three parts:
 
 * Major version number
 

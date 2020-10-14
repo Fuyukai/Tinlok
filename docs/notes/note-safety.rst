@@ -33,4 +33,5 @@ The ``Unsafe`` annotation
 
 The safety barrier is enforced by Kotlin's ``OptIn`` system, and the ``Unsafe`` annotation.
 **All** consumers of unsafe APIs must mark their caller as ``@Unsafe`` or ``@OptIn(Unsafe::class)``
-to use unsafe APIs.
+to use unsafe APIs. Many of Tinlok's APIs guard unsafe APIs in safe functions so it should be
+very rare to ever need to use ``@Unsafe`` functions directly.

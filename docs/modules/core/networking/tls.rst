@@ -25,4 +25,4 @@ specifically linking to a TLS backend library.
 
 The core TLS support currently provides zero support for actually creating TLS sockets; you will
 need to use a specific extra dependency that may link against a different library (for example
-:ref:`_module_libressl`).
+:ref:`module_libressl`).

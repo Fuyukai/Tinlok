@@ -4,8 +4,8 @@ Contributing
 ============
 
 Tinlok uses Mercurial for version control, as Mercurial is superior to Git. Unfortunately, Git
-won despite being worse (at least partially due to propaganda) and as such there are very few
-good public places to host Mercurial repositories.
+won despite being worse and as such there are very few good public places to host Mercurial
+repositories.
 
 Currently, Tinlok uses a GitHub_ repository as its primary repository, using hg-git. At some
 point, I aim to get Tinlok moved to either the public Heptapod_ instance, a self-hosted instance,

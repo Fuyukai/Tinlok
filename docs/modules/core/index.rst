@@ -61,3 +61,4 @@ Contents
    networking/socketaddress.rst
    networking/socket.rst
    networking/tcp.rst
+   networking/tls.rst

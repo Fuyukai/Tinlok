@@ -3,8 +3,8 @@
 Changelog
 =========
 
-1.1.0
------
+1.1.0 (Released 2020-10-14)
+---------------------------
 
  - Add a ``SecureRandom`` API.
 
@@ -23,6 +23,8 @@ Changelog
  - Add Base64 encoding for ``ByteString`` objects.
 
  - Add ``poll()`` based timeout for TCP sockets when connecting.
+
+ - Add ``libtls`` based TLS support.
 
 1.0.0
 ------
