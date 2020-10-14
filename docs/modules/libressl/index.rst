@@ -30,7 +30,7 @@ Add the ``tinlok-tls-libtls`` module to your ``commonMain`` sourceset:
 
 Add the specific sub-platforms to your other sourcesets:
 
-.. code-block::
+.. code-block:: kotlin
 
     val linuxX64Main by getting {
         dependencies {
