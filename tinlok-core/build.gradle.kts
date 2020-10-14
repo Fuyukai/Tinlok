@@ -39,7 +39,7 @@ publishing {
     publications.withType<MavenPublication> {
         pom {
             name.set(project.name)
-            description.set("The core components for Tinlok.")
+            description.set("The core Tinlok module.")
             url.set("https://tinlok.lotte.tf")
 
             licenses {
@@ -59,6 +59,18 @@ publishing {
                     name.set("Charlotte Skye")
                     url.set("https://lotte.tf")
                 }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            val ROOT = "https://api.bintray.com/maven/constellarise/tinlok"
+            url = uri("$ROOT/tinlok-core/;publish=1;override=1")
+
+            credentials {
+                username = System.getenv("BINTRAY_USERNAME")
+                password = System.getenv("BINTRAY_KEY")
             }
         }
     }

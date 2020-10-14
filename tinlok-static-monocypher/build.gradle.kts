@@ -47,3 +47,40 @@ kotlin {
         }
     }
 }
+
+publishing {
+    publications.withType<MavenPublication> {
+        pom {
+            name.set(project.name)
+            description.set("A statically provided copy of the ipv6-parse library.")
+            url.set("https://github.com/LoupVaillant/Monocypher")
+
+            licenses {
+                license {
+                    name.set("BSD-2-Clause")
+                    url.set("https://opensource.org/licenses/BSD-2-Clause")
+                }
+            }
+
+            developers {
+                developer {
+                    id.set("LoupVaillant")
+                    name.set("Loup Vaillant")
+                    url.set("https://github.com/LoupVaillant")
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            val ROOT = "https://api.bintray.com/maven/constellarise/tinlok"
+            url = uri("$ROOT/tinlok-static-monocypher/;publish=1;override=1")
+
+            credentials {
+                username = System.getenv("BINTRAY_USERNAME")
+                password = System.getenv("BINTRAY_KEY")
+            }
+        }
+    }
+}

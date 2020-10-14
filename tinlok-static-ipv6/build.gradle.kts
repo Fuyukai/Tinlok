@@ -55,25 +55,33 @@ publishing {
         pom {
             name.set(project.name)
             description.set("A statically provided copy of the ipv6-parse library.")
-            url.set("https://tinlok.lotte.tf")
+            url.set("https://github.com/jrepp/ipv6-parse")
 
             licenses {
                 license {
-                    name.set("LGPL-3.0-or-later")
-                    url.set("https://www.gnu.org/licenses/lgpl-3.0.en.html")
-                }
-                license {
-                    name.set("MPL-2.0")
-                    url.set("https://www.mozilla.org/en-US/MPL/2.0/")
+                    name.set("MIT")
+                    url.set("https://opensource.org/licenses/MIT")
                 }
             }
 
             developers {
                 developer {
-                    id.set("Constellarise")
-                    name.set("Charlotte Skye")
-                    url.set("https://lotte.tf")
+                    id.set("jrepp")
+                    name.set("Jacob Repp")
+                    url.set("https://github.com/jrepp")
                 }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            val ROOT = "https://api.bintray.com/maven/constellarise/tinlok"
+            url = uri("$ROOT/tinlok-static-ipv6/;publish=1;override=1")
+
+            credentials {
+                username = System.getenv("BINTRAY_USERNAME")
+                password = System.getenv("BINTRAY_KEY")
             }
         }
     }
