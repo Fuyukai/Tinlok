@@ -9,10 +9,25 @@
 
 package tf.lotte.tinlok.net.tls
 
+import tf.lotte.tinlok.net.socket.PlatformSockets
 import tf.lotte.tinlok.net.tcp.TcpSocketAddress
 import tf.lotte.tinlok.util.ClosingScope
 import tf.lotte.tinlok.util.Unsafe
 import tf.lotte.tinlok.util.use
+
+
+/**
+ * Creates a new connected [TlsClientSocket] using the specified [address] and [timeout].
+ *
+ * This method is unsafe as it can leak file descriptors and memory related to TLS
+ * structures.
+ */
+@Unsafe
+public fun TlsClientSocket.Companion.unsafeOpen(
+    address: TcpSocketAddress, config: TlsConfig, timeout: Int
+): TlsClientSocket {
+    return PlatformSockets.newTlsSynchronousSocket(address, config, timeout)
+}
 
 
 /**
