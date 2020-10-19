@@ -35,8 +35,8 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
     override val components: List<String> by pure::components
     override val rawAnchor: ByteString? by pure::rawAnchor
     override val anchor: String? by pure::anchor
-    override val rawName: ByteString by pure::rawName
-    override val name: String by pure::name
+    override val rawName: ByteString? by pure::rawName
+    override val name: String? by pure::name
     override fun resolveChild(other: PurePath): LinuxPath = LinuxPath(pure.resolveChild(other))
     override fun withName(name: ByteString): LinuxPath = LinuxPath(pure.withName(name))
 

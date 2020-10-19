@@ -42,7 +42,9 @@ public interface PurePath {
      */
     public val isAbsolute: Boolean
 
-    /** The raw components that comprise this path. */
+    /**
+     * The raw components that comprise this path.
+     */
     public val rawComponents: List<ByteString>
 
     /**
@@ -63,11 +65,11 @@ public interface PurePath {
     /** The parent of this Path. */
     public val parent: PurePath
 
-    /** The raw final name of this Path. */
-    public val rawName: ByteString
+    /** The raw final name of this Path. Can be null if the path is just the anchor. */
+    public val rawName: ByteString?
 
-    /** The final name of this path. */
-    public val name: String
+    /** The final name of this path. Can be null if the path is just the anchor. */
+    public val name: String?
 
     /**
      * Resolves the other path as if it was a child of this path.

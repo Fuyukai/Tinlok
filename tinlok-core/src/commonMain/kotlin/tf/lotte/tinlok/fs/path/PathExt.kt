@@ -239,6 +239,10 @@ public fun Path.open(scope: ClosingScope, vararg modes: StandardOpenModes): File
  */
 @OptIn(Unsafe::class)
 public fun Path.writeBytes(bs: ByteString, atomic: Boolean = true) {
+    if (rawName == null) {
+        throw IllegalArgumentException("Cannot write to a path with no name!")
+    }
+
     if (atomic) {
         val realPath = if (this.exists()) {
             if (this.isDirectory(followSymlinks = true)) {
@@ -252,7 +256,8 @@ public fun Path.writeBytes(bs: ByteString, atomic: Boolean = true) {
             // resolve through symlinks
             this.toAbsolutePath(strict = true)
         } else this
-        val tempName = realPath.withName(rawName + TEMP_SUFFIX)
+
+        val tempName = realPath.withName(rawName!! + TEMP_SUFFIX)
 
         tempName.open(StandardOpenModes.WRITE, StandardOpenModes.CREATE) {
             it.writeAll(bs)

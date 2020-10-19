@@ -87,11 +87,18 @@ public open class PosixPurePath(rawParts: List<ByteString>) : PurePath {
         }
     }
 
-    override val rawName: ByteString by lazy {
-        rawComponents.last()
+    override val rawName: ByteString? get() {
+        return if (isAbsolute) {
+            // only get the name if it exists
+            // because we may only have /
+            if (rawComponents.size <= 1) null
+            else rawComponents.last()
+        } else {
+            // always exists on relative paths
+            rawComponents.last()
+        }
     }
-
-    override val name: String by lazy { rawName.decode() }
+    override val name: String? get() = rawName?.decode()
 
 
     override fun resolveChild(other: PurePath): PosixPurePath {
@@ -115,6 +122,8 @@ public open class PosixPurePath(rawParts: List<ByteString>) : PurePath {
     }
 
     override fun isChildOf(other: PurePath): Boolean {
+        if (other !is PosixPurePath) return false
+
         // un-absolute pure paths cannot be compared child-wise
         // as there exists no reference point to compare
         // but absolute paths can be compared with other absolutes
@@ -171,6 +180,7 @@ public open class PosixPurePath(rawParts: List<ByteString>) : PurePath {
     }
 
     override fun equals(other: Any?): Boolean {
+        if (this === other) return true
         if (other == null || other !is PosixPurePath) return false
         return rawComponents == other.rawComponents
     }

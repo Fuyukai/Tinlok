@@ -89,9 +89,9 @@ public fun PurePath.allParents(): List<PurePath> {
  */
 public val PurePath.rawSuffix: ByteString?
     get() {
-        val idx = rawName.lastIndexOf('.'.toByte())
+        val idx = rawName?.lastIndexOf('.'.toByte()) ?: -1
         return if (idx <= -1) null
-        else rawName.substring(idx + 1)
+        else rawName!!.substring(idx + 1)
     }
 
 /**
@@ -108,8 +108,11 @@ public val PurePath.suffix: String?
  */
 public val PurePath.rawSuffixes: List<ByteString>
     get() {
-        if (!rawName.contains('.'.toByte())) return emptyList()
-        val split = rawName.split(b("."))
+        // copy to
+        val raw = rawName
+
+        if (raw == null || !raw.contains('.'.toByte())) return emptyList()
+        val split = raw.split(b("."))
         return split.drop(1)
     }
 
@@ -118,11 +121,6 @@ public val PurePath.rawSuffixes: List<ByteString>
  */
 public val PurePath.suffixes: List<String>
     get() {
-        // copy to avoid repeated decoding on default impls
-        val nam = name
-
-        if (!nam.contains('.')) return emptyList()
-        val split = nam.split('.')
-        return split.drop(1)
+        return rawSuffixes.map { it.decode() }
     }
 
