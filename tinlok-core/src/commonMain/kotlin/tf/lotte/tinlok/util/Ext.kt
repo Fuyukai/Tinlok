@@ -29,3 +29,26 @@ public inline fun <T : Closeable, R> T.use(block: (T) -> R): R {
         close()
     }
 }
+
+/**
+ * Converts this short array into a string (assuming it is UTF-16).
+ */
+public fun ShortArray.utf16ToString(count: Int = this.size): String {
+    val ca = CharArray(count)
+    for (idx in 0 until count) {
+        ca[idx] = this[idx].toChar()
+    }
+    return ca.concatToString()
+}
+
+/**
+ * Converts this UShortArray into a string (assumiing it is UTF-16).
+ */
+@ExperimentalUnsignedTypes
+public fun UShortArray.utf16ToString(count: Int = this.size): String {
+    val ca = CharArray(count)
+    for (idx in 0 until count) {
+        ca[idx] = this[idx].toShort().toChar()
+    }
+    return ca.concatToString()
+}

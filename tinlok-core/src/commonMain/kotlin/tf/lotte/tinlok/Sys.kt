@@ -22,7 +22,8 @@ public expect object Sys {
     /**
      * Gets the current process ID.
      */
-    public fun getPID(): Int
+    @OptIn(ExperimentalUnsignedTypes::class)
+    public fun getPID(): UInt
 
     /**
      * Gets the current username of the user running this application.

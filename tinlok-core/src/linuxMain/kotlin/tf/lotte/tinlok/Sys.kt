@@ -25,8 +25,8 @@ public actual object Sys {
         return platform.posix.getenv(key)?.toKStringFromUtf8()
     }
 
-    public actual fun getPID(): Int {
-        return getpid()
+    public actual fun getPID(): UInt {
+        return getpid().toUInt()
     }
 
     @OptIn(Unsafe::class)

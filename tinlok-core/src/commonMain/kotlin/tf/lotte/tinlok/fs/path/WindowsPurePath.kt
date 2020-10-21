@@ -9,10 +9,7 @@
 
 package tf.lotte.tinlok.fs.path
 
-import tf.lotte.tinlok.types.bytestring.ByteString
-import tf.lotte.tinlok.types.bytestring.b
-import tf.lotte.tinlok.types.bytestring.substring
-import tf.lotte.tinlok.types.bytestring.toByteString
+import tf.lotte.tinlok.types.bytestring.*
 import tf.lotte.tinlok.util.Unsafe
 
 /**
@@ -239,7 +236,7 @@ public open class WindowsPurePath private constructor(
         return true
     }
 
-    override fun withName(name: ByteString): PurePath {
+    override fun withName(name: ByteString): WindowsPurePath {
         require(!checkIllegalName(name)) { "$name is an illegal path" }
 
         return if (rawName == null) {
@@ -254,7 +251,7 @@ public open class WindowsPurePath private constructor(
         }
     }
 
-    override fun resolveChild(other: PurePath): PurePath {
+    override fun resolveChild(other: PurePath): WindowsPurePath {
         require(other is WindowsPurePath) { "Can only accept other Windows paths!" }
 
         // same as posix paths, the second absolute path always wins
@@ -264,7 +261,7 @@ public open class WindowsPurePath private constructor(
         }
     }
 
-    override fun reparent(from: PurePath, to: PurePath): PurePath {
+    override fun reparent(from: PurePath, to: PurePath): WindowsPurePath {
         require(from is WindowsPurePath) { "Can only accept other Windows paths!" }
         require(to is WindowsPurePath) { "Can only accept other Windows paths!" }
         require(this.isChildOf(from)) { "$this is not a child of $from" }

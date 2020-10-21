@@ -48,7 +48,7 @@ subprojects {
         // macosX64()
 
         // windows
-        // mingwX64()
+        mingwX64()
 
 
         sourceSets {
@@ -74,6 +74,10 @@ subprojects {
             // linux sourcesets all share a sourceset
             val linuxMain by creating { dependsOn(nativeMain) }
             val linuxX64Main by getting { dependsOn(linuxMain) }
+
+            val mingwX64Main by getting {
+                dependsOn(nativeMain)
+            }
 
             all {
                 languageSettings.apply {
