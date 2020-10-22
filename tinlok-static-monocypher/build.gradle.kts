@@ -17,8 +17,9 @@ val LIB_NAME = "libmonocypher"
 kotlin {
     val amd64 = linuxX64()
     val aarch64 = linuxArm64()
+    val mingw64 = mingwX64()
 
-    listOf(amd64, aarch64).forEach {
+    listOf(amd64, aarch64, mingw64).forEach {
         val main by it.compilations.getting {
             val sourceSet = defaultSourceSetName
             val libPath = "src/$sourceSet/$LIB_NAME.a"

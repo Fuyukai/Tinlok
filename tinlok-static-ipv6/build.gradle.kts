@@ -17,8 +17,9 @@ repositories {
 kotlin {
     val x64 = linuxX64()
     val aarch64 = linuxArm64()
+    val mingw64 = mingwX64()
 
-    listOf(x64, aarch64).forEach {
+    listOf(x64, aarch64, mingw64).forEach {
         val main by it.compilations.getting {
             val sourceSet = defaultSourceSetName
             val libPath = "src/$sourceSet/libipv6-parse.a"
