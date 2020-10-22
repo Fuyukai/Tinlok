@@ -24,41 +24,43 @@ import tf.lotte.tinlok.types.bytestring.b
 import tf.lotte.tinlok.util.Unsafe
 
 /**
- * Linux-based implementation of a [Path]. Wraps a [PosixPurePath].
+ * Linux-based implementation of a [Path]. Is also a [PosixPurePath].
  */
 @OptIn(ExperimentalUnsignedTypes::class)
-internal class LinuxPath(private val pure: PosixPurePath) : Path {
+internal class LinuxPath(rawParts: List<ByteString>) : Path, PosixPurePath(rawParts) {
+    companion object {
+        /**
+         * Creates a new [LinuxPath]
+         */
+        internal fun fromByteString(bs: ByteString): LinuxPath {
+            return LinuxPath(splitParts(bs))
+        }
+    }
+
     // == purepath functionality == //
-    override val isAbsolute: Boolean by pure::isAbsolute
-    override val parent: LinuxPath get() = LinuxPath(pure.parent)
-    override val rawComponents: List<ByteString> by pure::rawComponents
-    override val components: List<String> by pure::components
-    override val rawAnchor: ByteString? by pure::rawAnchor
-    override val anchor: String? by pure::anchor
-    override val rawName: ByteString? by pure::rawName
-    override val name: String? by pure::name
-    override fun resolveChild(other: PurePath): LinuxPath = LinuxPath(pure.resolveChild(other))
-    override fun withName(name: ByteString): LinuxPath = LinuxPath(pure.withName(name))
+    override val parent: LinuxPath get() = LinuxPath(super.parent.rawComponents)
 
-    @Unsafe
-    override fun unsafeToString(): String = pure.unsafeToString()
+    override fun resolveChild(other: PurePath): LinuxPath {
+        return LinuxPath(super.resolveChild(other).rawComponents)
+    }
+    override fun withName(name: ByteString): LinuxPath {
+        return LinuxPath(super.withName(name).rawComponents)
+    }
+    override fun reparent(from: PurePath, to: PurePath): LinuxPath {
+        return LinuxPath(super.reparent(from, to).rawComponents)
+    }
 
-    // todo: make this use LinuxPath as the prefix
-    override fun toString(): String = pure.toString()
-    override fun isChildOf(other: PurePath): Boolean = pure.isChildOf(other)
-    override fun reparent(from: PurePath, to: PurePath): LinuxPath =
-        LinuxPath(pure.reparent(from, to))
 
     // == path functionality == //
     @OptIn(Unsafe::class)
     override fun exists(): Boolean {
-        val strPath = pure.unsafeToString()
+        val strPath = unsafeToString()
         return Syscall.access(strPath, F_OK)
     }
 
     @OptIn(Unsafe::class)
     fun statSafe(followSymlinks: Boolean): Stat? = memScoped {
-        val strPath = pure.unsafeToString()
+        val strPath = unsafeToString()
         val pathStat = Syscall.__stat_safer(this, strPath, followSymlinks)
             ?: return null
 
@@ -73,7 +75,7 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
 
     @OptIn(Unsafe::class)
     fun stat(followSymlinks: Boolean): Stat = memScoped {
-        val strPath = pure.unsafeToString()
+        val strPath = unsafeToString()
         val pathStat = Syscall.stat(this, strPath, followSymlinks)
 
         return Stat(
@@ -87,7 +89,7 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
 
     @OptIn(Unsafe::class)
     override fun owner(followSymlinks: Boolean): String? = memScoped {
-        val strPath = pure.unsafeToString()
+        val strPath = unsafeToString()
         val stat = Syscall.stat(this, strPath, followSymlinks)
         val uid = stat.st_uid
         val passwd = Syscall.getpwuid_r(this, uid)
@@ -115,7 +117,7 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
         // safer approach
         return try {
             val link = Syscall.readlink(this, unsafeToString())
-            LinuxPath(PosixPurePath.fromByteString(link))
+            LinuxPath(splitParts(link))
         } catch (e: FileNotFoundException) {
             null
         } catch (e: OSException) {
@@ -127,8 +129,8 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
     @OptIn(Unsafe::class)
     override fun toAbsolutePath(strict: Boolean): Path {
         if (!strict) TODO("Pure-Kotlin resolving")
-        val realPath = memScoped { Syscall.realpath(this, pure.unsafeToString()) }
-        return LinuxPath(PosixPurePath.fromByteString(realPath))
+        val realPath = memScoped { Syscall.realpath(this, unsafeToString()) }
+        return LinuxPath(splitParts(realPath))
     }
 
     @OptIn(Unsafe::class)
@@ -137,7 +139,7 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
         existOk: Boolean,
         vararg permissions: FilePermission
     ) {
-        val path = this.unsafeToString()
+        val path = unsafeToString()
         val permMask = if (permissions.isEmpty()) {
             PosixFilePermission.ALL.bit
         } else {
@@ -160,7 +162,7 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
 
     @OptIn(Unsafe::class)
     override fun scanDir(block: (DirEntry) -> Unit) {
-        val path = this.unsafeToString()
+        val path = unsafeToString()
         val dir = Syscall.opendir(path)
         try {
             val dot = b(".")
@@ -286,11 +288,7 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
         if (this === other) return true
         if (other == null || other !is Path) return false
 
-        return pure.rawComponents == other.rawComponents
-    }
-
-    override fun hashCode(): Int {
-        return pure.hashCode()
+        return super.equals(other)
     }
 }
 
@@ -298,7 +296,7 @@ internal class LinuxPath(private val pure: PosixPurePath) : Path {
 private inline fun PurePath.ensureLinuxPath(): LinuxPath {
     if (this is LinuxPath) return this
     if (this !is PosixPurePath) error("Not a POSIX path!")
-    return LinuxPath(this)
+    return LinuxPath(rawComponents)
 }
 
 // this is a gross map because DT_ entries are not contiguous

@@ -33,8 +33,7 @@ public actual object PlatformPaths {
     @OptIn(Unsafe::class)
     public actual fun cwd(): Path {
         val path = ByteString.fromByteArray(Syscall.getcwd())
-        val pure = PosixPurePath.fromByteString(path)
-        return LinuxPath(pure)
+        return LinuxPath.fromByteString(path)
     }
 
     @OptIn(Unsafe::class)
@@ -52,8 +51,7 @@ public actual object PlatformPaths {
             }
         }
 
-        val pure = PosixPurePath.fromByteString(path)
-        return LinuxPath(pure)
+        return LinuxPath.fromByteString(path)
     }
 
     public actual fun purePath(of: ByteString): PosixPurePath {
@@ -62,11 +60,11 @@ public actual object PlatformPaths {
 
 
     public actual fun path(of: ByteString): Path {
-        return LinuxPath(PosixPurePath.fromByteString(of))
+        return LinuxPath.fromByteString(of)
     }
 
     public actual fun path(of: PosixPurePath): Path {
-        return LinuxPath(of)
+        return LinuxPath(of.rawComponents)
     }
 
     /**

@@ -26,25 +26,17 @@ public open class PosixPurePath(rawParts: List<ByteString>) : PurePath {
         internal val DOT_PATH = PosixPurePath(listOf(DOT))
 
         /**
-         * Creates a new [PosixPurePath] from a string.
+         * Splits out the parts of a posix path.
          */
-        public fun fromString(s: String): PosixPurePath {
-            return fromByteString(s.toByteString())
-        }
-
-        /**
-         * Creates a new [PosixPurePath] from a [ByteString].
-         */
-        public fun fromByteString(s: ByteString): PosixPurePath {
-            // this contains the bulk of the path processing logic
+        protected fun splitParts(bs: ByteString): List<ByteString> {
             val parts = ArrayDeque<ByteString>()
 
-            val isAbsolute = s.startsWith(SLASH)
+            val isAbsolute = bs.startsWith(SLASH)
             if (isAbsolute) {
                 parts.addLast(SLASH)
             }
 
-            val split = s.split(SLASH)
+            val split = bs.split(SLASH)
 
             for (part in split) {
                 // empty parts (i.e. double slashes, usually) are ignored entirely
@@ -58,7 +50,21 @@ public open class PosixPurePath(rawParts: List<ByteString>) : PurePath {
                 else parts.addLast(part)
             }
 
-            return PosixPurePath(parts)
+            return parts
+        }
+
+        /**
+         * Creates a new [PosixPurePath] from a string.
+         */
+        public fun fromString(s: String): PosixPurePath {
+            return fromByteString(s.toByteString())
+        }
+
+        /**
+         * Creates a new [PosixPurePath] from a [ByteString].
+         */
+        public fun fromByteString(bs: ByteString): PosixPurePath {
+            return PosixPurePath(splitParts(bs))
         }
     }
 
@@ -116,18 +122,24 @@ public open class PosixPurePath(rawParts: List<ByteString>) : PurePath {
     override fun withName(name: ByteString): PosixPurePath {
         require(!name.contains('/'.toByte())) { "Invalid name: $name" }
 
-        val components = rawComponents.toMutableList()
-        components[components.size - 1] = name
-        return PosixPurePath(components)
+        return if (rawComponents.size == 1) {
+            PosixPurePath(listOf(SLASH, name))
+        } else {
+            val components = rawComponents.toMutableList()
+            components[components.size - 1] = name
+            PosixPurePath(components)
+        }
     }
 
     override fun isChildOf(other: PurePath): Boolean {
+        println("$other is PosixPurePath: ${other is PosixPurePath}")
         if (other !is PosixPurePath) return false
 
         // un-absolute pure paths cannot be compared child-wise
         // as there exists no reference point to compare
         // but absolute paths can be compared with other absolutes
         // and relatives can be compared with other relatives
+        println("this: $this $isAbsolute / other: $other ${other.isAbsolute}")
         if (isAbsolute != other.isAbsolute) {
             return false
         }
