@@ -132,14 +132,12 @@ public open class PosixPurePath(rawParts: List<ByteString>) : PurePath {
     }
 
     override fun isChildOf(other: PurePath): Boolean {
-        println("$other is PosixPurePath: ${other is PosixPurePath}")
         if (other !is PosixPurePath) return false
 
         // un-absolute pure paths cannot be compared child-wise
         // as there exists no reference point to compare
         // but absolute paths can be compared with other absolutes
         // and relatives can be compared with other relatives
-        println("this: $this $isAbsolute / other: $other ${other.isAbsolute}")
         if (isAbsolute != other.isAbsolute) {
             return false
         }
