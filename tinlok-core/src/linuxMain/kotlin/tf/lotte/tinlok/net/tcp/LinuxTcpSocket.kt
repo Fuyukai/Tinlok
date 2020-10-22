@@ -13,7 +13,6 @@ import platform.posix.SHUT_WR
 import tf.lotte.tinlok.exc.ClosedException
 import tf.lotte.tinlok.system.FD
 import tf.lotte.tinlok.system.Syscall
-import tf.lotte.tinlok.types.bytestring.ByteString
 import tf.lotte.tinlok.util.Unsafe
 
 /**
@@ -23,8 +22,8 @@ internal class LinuxTcpSocket(
     override val fd: FD, address: TcpConnectionInfo
 ) : LinuxTcpParent(), TcpClientSocket {
     init {
-        // this socket is always open
-        isOpen = true
+        // this socket is always open initially
+        isOpen.value = true
     }
 
     override val remoteAddress = address
@@ -35,27 +34,14 @@ internal class LinuxTcpSocket(
     }
 
     @OptIn(Unsafe::class)
-    override fun readUpTo(bytes: Long): ByteString? {
-        if (!isOpen) throw ClosedException("This socket is not opened yet")
-
-        val buffer = ByteArray(bytes.toInt())
-        val size = Syscall.recv(fd, buffer)
-        // EOF
-        if (size == 0) return null
-
-        return if (size == buffer.size) {
-            ByteString.fromUncopied(buffer)
-        } else {
-            // ugh
-            val copy = buffer.copyOfRange(0, size)
-            ByteString.fromUncopied(copy)
-        }
+    override fun readInto(buf: ByteArray, offset: Int, bytes: Int): Int {
+        if (!isOpen.value) throw ClosedException("This socket is closed")
+        return Syscall.recv(fd, buffer = buf, offset = offset)
     }
 
     @OptIn(Unsafe::class)
-    override fun writeAll(bs: ByteString) {
-        if (!isOpen) throw ClosedException("This socket is not opened yet")
-        val unwrapped = bs.unwrap()
-        Syscall.send(fd, unwrapped)
+    override fun writeAllFrom(buf: ByteArray): Int {
+        if (!isOpen.value) throw ClosedException("This socket is closed")
+        return Syscall.send(fd, buf).toInt()
     }
 }

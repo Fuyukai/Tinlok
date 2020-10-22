@@ -16,7 +16,8 @@ import tf.lotte.tinlok.types.bytestring.ByteString
  */
 public interface Writeable {
     /**
-     * Writes the entirety of this [ByteString] to this object.
+     * Attempts to write the entirety of the buffer [buf] to this object, returning the number of
+     * bytes actually written before reaching EOF.
      */
-    public fun writeAll(bs: ByteString)
+    public fun writeAllFrom(buf: ByteArray): Int
 }

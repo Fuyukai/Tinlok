@@ -9,13 +9,12 @@
 
 package tf.lotte.tinlok._workarounds
 
+import tf.lotte.tinlok.io.readUpTo
+import tf.lotte.tinlok.io.writeAll
 import tf.lotte.tinlok.net.accept
 import tf.lotte.tinlok.net.bind
 import tf.lotte.tinlok.net.connect
-import tf.lotte.tinlok.net.tcp.TcpClientSocket
-import tf.lotte.tinlok.net.tcp.TcpConnectionInfo
-import tf.lotte.tinlok.net.tcp.TcpServerSocket
-import tf.lotte.tinlok.net.tcp.TcpSocketAddress
+import tf.lotte.tinlok.net.tcp.*
 import tf.lotte.tinlok.types.bytestring.b
 import kotlin.native.concurrent.TransferMode
 import kotlin.native.concurrent.Worker

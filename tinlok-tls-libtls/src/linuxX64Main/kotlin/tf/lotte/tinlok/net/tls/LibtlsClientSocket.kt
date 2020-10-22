@@ -19,9 +19,8 @@ import tf.lotte.tinlok.net.socket.StandardSocketOption
 import tf.lotte.tinlok.net.tcp.TcpConnectionInfo
 import tf.lotte.tinlok.net.tcp.TcpSocketAddress
 import tf.lotte.tinlok.system.Syscall
-import tf.lotte.tinlok.types.bytestring.ByteString
+import tf.lotte.tinlok.util.AtomicBoolean
 import tf.lotte.tinlok.util.Unsafe
-import kotlin.native.concurrent.AtomicInt
 
 /**
  * Implements TLS using libtls.
@@ -34,14 +33,9 @@ constructor(
     override val config: TlsConfig,
     override val remoteAddress: TcpConnectionInfo
 ) : TlsClientSocket {
-    // hack for lack of AtomicBoolean
-    private val _closed = AtomicInt(0)
+    val closed = AtomicBoolean(true)
     private var tlsContext = tls_client()
     private var tlsConfig = tls_config_new()
-
-    /** Booleanifies the _closed value */
-    val closed: Boolean
-        get() = _closed.value == 1
 
     /**
      * Frees all of the TLS structures, and closes the file descriptor.
@@ -49,13 +43,13 @@ constructor(
     @OptIn(Unsafe::class)
     private fun free() {
         // avoid double-frees by guarding with the "atomic boolean"
-        if (_closed.value != 0) return
-        _closed.addAndGet(1)
+        if (closed.value) return
+        closed.value = true
 
         try {
             Syscall.close(fd)
         } finally {
-            // if libtls let me allocatee these normally...
+            // if libtls let me allocate these normally...
             // i could just use an arena
             if (tlsConfig != null) {
                 tls_config_free(tlsConfig)
@@ -120,7 +114,7 @@ constructor(
     override fun close() {
         // i don't actually care what tls_close returns
         // given we're about to destroy the connection
-        if (!closed)  {
+        if (!closed.value)  {
             tls_close(tlsContext)
             free()
         }
@@ -128,46 +122,34 @@ constructor(
 
     @OptIn(Unsafe::class)
     override fun <T> getSocketOption(option: StandardSocketOption<T>): T {
-        if (closed) throw ClosedException("This socket is closed")
+        if (closed.value) throw ClosedException("This socket is closed")
         return Syscall.getsockopt(fd, option)
     }
 
     @OptIn(Unsafe::class)
     override fun <T> setSocketOption(option: StandardSocketOption<T>, value: T) {
-        if (closed) throw ClosedException("This socket is closed")
+        if (closed.value) throw ClosedException("This socket is closed")
         return Syscall.setsockopt(fd, option, value)
     }
 
-    // TLS I/O
-    // i love writing two retry loops
-    override fun readUpTo(bytes: Long): ByteString? {
-        if (closed) throw ClosedException("This socket is closed")
+    override fun readInto(buf: ByteArray, offset: Int, size: Int): Int {
+        if (closed.value) throw ClosedException("This socket is closed")
 
-        val buf = ByteArray(bytes.toInt())
         buf.usePinned {
             while (true) {
                 val read = xerr {
                     tls_read(tlsContext, it.addressOf(0), buf.size.toULong()).toInt()
                 }
                 if (read == TLS_WANT_POLLIN || read == TLS_WANT_POLLOUT) continue
-
-                return if (read == bytes.toInt()) ByteString.fromByteArray(buf)
-                else {
-                    println("forcing copy")
-                    val copy = buf.copyOfRange(0, read)
-                    ByteString.fromByteArray(copy)
-                }
             }
         }
-
         throw Throwable("unreachable code; severe bug; please report!")
     }
 
-    override fun writeAll(bs: ByteString) {
-        if (closed) throw ClosedException("This socket is closed")
+    override fun writeAllFrom(buf: ByteArray): Int {
+        if (closed.value) throw ClosedException("This socket is closed")
 
-        val buf = bs.unwrapCopy()
-        buf.usePinned {
+        return buf.usePinned {
             var ptr = 0
             var length = buf.size
 
@@ -183,11 +165,13 @@ constructor(
                     break
                 }
             }
+
+            length
         }
     }
 
     override fun sendEof() {
-        if (closed) throw ClosedException("This socket is closed")
+        if (closed.value) throw ClosedException("This socket is closed")
         // lie blatantly and close both ends
         close()
     }

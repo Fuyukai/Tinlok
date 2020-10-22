@@ -9,6 +9,7 @@
 
 package tf.lotte.tinlok.net.tcp
 
+import tf.lotte.tinlok.exc.ClosedException
 import tf.lotte.tinlok.net.ConnectionInfoCreator
 import tf.lotte.tinlok.system.FD
 import tf.lotte.tinlok.system.Syscall
@@ -25,11 +26,12 @@ internal class LinuxTcpServerSocket(
     override fun bind(backlog: Int) {
         Syscall.bind(fd, address)
         Syscall.listen(fd, backlog)
-        isOpen = true
+        isOpen.value = true
     }
 
     @Unsafe
     override fun unsafeAccept(): TcpClientSocket {
+        if (!isOpen.value) throw ClosedException("This socket is closed")
         val accepted = Syscall.accept(fd, ConnectionInfoCreator.Tcp)
         return LinuxTcpSocket(accepted.fd, accepted.info!!)
     }

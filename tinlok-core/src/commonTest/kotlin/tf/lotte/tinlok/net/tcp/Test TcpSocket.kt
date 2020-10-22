@@ -11,12 +11,10 @@ package tf.lotte.tinlok.net.tcp
 
 import tf.lotte.tinlok._workarounds.__Workaround_TcpSocketTests
 import tf.lotte.tinlok.exc.TimeoutException
+import tf.lotte.tinlok.io.readUpTo
 import tf.lotte.tinlok.net.IPv4Address
 import tf.lotte.tinlok.net.connect
-import kotlin.test.Test
-import kotlin.test.assertFailsWith
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 // Welcome to the rest of your life.
 // Kotlin/Native concurrency is *completely* broken.

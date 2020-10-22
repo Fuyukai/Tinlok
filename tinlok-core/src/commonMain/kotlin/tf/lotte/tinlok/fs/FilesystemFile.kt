@@ -13,13 +13,14 @@ import tf.lotte.tinlok.fs.path.Path
 import tf.lotte.tinlok.io.BidirectionalStream
 import tf.lotte.tinlok.io.Seekable
 import tf.lotte.tinlok.types.bytestring.ByteString
+import tf.lotte.tinlok.util.AtomicBoolean
 
 /**
  * Represents a file on the filesystem.
  */
 public interface FilesystemFile : BidirectionalStream, Seekable {
     /** If this file is still open. */
-    public val isOpen: Boolean
+    public val isOpen: AtomicBoolean
 
     /** The path of this file. */
     public val path: Path

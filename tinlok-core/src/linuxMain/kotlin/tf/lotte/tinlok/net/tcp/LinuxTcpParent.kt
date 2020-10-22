@@ -12,6 +12,7 @@ package tf.lotte.tinlok.net.tcp
 import tf.lotte.tinlok.net.socket.StandardSocketOption
 import tf.lotte.tinlok.system.FD
 import tf.lotte.tinlok.system.Syscall
+import tf.lotte.tinlok.util.AtomicBoolean
 import tf.lotte.tinlok.util.Unsafe
 
 /**
@@ -19,7 +20,7 @@ import tf.lotte.tinlok.util.Unsafe
  */
 internal abstract class LinuxTcpParent : TcpSocket {
     /* socket has been opened and fd != -1 */
-    protected var isOpen: Boolean = false
+    protected val isOpen = AtomicBoolean(false)
 
     /* linux socket file descriptor */
     protected abstract val fd: FD
@@ -36,9 +37,9 @@ internal abstract class LinuxTcpParent : TcpSocket {
 
     @OptIn(Unsafe::class)
     override fun close() {
-        if (isOpen) return
+        if (isOpen.value) return
 
         Syscall.close(fd)
-        isOpen = false
+        isOpen.value = false
     }
 }

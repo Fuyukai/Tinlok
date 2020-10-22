@@ -227,15 +227,16 @@ public actual object Syscall {
     public const val IO_MAX: Int = 0x7ffff000
 
     /**
-     * Reads up to [count] bytes from file descriptor [fd] into the buffer [buf].
+     * Reads up to [count] bytes from file descriptor [fd] into the buffer [buf], at the offset
+     * [offset].
      */
     @Unsafe
-    public fun read(fd: FD, buf: ByteArray, count: Int): Long {
+    public fun read(fd: FD, buf: ByteArray, count: Int, offset: Int = 0): Long {
         assert(count <= IO_MAX) { "Count is too high!" }
         assert(buf.size >= count) { "Buffer is too small!" }
 
         val readCount = buf.usePinned {
-            retry { read(fd, it.addressOf(0), count.toULong()) }
+            retry { read(fd, it.addressOf(offset), count.toULong()) }
         }
 
         if (readCount.isError) {
@@ -255,19 +256,19 @@ public actual object Syscall {
      * This handles EINTR transparently, continuing a write if interrupted.
      */
     @Unsafe
-    public fun write(fd: FD, from: ByteArray, size: Int): Long {
+    public fun write(fd: FD, from: ByteArray, size: Int = from.size, offset: Int = 0): Long {
         assert(size <= IO_MAX) { "Count is too high!" }
         assert(from.size >= size) { "Buffer is too small!" }
 
-        // number of bytes we have successfully written as returned from write()
-        var totalWritten = 0
+        // next of
+        var nextOffset = offset
 
         // head spinny logic
         from.usePinned {
             while (true) {
                 val written = write(
-                    fd, it.addressOf(totalWritten),
-                    (size - totalWritten).toULong()
+                    fd, it.addressOf(nextOffset),
+                    (size - nextOffset).toULong()
                 )
 
                 // eintr means it didn't write anything, so we can transparently retry
@@ -277,14 +278,14 @@ public actual object Syscall {
 
                 // make sure we actually write all of the bytes we want to write
                 // this will never be more than INT_MAX, so we're fine
-                totalWritten += written.toInt()
-                if (totalWritten >= size) {
+                nextOffset += written.toInt()
+                if (nextOffset >= size) {
                     break
                 }
             }
         }
 
-        return totalWritten.toLong()
+        return nextOffset.toLong()
     }
 
     /**
@@ -789,12 +790,17 @@ public actual object Syscall {
      * Receives bytes from a socket into the specified buffer.
      */
     @Unsafe
-    public fun recv(sock: FD, buffer: ByteArray, size: Int = buffer.size, flags: Int = 0): Int {
+    public fun recv(
+        sock: FD,
+        buffer: ByteArray,
+        size: Int = buffer.size, offset: Int = 0,
+        flags: Int = 0
+    ): Int {
         assert(size <= IO_MAX) { "Count is too high!" }
         assert(buffer.size >= size) { "Buffer is too small!" }
 
         val read = buffer.usePinned {
-            retry { recv(sock, it.addressOf(0), size.toULong(), flags) }
+            retry { recv(sock, it.addressOf(offset), size.toULong(), flags) }
         }
 
         if (read.isError) {
@@ -804,17 +810,18 @@ public actual object Syscall {
         return read.toInt()
     }
 
+
     /**
      * Writes bytes to a socket from the specified buffer.
      */
     @Unsafe
-    public fun send(sock: FD, buffer: ByteArray, size: Int = buffer.size): Long {
+    public fun send(sock: FD, buffer: ByteArray, size: Int = buffer.size, offset: Int = 0): Long {
         assert(size <= IO_MAX) { "Count is too high!" }
         assert(buffer.size >= size) { "Buffer is too small!" }
 
         // our retry logic is already implemented in write
         // and write() on a socket works fine.
-        return write(sock, buffer, size)
+        return write(sock, buffer, size, offset)
     }
 
     // These are both really gross!

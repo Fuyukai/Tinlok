@@ -11,6 +11,8 @@ package tf.lotte.tinlok.fs
 
 import tf.lotte.tinlok.fs.path.*
 import tf.lotte.tinlok.io.peek
+import tf.lotte.tinlok.io.readUpTo
+import tf.lotte.tinlok.io.writeAll
 import tf.lotte.tinlok.types.bytestring.b
 import tf.lotte.tinlok.types.bytestring.substring
 import kotlin.test.Test
@@ -40,7 +42,7 @@ class `Test FilesystemFile` {
             }
 
             assertNotNull(data)
-            assertEquals(data, toWrite)
+            assertEquals(toWrite, data)
         }
 
         run {
@@ -48,7 +50,7 @@ class `Test FilesystemFile` {
                 file.readAll()
             }
 
-            assertEquals(data, toWrite)
+            assertEquals(toWrite, data)
         }
     }
 
@@ -100,7 +102,7 @@ class `Test FilesystemFile` {
         }
 
         path.open(StandardOpenModes.READ) { file ->
-            val data = file.peek(toWrite.size.toLong())
+            val data = file.peek(toWrite.size)
             assertNotNull(data)
             assertEquals(data, toWrite)
             assertEquals(file.cursor(), 0L)

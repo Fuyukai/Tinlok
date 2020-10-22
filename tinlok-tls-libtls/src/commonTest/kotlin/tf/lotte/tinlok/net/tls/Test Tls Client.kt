@@ -11,10 +11,7 @@ package tf.lotte.tinlok.net.tls
 
 import tf.lotte.tinlok.net.tcp.TcpSocketAddress
 import tf.lotte.tinlok.types.bytestring.b
-import kotlin.test.Test
-import kotlin.test.assertFailsWith
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 // BIG thanks to BadSSL for existing
 public class `Test Tls Client` {
@@ -25,7 +22,7 @@ public class `Test Tls Client` {
         val addr = TcpSocketAddress.resolve(host, port)
         TlsClientSocket.connect(addr, config) { sock ->
             val toWrite = b("GET / HTTP/1.1\r\nHost: $host:$port\r\n\r\n")
-            sock.writeAll(toWrite)
+            sock.writeAllFrom(toWrite)
 
             // won't fit, but we only check for a starts with
             val data = sock.readUpTo(256)

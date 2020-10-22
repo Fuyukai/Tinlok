@@ -19,6 +19,8 @@ public interface HalfCloseableStream : BidirectionalStream {
     /**
      * Sends an end-of-file indicator. This will close the writing half of the stream without
      * closing the reading half.
+     *
+     * Unlike [close], this method is NOT idempotent.
      */
     public fun sendEof()
 }

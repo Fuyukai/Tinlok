@@ -14,6 +14,7 @@ import tf.lotte.tinlok.exc.IsADirectoryException
 import tf.lotte.tinlok.fs.DirEntry
 import tf.lotte.tinlok.fs.FilesystemFile
 import tf.lotte.tinlok.fs.StandardOpenModes
+import tf.lotte.tinlok.io.writeAll
 import tf.lotte.tinlok.types.bytestring.ByteString
 import tf.lotte.tinlok.types.bytestring.b
 import tf.lotte.tinlok.types.bytestring.toByteString

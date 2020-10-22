@@ -16,6 +16,7 @@ import tf.lotte.tinlok.fs.path.LinuxPath
 import tf.lotte.tinlok.system.FD
 import tf.lotte.tinlok.system.Syscall
 import tf.lotte.tinlok.types.bytestring.ByteString
+import tf.lotte.tinlok.util.AtomicBoolean
 import tf.lotte.tinlok.util.Unsafe
 
 /**
@@ -58,53 +59,42 @@ internal class LinuxSyncFile(
     // manually handled
 
     // == closing == //
-    override var isOpen: Boolean = true
-        private set
+    override val isOpen = AtomicBoolean(true)
 
     @OptIn(Unsafe::class)
     override fun close() {
-        if (!isOpen) return
-        isOpen = false
+        if (!isOpen.value) return
+
+        isOpen.value = false
         Syscall.close(fd)
     }
 
     @OptIn(Unsafe::class)
     override fun cursor(): Long {
-        if (!isOpen) throw ClosedException("This file is closed")
+        if (!isOpen.value) throw ClosedException("This file is closed")
         return Syscall.lseek(fd, 0L, SEEK_CUR)
     }
 
     @OptIn(Unsafe::class)
     override fun seekAbsolute(position: Long) {
-        if (!isOpen) throw ClosedException("This file is closed")
+        if (!isOpen.value) throw ClosedException("This file is closed")
         Syscall.lseek(fd, position, SEEK_SET)
     }
 
     @OptIn(Unsafe::class)
     override fun seekRelative(position: Long) {
-        if (!isOpen) throw ClosedException("This file is closed")
+        if (!isOpen.value) throw ClosedException("This file is closed")
         Syscall.lseek(fd, position, SEEK_CUR)
     }
 
-    // == reading == //
-    @OptIn(Unsafe::class)
-    override fun readUpTo(bytes: Long): ByteString? {
-        if (!isOpen) throw ClosedException("This file is closed")
-
-        val ba = ByteArray(bytes.toInt())
-        val cnt = Syscall.read(fd, ba, bytes.toInt())
-
-        // EOF
-        if (cnt == 0L) return null
-        // big...
-        if (cnt == bytes) return ByteString.fromUncopied(ba)
-        // too small :(
-        return ByteString.fromUncopied(ba.copyOfRange(0, cnt.toInt()))
+    override fun readInto(buf: ByteArray, offset: Int, size: Int): Int {
+        if (!isOpen.value) throw ClosedException("This file is closed")
+        return Syscall.read(fd, buf, size, offset).toInt()
     }
 
     @OptIn(Unsafe::class)
     override fun readAll(): ByteString {
-        if (!isOpen) throw ClosedException("This file is closed")
+        if (!isOpen.value) throw ClosedException("This file is closed")
 
         // get the correct size for symlinks
         val realPath = path.toAbsolutePath(strict = true)
@@ -131,12 +121,8 @@ internal class LinuxSyncFile(
         })
     }
 
-    // == writing == //
-    @OptIn(Unsafe::class)
-    override fun writeAll(bs: ByteString) {
-        if (!isOpen) throw ClosedException("This file is closed")
-
-        val ba = bs.unwrap()
-        Syscall.write(fd, ba, ba.size)
+    override fun writeAllFrom(buf: ByteArray): Int {
+        if (!isOpen.value) throw ClosedException("This file is closed")
+        return Syscall.write(fd, buf, buf.size).toInt()
     }
 }
