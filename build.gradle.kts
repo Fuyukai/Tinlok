@@ -29,6 +29,7 @@ allprojects {
 
 subprojects {
     // ignore all -static projects, we configure K/N ourselves
+    if (!this.name.startsWith("tinlok-")) return@subprojects
     if (this.name.startsWith("tinlok-static")) return@subprojects
 
     apply(plugin = "org.jetbrains.kotlin.multiplatform")
