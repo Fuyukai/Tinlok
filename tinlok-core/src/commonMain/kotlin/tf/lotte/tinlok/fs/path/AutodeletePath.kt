@@ -9,7 +9,7 @@
 
 package tf.lotte.tinlok.fs.path
 
-import tf.lotte.tinlok.util.Closeable
+import tf.lotte.cc.Closeable
 
 /**
  * A path that will automatically delete itself when closed.

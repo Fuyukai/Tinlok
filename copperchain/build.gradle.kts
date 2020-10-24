@@ -51,6 +51,20 @@ kotlin {
     // = Misc = //
     wasm32()
 
+    sourceSets {
+        val nonJvmShared by creating {
+            dependsOn(commonMain.get())
+        }
+
+        // ALL non-jvm source sets depend on nonJvmShared
+        val filtered = filterNot {
+            it.name.startsWith("jvm") || it.name.startsWith("common") || it.name == "nonJvmShared"
+        }
+        configure(filtered) {
+            dependsOn(nonJvmShared)
+        }
+    }
+
     sourceSets.all {
         dependencies {
             // stop intellij freaking out

@@ -7,9 +7,7 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
-package tf.lotte.tinlok.util
-
-import tf.lotte.cc.Unsafe
+package tf.lotte.cc
 
 /**
  * A scope that can have objects added to it to automatically close them.

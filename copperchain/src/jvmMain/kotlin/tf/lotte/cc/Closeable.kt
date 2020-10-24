@@ -7,5 +7,7 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
-package tf.lotte.tinlok.util
+package tf.lotte.cc
 
+// simple typealias for AutoCloseable, as it has the same semantics
+public actual typealias Closeable = AutoCloseable
