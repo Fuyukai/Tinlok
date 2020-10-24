@@ -25,11 +25,14 @@ allprojects {
 }
 
 subprojects {
+    // ALL projects get the appropriately tracked version
+    version = "1.2.0"
+
     // ignore the non tinlok branded project
     if (!this.name.startsWith("tinlok-")) return@subprojects
 
+    // all projects get the group
     group = "tf.lotte.tinlok"
-    version = "1.2.0"
 
     // ignore all -static projects, we configure K/N ourselves
     if (this.name.startsWith("tinlok-static")) return@subprojects

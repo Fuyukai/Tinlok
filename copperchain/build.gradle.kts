@@ -13,7 +13,6 @@ plugins {
 }
 
 group = "tf.lotte.copperchain"
-version = "1.0.0"
 
 kotlin {
     // == JVM targets == //
