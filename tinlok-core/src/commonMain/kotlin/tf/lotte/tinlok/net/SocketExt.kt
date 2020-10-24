@@ -10,8 +10,8 @@
 package tf.lotte.tinlok.net
 
 import tf.lotte.cc.Unsafe
+import tf.lotte.cc.exc.OSException
 import tf.lotte.tinlok.Sys
-import tf.lotte.tinlok.exc.OSException
 import tf.lotte.tinlok.net.socket.AcceptingSeverSocket
 import tf.lotte.tinlok.net.socket.ClientSocket
 import tf.lotte.tinlok.net.socket.StandardSocketOption

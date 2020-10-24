@@ -12,7 +12,7 @@
 package tf.lotte.tinlok.crypto
 
 import kotlinx.cinterop.*
-import tf.lotte.tinlok.exc.ClosedException
+import tf.lotte.cc.exc.ClosedException
 import tf.lotte.tinlok.interop.libmonocypher.*
 import tf.lotte.tinlok.types.bytestring.ByteString
 import tf.lotte.tinlok.util.Closeable

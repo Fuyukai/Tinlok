@@ -11,7 +11,7 @@
 package tf.lotte.tinlok.fs.path
 
 import tf.lotte.cc.Unsafe
-import tf.lotte.tinlok.exc.FileNotFoundException
+import tf.lotte.cc.exc.FileNotFoundException
 import tf.lotte.tinlok.fs.*
 import tf.lotte.tinlok.types.bytestring.ByteString
 

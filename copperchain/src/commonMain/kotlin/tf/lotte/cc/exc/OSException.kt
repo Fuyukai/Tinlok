@@ -7,7 +7,9 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
-package tf.lotte.tinlok.exc
+@file:Suppress("unused")
+
+package tf.lotte.cc.exc
 
 // See: https://docs.python.org/3/library/exceptions.html#OSError
 /**
@@ -15,7 +17,7 @@ package tf.lotte.tinlok.exc
  */
 public open class OSException(
     message: String? = null, cause: Throwable? = null
-) : Exception(message)
+) : Exception(message, cause)
 
 // See: https://www.python.org/dev/peps/pep-3151/
 // Some descriptions has been taken and reworded slightly from the Python documentation.

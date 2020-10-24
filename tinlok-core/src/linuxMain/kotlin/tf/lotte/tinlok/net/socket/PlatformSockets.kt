@@ -11,7 +11,7 @@ package tf.lotte.tinlok.net.socket
 
 import platform.posix.ENETUNREACH
 import tf.lotte.cc.Unsafe
-import tf.lotte.tinlok.exc.OSException
+import tf.lotte.cc.exc.OSException
 import tf.lotte.tinlok.net.AddressFamily
 import tf.lotte.tinlok.net.AllConnectionsFailedException
 import tf.lotte.tinlok.net.tcp.*

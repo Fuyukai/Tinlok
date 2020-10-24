@@ -10,8 +10,8 @@
 package tf.lotte.tinlok.fs.path
 
 import tf.lotte.cc.Unsafe
-import tf.lotte.tinlok.exc.FileAlreadyExistsException
-import tf.lotte.tinlok.exc.IsADirectoryException
+import tf.lotte.cc.exc.FileAlreadyExistsException
+import tf.lotte.cc.exc.IsADirectoryException
 import tf.lotte.tinlok.fs.DirEntry
 import tf.lotte.tinlok.fs.FilesystemFile
 import tf.lotte.tinlok.fs.StandardOpenModes

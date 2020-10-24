@@ -11,7 +11,7 @@ package tf.lotte.tinlok.fs
 
 import platform.posix.*
 import tf.lotte.cc.Unsafe
-import tf.lotte.tinlok.exc.ClosedException
+import tf.lotte.cc.exc.ClosedException
 import tf.lotte.tinlok.fs.StandardOpenModes.*
 import tf.lotte.tinlok.fs.path.LinuxPath
 import tf.lotte.tinlok.system.FD

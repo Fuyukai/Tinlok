@@ -14,7 +14,7 @@ package tf.lotte.tinlok.system
 import kotlinx.cinterop.*
 import platform.posix.*
 import tf.lotte.cc.Unsafe
-import tf.lotte.tinlok.exc.*
+import tf.lotte.cc.exc.*
 import tf.lotte.tinlok.net.*
 import tf.lotte.tinlok.net.dns.GAIException
 import tf.lotte.tinlok.net.socket.LinuxSocketOption

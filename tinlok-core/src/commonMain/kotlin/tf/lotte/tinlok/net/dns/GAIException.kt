@@ -9,7 +9,7 @@
 
 package tf.lotte.tinlok.net.dns
 
-import tf.lotte.tinlok.exc.OSException
+import tf.lotte.cc.exc.OSException
 
 /**
  * Thrown when an error occurs with the getaddrinfo() system call.

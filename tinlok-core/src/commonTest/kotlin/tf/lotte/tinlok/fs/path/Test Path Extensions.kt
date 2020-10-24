@@ -9,8 +9,8 @@
 
 package tf.lotte.tinlok.fs.path
 
-import tf.lotte.tinlok.exc.IsADirectoryException
-import tf.lotte.tinlok.exc.OSException
+import tf.lotte.cc.exc.IsADirectoryException
+import tf.lotte.cc.exc.OSException
 import kotlin.test.*
 
 /**

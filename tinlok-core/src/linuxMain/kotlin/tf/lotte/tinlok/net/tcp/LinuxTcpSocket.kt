@@ -11,7 +11,7 @@ package tf.lotte.tinlok.net.tcp
 
 import platform.posix.SHUT_WR
 import tf.lotte.cc.Unsafe
-import tf.lotte.tinlok.exc.ClosedException
+import tf.lotte.cc.exc.ClosedException
 import tf.lotte.tinlok.system.FD
 import tf.lotte.tinlok.system.Syscall
 
