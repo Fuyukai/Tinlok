@@ -7,7 +7,9 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
-package tf.lotte.tinlok.types.bytestring
+package tf.lotte.cc.types
+
+import tf.lotte.cc.Unsafe
 
 
 /**
@@ -33,9 +35,11 @@ private constructor(
         }
 
         /**
-         * Creates a new [ByteString] from a [ByteArray], without copying it.
+         * Creates a new [ByteString] from a [ByteArray], without copying it. This is unsafe as
+         * it can break immutability.
          */
-        internal fun fromUncopied(ba: ByteArray): ByteString =
+        @Unsafe
+        public fun fromUncopied(ba: ByteArray): ByteString =
             ByteString(ByteArrayByteStringHolder(ba))
 
         /**
@@ -65,6 +69,7 @@ private constructor(
     /**
      * Concatenates two [ByteString] instances, returning a new [ByteString].
      */
+    @OptIn(Unsafe::class)
     public operator fun plus(other: ByteString): ByteString {
         return ByteString(backing.concatenate(other.unwrap()))
     }
@@ -113,9 +118,11 @@ private constructor(
     }
 
     /**
-     * Unwraps this [ByteString], getting the underlying array.
+     * Unwraps this [ByteString], getting the underlying array. This is unsafe as it can break
+     * immutability.
      */
-    internal fun unwrap(): ByteArray {
+    @Unsafe
+    public fun unwrap(): ByteArray {
         return backing.unwrap()
     }
 

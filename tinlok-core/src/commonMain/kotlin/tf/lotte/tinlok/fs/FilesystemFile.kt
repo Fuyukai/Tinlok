@@ -9,10 +9,10 @@
 
 package tf.lotte.tinlok.fs
 
+import tf.lotte.cc.io.BidirectionalStream
+import tf.lotte.cc.io.Seekable
+import tf.lotte.cc.types.ByteString
 import tf.lotte.tinlok.fs.path.Path
-import tf.lotte.tinlok.io.BidirectionalStream
-import tf.lotte.tinlok.io.Seekable
-import tf.lotte.tinlok.types.bytestring.ByteString
 import tf.lotte.tinlok.util.AtomicBoolean
 
 /**

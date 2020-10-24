@@ -9,7 +9,8 @@
 
 package tf.lotte.tinlok.codec
 
-import tf.lotte.tinlok.types.bytestring.ByteString
+import tf.lotte.cc.Unsafe
+import tf.lotte.cc.types.ByteString
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
@@ -41,13 +42,13 @@ private const val PADDING = '='
  */
 @OptIn(ExperimentalUnsignedTypes::class)
 private fun encodeBase64ThreeChunk(
-    table: CharArray, ba: ByteArray, baset: Int, output: CharArray, outset: Int
+    table: CharArray, bs: ByteString, baset: Int, output: CharArray, outset: Int
 ) {
     var baseOffset = baset
     // gross increment hacks
-    val i1 = ba[baseOffset++].toUInt().shl(16)
-    val i2 = ba[baseOffset++].toUInt().shl(8)
-    val i3 = ba[baseOffset].toUInt()
+    val i1 = bs[baseOffset++].toUInt().shl(16)
+    val i2 = bs[baseOffset++].toUInt().shl(8)
+    val i3 = bs[baseOffset].toUInt()
     val iAll = i1.or(i2).or(i3)
 
     var outOffset = outset
@@ -62,15 +63,15 @@ private fun encodeBase64ThreeChunk(
  */
 @OptIn(ExperimentalUnsignedTypes::class)
 private fun encodeBase64TwoChunk(
-    table: CharArray, ba: ByteArray, baset: Int, output: CharArray, outset: Int
+    table: CharArray, bs: ByteString, baset: Int, output: CharArray, outset: Int
 ) {
     var baseOffset = baset
 
     // more gross increment hacks
     // this is the same as threeChunk but the lower bits are all zero
     // and we just forcibly add a padding char
-    val i1 = ba[baseOffset++].toUInt().shl(16)
-    val i2 = ba[baseOffset].toUInt().shl(8)
+    val i1 = bs[baseOffset++].toUInt().shl(16)
+    val i2 = bs[baseOffset].toUInt().shl(8)
     val iAll = i1.or(i2)
 
     var outOffset = outset
@@ -111,7 +112,6 @@ public fun base64Encode(bs: ByteString, urlSafe: Boolean = false): String {
     size = roundUp(size, 4)
 
     // bytestring cursors
-    val ba = bs.unwrap()
     var bsCursor = 0
 
     // output arr and cursor
@@ -122,21 +122,21 @@ public fun base64Encode(bs: ByteString, urlSafe: Boolean = false): String {
 
     while (true) {
         // loose check to ensure we encode 2 and 1-blocks properly
-        val remaining = ba.size - bsCursor
+        val remaining = bs.size - bsCursor
         if (remaining >= 3) {
             // 3 blocks are simplest as lcm(6, 8) == 24 so we can easily fit this into a uint32
-            encodeBase64ThreeChunk(alphabet, ba, bsCursor, ca, cursor)
+            encodeBase64ThreeChunk(alphabet, bs, bsCursor, ca, cursor)
             // adjust cursors for next iterations
             bsCursor += 3
             cursor += 4
         } else if (remaining == 2) {
             // 2 blocks are encoded differently
             // and this means we're at the end of the bytestring so we can exit after this
-            encodeBase64TwoChunk(alphabet, ba, bsCursor, ca, cursor)
+            encodeBase64TwoChunk(alphabet, bs, bsCursor, ca, cursor)
             break
         } else if (remaining == 1) {
             // 1 blocks are also encoded differently
-            val byte = ba[bsCursor]
+            val byte = bs[bsCursor]
             encodeBase64OneChunk(alphabet, byte, ca, cursor)
             break
         } else break
@@ -212,7 +212,7 @@ private fun decodeBase64OneChunk(chunk: String, out: ByteArray, outset: Int) {
  *
  * The string must be correctly padded.
  */
-@OptIn(ExperimentalUnsignedTypes::class)
+@OptIn(ExperimentalUnsignedTypes::class, Unsafe::class)
 public fun base64Decode(str: String): ByteString {
     require(str.length.rem(4) == 0) { "String is incorrectly padded" }
     // calculate final length

@@ -9,7 +9,8 @@
 
 package tf.lotte.tinlok.crypto
 
-import tf.lotte.tinlok.types.bytestring.ByteString
+import tf.lotte.cc.Unsafe
+import tf.lotte.cc.types.ByteString
 
 /**
  * Represents a password hash that was created using the Argon2i hashing algorithm.
@@ -27,7 +28,7 @@ public class Argon2iHash internal constructor(
     /**
      * Verifies if this password hash matches a password.
      */
-    @OptIn(ExperimentalUnsignedTypes::class)
+    @OptIn(ExperimentalUnsignedTypes::class, Unsafe::class)
     public fun verify(password: String): Boolean {
         val nextHash = passwordHash(
             password, salt.unwrap().toUByteArray(), blocks, iterations

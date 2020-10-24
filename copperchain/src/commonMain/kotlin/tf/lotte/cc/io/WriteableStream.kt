@@ -7,9 +7,11 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
-package tf.lotte.tinlok.io
+package tf.lotte.cc.io
+
+import tf.lotte.cc.Closeable
 
 /**
- * Represents any stream that operates in both directions (it is both readable and writeable).
+ * Interface for any object that can be written to and closed (e.g. a socket).
  */
-public interface BidirectionalStream : ReadableStream, WriteableStream
+public interface WriteableStream : Writeable, Closeable

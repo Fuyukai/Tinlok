@@ -10,7 +10,7 @@
 package tf.lotte.tinlok.fs.path
 
 import tf.lotte.cc.Unsafe
-import tf.lotte.tinlok.types.bytestring.ByteString
+import tf.lotte.cc.types.ByteString
 
 /**
  * A path to a file or folder on the filesystem. All PurePaths are immutable.

@@ -9,11 +9,8 @@
 
 package tf.lotte.tinlok
 
-import tf.lotte.tinlok.types.bytestring.*
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFails
-import kotlin.test.assertTrue
+import tf.lotte.cc.types.*
+import kotlin.test.*
 
 /**
  * Tests [ByteString] functionality.

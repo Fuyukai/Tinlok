@@ -9,7 +9,7 @@
 
 package tf.lotte.tinlok.net.socket
 
-import tf.lotte.tinlok.io.HalfCloseableStream
+import tf.lotte.cc.io.HalfCloseableStream
 import tf.lotte.tinlok.net.ConnectionInfo
 
 /**

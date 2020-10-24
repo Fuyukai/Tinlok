@@ -7,11 +7,11 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
-package tf.lotte.tinlok.io
+package tf.lotte.cc.io
 
 import tf.lotte.cc.Closeable
 
 /**
- * Interface for any object that can be written to or closed (e.g. a socket).
+ * Interface for any object that can be read from and closed (e.g. a socket).
  */
-public interface WriteableStream : Writeable, Closeable
+public interface ReadableStream : Readable, Closeable

@@ -10,7 +10,7 @@
 package tf.lotte.tinlok.fs.path
 
 import tf.lotte.cc.Unsafe
-import tf.lotte.tinlok.types.bytestring.ByteString
+import tf.lotte.cc.types.ByteString
 
 /**
  * Defines the [PurePath] that for the current platform.

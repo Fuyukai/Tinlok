@@ -13,9 +13,10 @@ package tf.lotte.tinlok.crypto
 
 import kotlinx.cinterop.*
 import tf.lotte.cc.Closeable
+import tf.lotte.cc.Unsafe
 import tf.lotte.cc.exc.ClosedException
+import tf.lotte.cc.types.ByteString
 import tf.lotte.tinlok.interop.libmonocypher.*
-import tf.lotte.tinlok.types.bytestring.ByteString
 
 /**
  * A class that takes in data and will eventually produce a hash using the Blake2b algorithm.
@@ -49,6 +50,7 @@ public actual class Blake2b internal actual constructor(key: UByteArray) : Close
     /**
      * Feeds some data into this object.
      */
+    @OptIn(Unsafe::class)
     public actual fun feed(data: ByteString) {
         if (closed) throw ClosedException("This hasher is closed")
 
@@ -66,6 +68,7 @@ public actual class Blake2b internal actual constructor(key: UByteArray) : Close
      * Performs the Blake2b hashing algorithm over all previously consumed data and returns a
      * final hash.
      */
+    @OptIn(Unsafe::class)
     public actual fun hash(): Blake2bHash {
         if (closed) throw ClosedException("This hasher is closed")
 

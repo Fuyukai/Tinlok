@@ -7,7 +7,7 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
-package tf.lotte.tinlok.types.bytestring
+package tf.lotte.cc.types
 
 /**
  * Simple implementation of a [ByteStringHolder].

@@ -12,9 +12,9 @@
 package tf.lotte.tinlok.fs.path
 
 import tf.lotte.cc.Unsafe
+import tf.lotte.cc.types.b
 import tf.lotte.tinlok.Sys
 import tf.lotte.tinlok.fs.StandardOpenModes
-import tf.lotte.tinlok.types.bytestring.b
 import kotlin.test.*
 
 /**

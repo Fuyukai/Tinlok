@@ -7,12 +7,10 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
-package tf.lotte.tinlok.io
-
-import tf.lotte.tinlok.types.bytestring.ByteString
+package tf.lotte.cc.io
 
 /**
- * Represents any object that is readable, producing [ByteString] objects.
+ * Interface for any object that is readable.
  */
 public interface Readable {
     /**

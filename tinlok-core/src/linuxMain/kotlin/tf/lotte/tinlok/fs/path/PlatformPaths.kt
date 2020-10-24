@@ -16,10 +16,10 @@ import platform.posix.PATH_MAX
 import platform.posix.getenv
 import platform.posix.mkdtemp
 import tf.lotte.cc.Unsafe
+import tf.lotte.cc.types.ByteString
+import tf.lotte.cc.types.b
 import tf.lotte.tinlok.system.Syscall
 import tf.lotte.tinlok.system.readZeroTerminated
-import tf.lotte.tinlok.types.bytestring.ByteString
-import tf.lotte.tinlok.types.bytestring.b
 
 public actual typealias PlatformPurePath = PosixPurePath
 

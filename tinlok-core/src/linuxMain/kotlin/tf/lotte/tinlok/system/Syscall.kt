@@ -15,10 +15,10 @@ import kotlinx.cinterop.*
 import platform.posix.*
 import tf.lotte.cc.Unsafe
 import tf.lotte.cc.exc.*
+import tf.lotte.cc.types.ByteString
 import tf.lotte.tinlok.net.*
 import tf.lotte.tinlok.net.dns.GAIException
 import tf.lotte.tinlok.net.socket.LinuxSocketOption
-import tf.lotte.tinlok.types.bytestring.ByteString
 import tf.lotte.tinlok.util.toByteArray
 import tf.lotte.tinlok.util.toUInt
 import kotlin.experimental.ExperimentalTypeInference

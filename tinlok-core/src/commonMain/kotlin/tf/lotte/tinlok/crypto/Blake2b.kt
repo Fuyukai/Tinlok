@@ -12,8 +12,8 @@ package tf.lotte.tinlok.crypto
 
 import tf.lotte.cc.Closeable
 import tf.lotte.cc.ClosingScope
+import tf.lotte.cc.types.ByteString
 import tf.lotte.cc.use
-import tf.lotte.tinlok.types.bytestring.ByteString
 
 /**
  * A class that takes in data and will eventually produce a hash using the Blake2b algorithm.

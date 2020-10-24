@@ -12,8 +12,9 @@
 package tf.lotte.tinlok.crypto
 
 import kotlinx.cinterop.*
+import tf.lotte.cc.Unsafe
+import tf.lotte.cc.types.ByteString
 import tf.lotte.tinlok.interop.libmonocypher.crypto_argon2i
-import tf.lotte.tinlok.types.bytestring.ByteString
 import kotlin.random.nextUBytes
 
 public const val HASH_SIZE: Int = 64
@@ -52,7 +53,7 @@ public fun crypto_argon2(
 /**
  * Hashes a password using crypto_argon2i.
  */
-@OptIn(ExperimentalUnsignedTypes::class)
+@OptIn(ExperimentalUnsignedTypes::class, Unsafe::class)
 public actual fun passwordHash(
     password: String, salt: UByteArray?,
     blocks: Int, iterations: Int

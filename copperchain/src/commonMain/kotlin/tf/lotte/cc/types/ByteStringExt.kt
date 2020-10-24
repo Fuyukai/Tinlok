@@ -7,7 +7,9 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
-package tf.lotte.tinlok.types.bytestring
+package tf.lotte.cc.types
+
+import tf.lotte.cc.Unsafe
 
 // TODO: This is not very efficient.
 //  I believe a proper search alg would be faster. But that's for another day.
@@ -61,6 +63,7 @@ public fun ByteString.split(delim: ByteString): List<ByteString> {
 /**
  * Creates a substring of the specified range.
  */
+@OptIn(Unsafe::class)
 public fun ByteString.substring(start: Int, end: Int = size): ByteString {
     return ByteString.fromUncopied(unwrap().copyOfRange(start, end))
 }
@@ -68,6 +71,7 @@ public fun ByteString.substring(start: Int, end: Int = size): ByteString {
 /**
  * Joins an iterable of [ByteString] together with the specified [delim].
  */
+@OptIn(Unsafe::class)
 public fun Collection<ByteString>.join(delim: ByteString): ByteString {
     val size = (delim.size * (this.size - 1)) + this.sumBy { it.size }
     val final = ByteArray(size)
@@ -135,6 +139,7 @@ internal fun Char.toInt16(): Int {
 /**
  * Decodes a hex-encoded string from this String.
  */
+@OptIn(Unsafe::class)
 public fun String.unhexlify(): ByteString {
     require((length.rem(2)) == 0) { "Hex string length was not a multiple of two!" }
     val buf = ByteArray(length / 2)

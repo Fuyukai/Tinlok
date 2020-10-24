@@ -9,12 +9,12 @@
 
 package tf.lotte.tinlok.fs
 
+import tf.lotte.cc.io.peek
+import tf.lotte.cc.io.readUpTo
+import tf.lotte.cc.io.writeAll
+import tf.lotte.cc.types.b
+import tf.lotte.cc.types.substring
 import tf.lotte.tinlok.fs.path.*
-import tf.lotte.tinlok.io.peek
-import tf.lotte.tinlok.io.readUpTo
-import tf.lotte.tinlok.io.writeAll
-import tf.lotte.tinlok.types.bytestring.b
-import tf.lotte.tinlok.types.bytestring.substring
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull

@@ -10,7 +10,7 @@
 package tf.lotte.tinlok.fs.path
 
 import tf.lotte.cc.Unsafe
-import tf.lotte.tinlok.types.bytestring.*
+import tf.lotte.cc.types.*
 
 /**
  * Implements a pure path with Windows filesystem semantics.
@@ -57,6 +57,7 @@ public open class WindowsPurePath private constructor(
         /**
          * Splits a path up using the sep and altsep.
          */
+        @OptIn(Unsafe::class)
         private fun splitPath(path: ByteString): List<ByteString> {
             // sizes pre-allocated for worst case scenarios
             val items = ArrayList<ByteString>(path.size)
@@ -135,6 +136,7 @@ public open class WindowsPurePath private constructor(
         /**
          * Creates a new [WindowsPurePath] from the specified ByteString.
          */
+        @OptIn(Unsafe::class)
         public fun fromByteString(bs: ByteString): WindowsPurePath {
             if (bs.substring(1, 3) == DRIVE_SEP) {
                 // path one: absolute path, with drive letter

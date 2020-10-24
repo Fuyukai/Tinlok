@@ -9,8 +9,8 @@
 
 package tf.lotte.tinlok.net.tls
 
+import tf.lotte.cc.types.b
 import tf.lotte.tinlok.net.tcp.TcpSocketAddress
-import tf.lotte.tinlok.types.bytestring.b
 import kotlin.test.*
 
 // BIG thanks to BadSSL for existing

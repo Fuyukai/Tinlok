@@ -10,8 +10,8 @@
 package tf.lotte.tinlok.fs.path
 
 import tf.lotte.cc.Unsafe
+import tf.lotte.cc.types.ByteString
 import tf.lotte.tinlok.fs.*
-import tf.lotte.tinlok.types.bytestring.ByteString
 
 internal class WindowsPath(private val pure: WindowsPurePath) : Path {
     // == purepath functionality == //

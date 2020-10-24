@@ -7,15 +7,17 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
-package tf.lotte.tinlok.io
+package tf.lotte.cc.io
 
-import tf.lotte.tinlok.types.bytestring.ByteString
+import tf.lotte.cc.Unsafe
+import tf.lotte.cc.types.ByteString
 
 /**
  * Reads no more than [count] bytes from this object.
  *
  * A null return means EOF.
  */
+@OptIn(Unsafe::class)
 public fun Readable.readUpTo(count: Int): ByteString? {
     val buf = ByteArray(count.toInt())
     val read = readInto(buf)
@@ -30,6 +32,7 @@ public fun Readable.readUpTo(count: Int): ByteString? {
 /**
  * Writes the entirety of the ByteString [bs] into the specified buffer.
  */
+@OptIn(Unsafe::class)
 public fun Writeable.writeAll(bs: ByteString): Int {
     val unwrapped = bs.unwrap()
     return writeAllFrom(unwrapped)

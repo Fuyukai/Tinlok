@@ -16,11 +16,11 @@ import platform.posix.*
 import tf.lotte.cc.Unsafe
 import tf.lotte.cc.exc.FileNotFoundException
 import tf.lotte.cc.exc.IsADirectoryException
+import tf.lotte.cc.types.ByteString
+import tf.lotte.cc.types.b
 import tf.lotte.tinlok.fs.*
 import tf.lotte.tinlok.system.Syscall
 import tf.lotte.tinlok.system.readZeroTerminated
-import tf.lotte.tinlok.types.bytestring.ByteString
-import tf.lotte.tinlok.types.bytestring.b
 
 /**
  * Linux-based implementation of a [Path]. Is also a [PosixPurePath].

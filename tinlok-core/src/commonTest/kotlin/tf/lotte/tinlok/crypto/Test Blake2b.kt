@@ -9,7 +9,7 @@
 
 package tf.lotte.tinlok.crypto
 
-import tf.lotte.tinlok.types.bytestring.b
+import tf.lotte.cc.types.b
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

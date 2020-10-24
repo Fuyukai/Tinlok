@@ -9,8 +9,9 @@
 
 package tf.lotte.tinlok.crypto
 
-import tf.lotte.tinlok.types.bytestring.ByteString
-import tf.lotte.tinlok.types.bytestring.hexlify
+import tf.lotte.cc.Unsafe
+import tf.lotte.cc.types.ByteString
+import tf.lotte.cc.types.hexlify
 
 /**
  * Wraps the raw bytes of an outgoing Blake2b hash. This is a 64-byte hash (i.e. a BLAKE2-512 hash).
@@ -26,7 +27,7 @@ public inline class Blake2bHash(public val bytes: ByteString) {
     /**
      * Securely compares this hash with another hash.
      */
-    @OptIn(ExperimentalUnsignedTypes::class)
+    @OptIn(ExperimentalUnsignedTypes::class, Unsafe::class)
     public fun secureCompare(other: Blake2bHash): Boolean {
         val first = bytes.unwrap().toUByteArray()
         val second = other.bytes.unwrap().toUByteArray()
