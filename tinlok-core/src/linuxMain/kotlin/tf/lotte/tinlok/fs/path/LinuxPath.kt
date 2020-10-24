@@ -16,7 +16,6 @@ import platform.posix.*
 import tf.lotte.cc.Unsafe
 import tf.lotte.cc.exc.FileNotFoundException
 import tf.lotte.cc.exc.IsADirectoryException
-import tf.lotte.cc.exc.OSException
 import tf.lotte.tinlok.fs.*
 import tf.lotte.tinlok.system.Syscall
 import tf.lotte.tinlok.system.readZeroTerminated
@@ -120,9 +119,8 @@ internal class LinuxPath(rawParts: List<ByteString>) : Path, PosixPurePath(rawPa
             LinuxPath(splitParts(link))
         } catch (e: FileNotFoundException) {
             null
-        } catch (e: OSException) {
-            if (e.errno == EINVAL) null
-            else throw e
+        } catch (e: IllegalArgumentException) {
+            null
         }
     }
 

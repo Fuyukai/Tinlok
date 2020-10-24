@@ -102,7 +102,7 @@ constructor(
  * ESHUTDOWN.
  */
 public open class SocketShutdownException
- constructor(
+constructor(
     cause: Throwable?
 ) : ConnectionException(message = "Cannot send after transport endpoint shutdown", cause = cause) {
     public constructor() : this(null)
@@ -112,7 +112,7 @@ public open class SocketShutdownException
  * Thrown when a connection attempt is aborted by the remote end. Corresponds to ECONNABORTED.
  */
 public open class ConnectionAbortedException
- constructor(
+constructor(
     cause: Throwable?
 ) : ConnectionException(
     message = "Connection aborted", cause = cause
@@ -124,7 +124,7 @@ public open class ConnectionAbortedException
  * Thrown when a connection attempt is refused by the remote end. Corresponds to ECONNREFUSED.
  */
 public open class ConnectionRefusedException
- constructor(cause: Throwable?) : ConnectionException(
+constructor(cause: Throwable?) : ConnectionException(
     message = "Connection refused by peer", cause = cause
 ) {
     public constructor() : this(null)
@@ -134,7 +134,7 @@ public open class ConnectionRefusedException
  * Thrown when a connection is reset by the remote end. Corresponds to ECONNRESET.
  */
 public open class ConnectionResetException
- constructor(cause: Throwable?) : ConnectionException(
+constructor(cause: Throwable?) : ConnectionException(
     message = "Connection reset by peer", cause = cause
 ) {
     public constructor() : this(null)
@@ -144,8 +144,15 @@ public open class ConnectionResetException
  * Thrown when a timeout happens on a connection. Corresponds to ETIMEDOUT.
  */
 public open class TimeoutException
- constructor(cause: Throwable?) : ConnectionException(
+constructor(cause: Throwable?) : ConnectionException(
     message = "Connection timed out", cause = cause
+) {
+    public constructor() : this(null)
+}
+
+public open class NetworkUnreachableException
+constructor(cause: Throwable?) : ConnectionException(
+    message = "Network unreachable", cause = cause
 ) {
     public constructor() : this(null)
 }

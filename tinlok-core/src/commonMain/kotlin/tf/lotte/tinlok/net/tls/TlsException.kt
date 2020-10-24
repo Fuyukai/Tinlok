@@ -14,4 +14,9 @@ import tf.lotte.cc.exc.OSException
 /**
  * Thrown when a exception happpens relating to TLS code.
  */
-public class TlsException(override val message: String) : OSException(errno = -1)
+public class TlsException
+public constructor(
+    message: String, cause: Throwable?
+) : OSException(message, cause) {
+    public constructor(message: String) : this(message, null)
+}

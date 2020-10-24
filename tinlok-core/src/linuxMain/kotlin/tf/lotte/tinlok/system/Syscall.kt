@@ -106,8 +106,11 @@ public actual object Syscall {
             ECONNABORTED -> ConnectionAbortedException()
             ECONNREFUSED -> ConnectionRefusedException()
             ETIMEDOUT -> TimeoutException()
+            ENETUNREACH -> NetworkUnreachableException()
 
-            else -> OSException(errno = errno, message = strerror(errno))
+            EINVAL -> IllegalArgumentException()
+
+            else -> OSException(message = strerror(errno))
         }
     }
 
@@ -215,7 +218,7 @@ public actual object Syscall {
         }
 
         if (isErrored) {
-            throw OSException(errno = lastErrno, message = strerror())
+            throwErrno(lastErrno)
         }
     }
 

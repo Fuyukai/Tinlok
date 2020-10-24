@@ -9,8 +9,8 @@
 
 package tf.lotte.tinlok.net.socket
 
-import platform.posix.ENETUNREACH
 import tf.lotte.cc.Unsafe
+import tf.lotte.cc.exc.NetworkUnreachableException
 import tf.lotte.cc.exc.OSException
 import tf.lotte.tinlok.net.AddressFamily
 import tf.lotte.tinlok.net.AllConnectionsFailedException
@@ -41,13 +41,10 @@ public actual object PlatformSockets {
 
                 // no error was hit during connect, we are now connected
                 return Pair(socket, info)
-            } catch (e: OSException) {
-                // unconditionally close, we can't really do anything
-                Syscall.close(socket)
-
+            } catch (e: NetworkUnreachableException) {
                 // ENETUNREACH is raised when ipv6 is requested but the network doesn't support ipv6
                 // so silently eat the error
-                if (e.errno == ENETUNREACH && info.family == AddressFamily.AF_INET6) continue
+                if (info.family == AddressFamily.AF_INET6) continue
                 else throw e
             } catch (e: Throwable) {
                 // always close if connect() fails for other reasons
@@ -77,7 +74,6 @@ public actual object PlatformSockets {
     @Unsafe
     public actual fun newTcpSynchronousServerSocket(address: TcpConnectionInfo): TcpServerSocket {
         val fd = Syscall.socket(address.family, address.type, address.protocol)
-        val sock = LinuxTcpServerSocket(fd, address)
-        return sock
+        return LinuxTcpServerSocket(fd, address)
     }
 }
