@@ -14,16 +14,8 @@ package tf.lotte.tinlok.exc
  * Thrown when a platform call returns an unhandleable error.
  */
 public open class OSException(
-    /** The POSIX error number. On Windows, this is an approximation. */
-    public val errno: Int,
-    /** The windows error number. On Linux, this is always 0. */
-    public val winerror: Int = 0,
-
     message: String? = null, cause: Throwable? = null
-) : Exception(
-    if (winerror != 0) "[WinError $winerror] $message" else "[errno $errno] $message",
-    cause
-)
+) : Exception(message)
 
 // See: https://www.python.org/dev/peps/pep-3151/
 // Some descriptions has been taken and reworded slightly from the Python documentation.
@@ -32,101 +24,126 @@ public open class OSException(
 /**
  * Thrown when a file already exists on a creation attempt. Corresponds to EEXIST.
  */
-public expect open class FileAlreadyExistsException(
-    path: String, cause: Throwable?
-) : OSException {
-    public constructor(path: String)
-
-    public val path: String
+public open class FileAlreadyExistsException
+public constructor(
+    public val path: String,
+    cause: Throwable?
+) : OSException(message = "File exists: $path", cause = cause) {
+    public constructor(path: String) : this(path, null)
 }
 
 /**
  * Thrown when a file *doesn't* exist. Corresponds to ENOENT.
  */
-public expect open class FileNotFoundException(
-    path: String, cause: Throwable?
-) : OSException {
-    public constructor(path: String)
-
-    public val path: String
+public open class FileNotFoundException
+constructor(
+    public  val path: String,
+    cause: Throwable?
+) : OSException(message = "File not found: $path", cause = cause) {
+    public constructor(path: String) : this(path, null)
 }
 
 /**
  * Thrown when a path is a directory and an attempt is made to treat it as a regular file.
  * Corresponds to EISDIR.
  */
-public expect open class IsADirectoryException(
-    path: String, cause: Throwable?
-) : OSException {
-    public constructor(path: String)
-
-    public val path: String
+public open class IsADirectoryException
+constructor(
+    public  val path: String,
+    cause: Throwable?
+) : OSException(message = "Is a directory: $path", cause = cause) {
+    public constructor(path: String) : this(path, null)
 }
 
 /**
  * Thrown when trying to run an operation without the adequate access rights - for example
  * filesystem permissions. Corresponds to EACCES.
  */
-public expect open class AccessDeniedException(cause: Throwable?) : OSException {
-    public constructor()
+public open class AccessDeniedException
+constructor(
+    cause: Throwable?
+) : OSException(message = "Access denied", cause = cause) {
+    public constructor() : this(null)
 }
 
 /**
  * Thrown when trying to run an operation without the correct permission. Corresponds to EPERM.
  */
-public expect open class PermissionDeniedException(cause: Throwable?) : OSException {
-    public constructor()
+public open class PermissionDeniedException
+constructor(
+    cause: Throwable?
+) : OSException(message = "Permission denied", cause = cause) {
+    public constructor() : this(null)
 }
-
 
 /**
  * Base superclass for all connection exceptions. Takes the same parameters as [OSException].
  */
-public open class ConnectionException(
-    errno: Int, winerror: Int = 0,
-    message: String? = null, cause: Throwable? = null
-) : OSException(errno, winerror, message, cause)
+public open class ConnectionException
+constructor(
+    message: String?, cause: Throwable?
+) : OSException(message, cause)
 
 /**
- * Thrown when trying to write on a pipe while the other end has been closed, or trying to write on
- * a socket which has been shutdown for writing. Corresponds to EPIPE and ESHUTDOWN.
+ * Thrown when trying to write on a pipe while the other end has been closed. Corresponds to
+ * EPIPE.
  */
-public expect class BrokenPipeException(cause: Throwable?) : ConnectionException {
-    public constructor()
+public open class BrokenPipeException
+constructor(
+    cause: Throwable?
+) : ConnectionException(message = "Broken pipe", cause = cause) {
+    public constructor() : this(null)
 }
 
 /**
  * Thrown when trying to write on a socket which has been shutdown for writing. Corresponds to
  * ESHUTDOWN.
  */
-public expect class SocketShutdownException(cause: Throwable?) : ConnectionException {
-    public constructor()
+public open class SocketShutdownException
+ constructor(
+    cause: Throwable?
+) : ConnectionException(message = "Cannot send after transport endpoint shutdown", cause = cause) {
+    public constructor() : this(null)
 }
 
 /**
  * Thrown when a connection attempt is aborted by the remote end. Corresponds to ECONNABORTED.
  */
-public expect class ConnectionAbortedException(cause: Throwable?) : ConnectionException {
-    public constructor()
+public open class ConnectionAbortedException
+ constructor(
+    cause: Throwable?
+) : ConnectionException(
+    message = "Connection aborted", cause = cause
+) {
+    public constructor() : this(null)
 }
 
 /**
  * Thrown when a connection attempt is refused by the remote end. Corresponds to ECONNREFUSED.
  */
-public expect class ConnectionRefusedException(cause: Throwable?) : ConnectionException {
-    public constructor()
+public open class ConnectionRefusedException
+ constructor(cause: Throwable?) : ConnectionException(
+    message = "Connection refused by peer", cause = cause
+) {
+    public constructor() : this(null)
 }
 
 /**
  * Thrown when a connection is reset by the remote end. Corresponds to ECONNRESET.
  */
-public expect class ConnectionResetException(cause: Throwable?) : ConnectionException {
-    public constructor()
+public open class ConnectionResetException
+ constructor(cause: Throwable?) : ConnectionException(
+    message = "Connection reset by peer", cause = cause
+) {
+    public constructor() : this(null)
 }
 
 /**
  * Thrown when a timeout happens on a connection. Corresponds to ETIMEDOUT.
  */
-public expect class TimeoutException(cause: Throwable?) : ConnectionException {
-    public constructor()
+public open class TimeoutException
+ constructor(cause: Throwable?) : ConnectionException(
+    message = "Connection timed out", cause = cause
+) {
+    public constructor() : this(null)
 }
