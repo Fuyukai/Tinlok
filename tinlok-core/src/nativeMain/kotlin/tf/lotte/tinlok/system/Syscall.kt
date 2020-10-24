@@ -10,7 +10,7 @@
 package tf.lotte.tinlok.system
 
 import kotlinx.cinterop.COpaquePointer
-import tf.lotte.tinlok.util.Unsafe
+import tf.lotte.cc.Unsafe
 
 /**
  * Namespace object for all libc bindings.

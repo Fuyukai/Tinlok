@@ -10,7 +10,7 @@
 package tf.lotte.tinlok.system
 
 import kotlinx.cinterop.*
-import tf.lotte.tinlok.util.Unsafe
+import tf.lotte.cc.Unsafe
 
 /**
  * Reads out a Kotlin [ByteArray] from a [CArrayPointer].

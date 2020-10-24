@@ -9,6 +9,8 @@
 
 package tf.lotte.tinlok.util
 
+import tf.lotte.cc.Unsafe
+
 /**
  * A scope that can have objects added to it to automatically close them.
  *

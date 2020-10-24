@@ -9,7 +9,7 @@
 
 package tf.lotte.tinlok.net
 
-public actual enum class IPProtocol(public val number: Int) {
+public actual enum class IPProtocol(public actual val number: Int) {
     /** Kernel's choice */
     IPPROTO_IP(platform.posix.IPPROTO_IP),
 

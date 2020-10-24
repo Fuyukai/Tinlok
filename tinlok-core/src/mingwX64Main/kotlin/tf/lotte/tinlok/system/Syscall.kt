@@ -14,7 +14,7 @@ import platform.posix.memcpy
 import platform.windows.GetEnvironmentVariableW
 import platform.windows.GetUserNameW
 import platform.windows.HRESULT
-import tf.lotte.tinlok.util.Unsafe
+import tf.lotte.cc.Unsafe
 import tf.lotte.tinlok.util.utf16ToString
 
 public actual object Syscall {
@@ -22,7 +22,7 @@ public actual object Syscall {
     public fun SUCCEEDED(result: HRESULT): Boolean {
         return (result >= 0)
     }
-    
+
     /**
      * Copies [size] bytes from the pointer at [pointer] to [buf].
      *
@@ -36,6 +36,11 @@ public actual object Syscall {
         buf.usePinned {
             memcpy(it.addressOf(0), pointer, size.toULong())
         }
+    }
+
+    @Unsafe
+    public fun FormatMessageW(code: Int): String {
+        TODO()
     }
 
     /**
@@ -62,6 +67,9 @@ public actual object Syscall {
         return buf.utf16ToString(count)
     }
 
+    /**
+     * Gets an environment variable with the specified [name].
+     */
     @OptIn(ExperimentalUnsignedTypes::class)
     @Unsafe
     public fun GetEnvironmentVariable(name: String): String? {

@@ -16,6 +16,7 @@ pluginManagement {
 
 rootProject.name = "tinlok"
 // core
+include("copperchain")
 include("tinlok-core")
 
 // extra modules

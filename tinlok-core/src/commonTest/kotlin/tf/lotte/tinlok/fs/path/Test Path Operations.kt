@@ -11,14 +11,11 @@
 
 package tf.lotte.tinlok.fs.path
 
+import tf.lotte.cc.Unsafe
 import tf.lotte.tinlok.Sys
 import tf.lotte.tinlok.fs.StandardOpenModes
 import tf.lotte.tinlok.types.bytestring.b
-import tf.lotte.tinlok.util.Unsafe
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 /**
  * Tests path modification operators.

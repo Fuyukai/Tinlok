@@ -9,7 +9,7 @@
 
 package tf.lotte.tinlok.net
 
-import tf.lotte.tinlok.util.Unsafe
+import tf.lotte.cc.Unsafe
 import tf.lotte.tinlok.util.toByteArray
 
 // see: https://docs.python.org/3/library/ipaddress.html

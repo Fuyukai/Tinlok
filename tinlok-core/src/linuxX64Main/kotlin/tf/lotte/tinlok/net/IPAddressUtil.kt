@@ -11,10 +11,10 @@ package tf.lotte.tinlok.net
 
 import kotlinx.cinterop.*
 import platform.posix.INET6_ADDRSTRLEN
+import tf.lotte.cc.Unsafe
 import tf.lotte.tinlok.interop.ipv6.ipv6_address_full_t
 import tf.lotte.tinlok.interop.ipv6.ipv6_from_str
 import tf.lotte.tinlok.interop.ipv6.ipv6_to_str
-import tf.lotte.tinlok.util.Unsafe
 
 // DON'T FUCKING TOUCH
 // ON THREAT OF DEATH

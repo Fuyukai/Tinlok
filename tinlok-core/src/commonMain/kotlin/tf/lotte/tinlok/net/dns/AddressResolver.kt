@@ -9,11 +9,8 @@
 
 package tf.lotte.tinlok.net.dns
 
-import tf.lotte.tinlok.net.AddressFamily
-import tf.lotte.tinlok.net.ConnectionInfo
-import tf.lotte.tinlok.net.IPProtocol
-import tf.lotte.tinlok.net.SocketType
-import tf.lotte.tinlok.util.Unsafe
+import tf.lotte.cc.Unsafe
+import tf.lotte.tinlok.net.*
 
 /**
  * Interface for address resolvers. This defines a portable getaddrinfo()-like high level function.

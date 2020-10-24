@@ -9,6 +9,7 @@
 
 package tf.lotte.tinlok.fs.path
 
+import tf.lotte.cc.Unsafe
 import tf.lotte.tinlok.exc.FileAlreadyExistsException
 import tf.lotte.tinlok.exc.IsADirectoryException
 import tf.lotte.tinlok.fs.DirEntry
@@ -19,7 +20,6 @@ import tf.lotte.tinlok.types.bytestring.ByteString
 import tf.lotte.tinlok.types.bytestring.b
 import tf.lotte.tinlok.types.bytestring.toByteString
 import tf.lotte.tinlok.util.ClosingScope
-import tf.lotte.tinlok.util.Unsafe
 import tf.lotte.tinlok.util.use
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind

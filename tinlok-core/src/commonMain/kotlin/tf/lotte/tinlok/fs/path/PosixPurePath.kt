@@ -9,8 +9,8 @@
 
 package tf.lotte.tinlok.fs.path
 
+import tf.lotte.cc.Unsafe
 import tf.lotte.tinlok.types.bytestring.*
-import tf.lotte.tinlok.util.Unsafe
 
 /**
  * A pure path that uses POSIX semantics.

@@ -10,16 +10,13 @@
 package tf.lotte.tinlok.net.dns
 
 import kotlinx.cinterop.*
-import platform.posix.addrinfo
-import platform.posix.ntohs
-import platform.posix.sockaddr_in
-import platform.posix.sockaddr_in6
+import platform.posix.*
+import tf.lotte.cc.Unsafe
 import tf.lotte.tinlok.net.*
 import tf.lotte.tinlok.net.tcp.TcpConnectionInfo
 import tf.lotte.tinlok.net.udp.UdpConnectionInfo
 import tf.lotte.tinlok.system.Syscall
 import tf.lotte.tinlok.system.readBytesFast
-import tf.lotte.tinlok.util.Unsafe
 import tf.lotte.tinlok.util.toByteArray
 
 @ExperimentalUnsignedTypes

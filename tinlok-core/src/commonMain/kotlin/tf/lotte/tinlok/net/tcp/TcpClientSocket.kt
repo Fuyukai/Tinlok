@@ -9,11 +9,11 @@
 
 package tf.lotte.tinlok.net.tcp
 
+import tf.lotte.cc.Unsafe
 import tf.lotte.tinlok.io.HalfCloseableStream
 import tf.lotte.tinlok.net.socket.PlatformSockets
 import tf.lotte.tinlok.net.socket.Socket
 import tf.lotte.tinlok.net.socket.StreamingClientSocket
-import tf.lotte.tinlok.util.Unsafe
 
 /**
  * Interface defining a TCP synchronous socket.

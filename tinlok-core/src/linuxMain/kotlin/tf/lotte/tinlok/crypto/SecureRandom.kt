@@ -10,8 +10,8 @@
 package tf.lotte.tinlok.crypto
 
 import platform.posix.O_RDONLY
+import tf.lotte.cc.Unsafe
 import tf.lotte.tinlok.system.Syscall
-import tf.lotte.tinlok.util.Unsafe
 import tf.lotte.tinlok.util.toInt
 import tf.lotte.tinlok.util.toLong
 import kotlin.experimental.and

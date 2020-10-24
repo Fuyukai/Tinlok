@@ -9,7 +9,7 @@
 
 package tf.lotte.tinlok.net
 
-import tf.lotte.tinlok.util.Unsafe
+import tf.lotte.cc.Unsafe
 
 /**
  * Parses an IPv6 address from a String to a [ByteArray] of its byte components.

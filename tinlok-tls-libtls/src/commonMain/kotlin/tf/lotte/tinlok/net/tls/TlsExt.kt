@@ -9,10 +9,10 @@
 
 package tf.lotte.tinlok.net.tls
 
+import tf.lotte.cc.Unsafe
 import tf.lotte.tinlok.net.socket.PlatformSockets
 import tf.lotte.tinlok.net.tcp.TcpSocketAddress
 import tf.lotte.tinlok.util.ClosingScope
-import tf.lotte.tinlok.util.Unsafe
 import tf.lotte.tinlok.util.use
 
 

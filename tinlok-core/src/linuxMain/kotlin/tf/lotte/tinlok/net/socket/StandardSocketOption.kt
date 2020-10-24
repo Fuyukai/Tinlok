@@ -13,7 +13,7 @@ package tf.lotte.tinlok.net.socket
 
 import kotlinx.cinterop.*
 import platform.posix.SOL_SOCKET
-import tf.lotte.tinlok.util.Unsafe
+import tf.lotte.cc.Unsafe
 
 /**
  * Socket options that are shareable by all sockets.

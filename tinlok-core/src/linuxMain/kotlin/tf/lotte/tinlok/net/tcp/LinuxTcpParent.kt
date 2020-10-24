@@ -9,11 +9,11 @@
 
 package tf.lotte.tinlok.net.tcp
 
+import tf.lotte.cc.Unsafe
 import tf.lotte.tinlok.net.socket.StandardSocketOption
 import tf.lotte.tinlok.system.FD
 import tf.lotte.tinlok.system.Syscall
 import tf.lotte.tinlok.util.AtomicBoolean
-import tf.lotte.tinlok.util.Unsafe
 
 /**
  * Parent class for the two TCP socket classes.

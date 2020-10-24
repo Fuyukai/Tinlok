@@ -10,10 +10,10 @@
 package tf.lotte.tinlok.net.tcp
 
 import platform.posix.SHUT_WR
+import tf.lotte.cc.Unsafe
 import tf.lotte.tinlok.exc.ClosedException
 import tf.lotte.tinlok.system.FD
 import tf.lotte.tinlok.system.Syscall
-import tf.lotte.tinlok.util.Unsafe
 
 /**
  * Implements a TCP socket on Linux.

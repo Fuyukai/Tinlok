@@ -14,8 +14,8 @@ import kotlinx.cinterop.toKString
 import kotlinx.cinterop.toKStringFromUtf8
 import platform.posix.getpid
 import platform.posix.getuid
+import tf.lotte.cc.Unsafe
 import tf.lotte.tinlok.system.Syscall
-import tf.lotte.tinlok.util.Unsafe
 
 /**
  * Linux-based system methods.

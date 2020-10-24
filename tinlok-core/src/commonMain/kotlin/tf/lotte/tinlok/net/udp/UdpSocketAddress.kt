@@ -9,13 +9,13 @@
 
 package tf.lotte.tinlok.net.udp
 
+import tf.lotte.cc.Unsafe
 import tf.lotte.tinlok.net.AddressFamily
 import tf.lotte.tinlok.net.IPProtocol
 import tf.lotte.tinlok.net.SocketType
 import tf.lotte.tinlok.net.dns.AddressResolver
 import tf.lotte.tinlok.net.dns.GlobalResolver
 import tf.lotte.tinlok.net.socket.SocketAddress
-import tf.lotte.tinlok.util.Unsafe
 
 /**
  * A socket address for UDP sockets.

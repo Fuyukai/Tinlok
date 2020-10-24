@@ -23,5 +23,8 @@ public expect enum class IPProtocol {
     IPPROTO_TCP,
 
     /** UDP protocol */
-    IPPROTO_UDP
+    IPPROTO_UDP;
+
+    /** The actual number for this IP protocol. */
+    public actual val number: Int
 }

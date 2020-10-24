@@ -22,14 +22,16 @@ allprojects {
         mavenLocal()
         jcenter()
     }
-
-    group = "tf.lotte.tinlok"
-    version = "1.1.0"
 }
 
 subprojects {
-    // ignore all -static projects, we configure K/N ourselves
+    // ignore the non tinlok branded project
     if (!this.name.startsWith("tinlok-")) return@subprojects
+
+    group = "tf.lotte.tinlok"
+    version = "1.2.0"
+
+    // ignore all -static projects, we configure K/N ourselves
     if (this.name.startsWith("tinlok-static")) return@subprojects
 
     apply(plugin = "org.jetbrains.kotlin.multiplatform")

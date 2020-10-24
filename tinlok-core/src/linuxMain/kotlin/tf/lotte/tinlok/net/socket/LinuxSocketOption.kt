@@ -11,7 +11,7 @@ package tf.lotte.tinlok.net.socket
 
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.NativePlacement
-import tf.lotte.tinlok.util.Unsafe
+import tf.lotte.cc.Unsafe
 
 /**
  * Sub-interface for linux socket options.

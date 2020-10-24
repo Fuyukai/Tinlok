@@ -10,13 +10,10 @@
 
 package tf.lotte.tinlok.fs.path
 
+import tf.lotte.cc.Unsafe
 import tf.lotte.tinlok.exc.FileNotFoundException
-import tf.lotte.tinlok.fs.DirEntry
-import tf.lotte.tinlok.fs.FileOpenMode
-import tf.lotte.tinlok.fs.FilePermission
-import tf.lotte.tinlok.fs.FilesystemFile
+import tf.lotte.tinlok.fs.*
 import tf.lotte.tinlok.types.bytestring.ByteString
-import tf.lotte.tinlok.util.Unsafe
 
 /**
  * Similar to [PurePath], but can perform I/O operations.

@@ -9,9 +9,9 @@
 
 package tf.lotte.tinlok.net.dns
 
+import tf.lotte.cc.Unsafe
 import tf.lotte.tinlok.net.AddressFamily
 import tf.lotte.tinlok.net.tcp.TcpConnectionInfo
-import tf.lotte.tinlok.util.Unsafe
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

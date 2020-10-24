@@ -9,11 +9,8 @@
 
 package tf.lotte.tinlok.net.socket
 
-import tf.lotte.tinlok.net.tcp.TcpClientSocket
-import tf.lotte.tinlok.net.tcp.TcpConnectionInfo
-import tf.lotte.tinlok.net.tcp.TcpServerSocket
-import tf.lotte.tinlok.net.tcp.TcpSocketAddress
-import tf.lotte.tinlok.util.Unsafe
+import tf.lotte.cc.Unsafe
+import tf.lotte.tinlok.net.tcp.*
 
 /**
  * Expect object providing the creation of socket instances.

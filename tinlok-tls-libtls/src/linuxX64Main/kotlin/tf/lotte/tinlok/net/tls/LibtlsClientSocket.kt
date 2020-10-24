@@ -12,6 +12,7 @@ package tf.lotte.tinlok.net.tls
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.toKString
 import kotlinx.cinterop.usePinned
+import tf.lotte.cc.Unsafe
 import tf.lotte.tinlok.exc.ClosedException
 import tf.lotte.tinlok.interop.libtls.*
 import tf.lotte.tinlok.net.socket.PlatformSockets
@@ -20,7 +21,6 @@ import tf.lotte.tinlok.net.tcp.TcpConnectionInfo
 import tf.lotte.tinlok.net.tcp.TcpSocketAddress
 import tf.lotte.tinlok.system.Syscall
 import tf.lotte.tinlok.util.AtomicBoolean
-import tf.lotte.tinlok.util.Unsafe
 
 /**
  * Implements TLS using libtls.

@@ -9,9 +9,9 @@
 
 package tf.lotte.tinlok.net.tcp
 
+import tf.lotte.cc.Unsafe
 import tf.lotte.tinlok.net.socket.AcceptingSeverSocket
 import tf.lotte.tinlok.net.socket.PlatformSockets
-import tf.lotte.tinlok.util.Unsafe
 
 /**
  * Interface defining a TCP synchronous server socket that produces [TcpClientSocket]

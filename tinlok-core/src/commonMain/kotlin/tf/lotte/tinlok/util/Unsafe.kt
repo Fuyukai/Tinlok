@@ -9,11 +9,3 @@
 
 package tf.lotte.tinlok.util
 
-/**
- * Marks an API as "unsafe". Unsafe APIs cannot be used from safe APIs
- */
-@RequiresOptIn(
-    message = "This API is unsafe and requires explicit opt-in.",
-    level = RequiresOptIn.Level.ERROR
-)
-public annotation class Unsafe

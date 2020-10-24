@@ -10,8 +10,8 @@
 package tf.lotte.tinlok
 
 import platform.windows.GetCurrentProcessId
+import tf.lotte.cc.Unsafe
 import tf.lotte.tinlok.system.Syscall
-import tf.lotte.tinlok.util.Unsafe
 
 /**
  * Semantically similar to Java's System namespace. Contains several useful functions for
