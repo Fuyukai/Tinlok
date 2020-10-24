@@ -15,23 +15,23 @@ import tf.lotte.cc.types.*
 /**
  * Implements a pure path with Windows filesystem semantics.
  */
-public open class WindowsPurePath private constructor(
-    private val driveLetter: ByteString?,
-    private val volume: ByteString?,
-    private val rest: List<ByteString>
+public open class WindowsPurePath protected constructor(
+    internal val driveLetter: ByteString?,
+    internal val volume: ByteString?,
+    internal val rest: List<ByteString>
 ) : PurePath {
     public companion object {
-        private val SEP = '\\'.toByte()
-        private val ALTSEP = '/'.toByte()
-        private val DRIVE_SEP = b(":\\")
-        private val UNC_SEP = b("\\\\")
-        private val ILLEGAL = listOf(
+        protected const val SEP: Byte = '\\'.toByte()
+        protected const val ALTSEP: Byte = '/'.toByte()
+        protected val DRIVE_SEP: ByteString = b(":\\")
+        protected val UNC_SEP: ByteString = b("\\\\")
+        protected val ILLEGAL: Set<Byte> = listOf(
             '<', '>', ':', '"', '|', '?', '*', '\\', '/'
         ).mapTo(mutableSetOf()) { it.toByte() }
-        private val DOT = b(".")
+        protected val DOT: ByteString = b(".")
 
         @OptIn(ExperimentalStdlibApi::class)
-        private val ILLEGAL_NAMES = buildList<String> {
+        protected val ILLEGAL_NAMES: Set<ByteString> = buildList<String> {
             add("CON")
             add("PRN")
             add("AUX")
@@ -58,7 +58,7 @@ public open class WindowsPurePath private constructor(
          * Splits a path up using the sep and altsep.
          */
         @OptIn(Unsafe::class)
-        private fun splitPath(path: ByteString): List<ByteString> {
+        protected fun splitPath(path: ByteString): List<ByteString> {
             // sizes pre-allocated for worst case scenarios
             val items = ArrayList<ByteString>(path.size)
             val working = ByteArray(path.size)
@@ -111,7 +111,7 @@ public open class WindowsPurePath private constructor(
         /**
          * Finds the end of the UNC anchor.
          */
-        private fun findUncAnchor(path: ByteString): Int {
+        protected fun findUncAnchor(path: ByteString): Int {
             // this finds the SECOND \
             // e.g. when scanning \\device\share it will attempt to skip past the initial \\,
             // find the FIRST \, then find the next \ after that.

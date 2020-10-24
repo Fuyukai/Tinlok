@@ -13,27 +13,31 @@ import tf.lotte.cc.Unsafe
 import tf.lotte.cc.types.ByteString
 import tf.lotte.tinlok.fs.*
 
-internal class WindowsPath(private val pure: WindowsPurePath) : Path {
+internal class WindowsPath(
+    driveLetter: ByteString?,
+    volume: ByteString?,
+    rest: List<ByteString>
+) : Path, WindowsPurePath(driveLetter, volume, rest) {
     // == purepath functionality == //
-    override val isAbsolute: Boolean by pure::isAbsolute
-    override val parent: WindowsPath get() = WindowsPath(pure.parent)
-    override val rawComponents: List<ByteString> by pure::rawComponents
-    override val components: List<String> by pure::components
-    override val rawAnchor: ByteString? by pure::rawAnchor
-    override val anchor: String? by pure::anchor
-    override val rawName: ByteString? by pure::rawName
-    override val name: String? by pure::name
-    override fun resolveChild(other: PurePath): WindowsPath = WindowsPath(pure.resolveChild(other))
-    override fun withName(name: ByteString): WindowsPath = WindowsPath(pure.withName(name))
+    override fun resolveChild(other: PurePath): WindowsPath {
+        val pure = super.resolveChild(other)
+        return WindowsPath(pure.driveLetter, pure.volume, pure.rest)
+    }
 
-    @Unsafe
-    override fun unsafeToString(): String = pure.unsafeToString()
+    override fun withName(name: ByteString): WindowsPath {
+        val pure = super.withName(name)
+        return WindowsPath(pure.driveLetter, pure.volume, pure.rest)
+    }
 
-    // todo: make this use WindowsPath as the prefix
-    override fun toString(): String = pure.toString()
-    override fun isChildOf(other: PurePath): Boolean = pure.isChildOf(other)
-    override fun reparent(from: PurePath, to: PurePath): WindowsPath =
-        WindowsPath(pure.reparent(from, to))
+    override fun reparent(from: PurePath, to: PurePath): WindowsPath {
+        val pure = super.reparent(from, to)
+        return WindowsPath(pure.driveLetter, pure.volume, pure.rest)
+    }
+
+    override val parent: WindowsPath get() {
+        val parent = super.parent
+        return WindowsPath(driveLetter, volume, parent.rest)
+    }
 
     override fun exists(): Boolean {
         TODO("Not yet implemented")
