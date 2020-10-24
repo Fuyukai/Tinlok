@@ -11,9 +11,9 @@ package tf.lotte.tinlok.net.tls
 
 import tf.lotte.cc.ClosingScope
 import tf.lotte.cc.Unsafe
+import tf.lotte.cc.use
 import tf.lotte.tinlok.net.socket.PlatformSockets
 import tf.lotte.tinlok.net.tcp.TcpSocketAddress
-import tf.lotte.tinlok.util.use
 
 
 /**

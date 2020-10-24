@@ -13,7 +13,7 @@ import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.toKString
 import kotlinx.cinterop.usePinned
 import tf.lotte.cc.Unsafe
-import tf.lotte.tinlok.exc.ClosedException
+import tf.lotte.cc.exc.ClosedException
 import tf.lotte.tinlok.interop.libtls.*
 import tf.lotte.tinlok.net.socket.PlatformSockets
 import tf.lotte.tinlok.net.socket.StandardSocketOption

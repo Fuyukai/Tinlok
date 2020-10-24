@@ -7,6 +7,8 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
+// needed to generate the right empty file due to how typealiases work
+@file:JvmName("__CloseableKt")
 package tf.lotte.cc
 
 // simple typealias for AutoCloseable, as it has the same semantics

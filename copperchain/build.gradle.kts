@@ -19,10 +19,10 @@ kotlin {
     jvm()
 
     // == JS targets == //
-    js() {
+    /*js() {
         browser()
         nodejs()
-    }
+    }*/
 
     // == Native targets == //
     // = Linux = //
