@@ -18,11 +18,21 @@ import tf.lotte.tinlok.exc.WindowsException
 import tf.lotte.tinlok.util.utf16ToString
 
 public actual object Syscall {
+    // == Macros and helpers == //
     /** Corresponds to the windows SUCCEEDED macro. */
     public fun SUCCEEDED(result: HRESULT): Boolean {
         return (result >= 0)
     }
 
+    /**
+     * Converts a FILETIME struct into a single ULong.
+     */
+    @OptIn(ExperimentalUnsignedTypes::class)
+    public fun FILETIME.toULong(): ULong {
+        return (dwHighDateTime.toULong().shl(32)).or(dwLowDateTime.toULong())
+    }
+
+    // == Syscall definitions == //
     /**
      * Copies [size] bytes from the pointer at [pointer] to [buf].
      *
@@ -38,6 +48,7 @@ public actual object Syscall {
         }
     }
 
+    // == Error handling == //
     /**
      * Formats the message for an error code.
      */
@@ -122,6 +133,146 @@ public actual object Syscall {
         }
     }
 
+    // == Filesystem == //
+    /**
+     * Checks if the specified path exists.
+     */
+    @Unsafe
+    public fun PathFileExists(path: String): Boolean {
+        val exists = PathFileExistsW(path)
+        return SUCCEEDED(exists)
+    }
+
+    /**
+     * Copies the attributes from a WIN32_FILE_ATTRIBUTE_DATA object to a [FileAttributes] object.
+     */
+    @OptIn(ExperimentalUnsignedTypes::class)
+    private fun copyAttributes(struct: WIN32_FILE_ATTRIBUTE_DATA): FileAttributes {
+        val size = (struct.nFileSizeHigh.toULong().shl(32)).or(struct.nFileSizeLow.toULong())
+
+        // copy attributes from the struct into our own data class so that the runtime can manage
+        // it instead of our memory scope
+        return FileAttributes(
+            attributes = struct.dwFileAttributes.toInt(),
+            size = size,
+            creationTime = struct.ftCreationTime.toULong(),
+            modificationTime = struct.ftLastWriteTime.toULong(),
+            accessTime = struct.ftLastAccessTime.toULong()
+        )
+    }
+
+    /**
+     * Gets the file attributes for the specified path.
+     */
+    @OptIn(ExperimentalUnsignedTypes::class)
+    @Unsafe
+    public fun GetFileAttributesEx(path: String): FileAttributes = memScoped {
+        val struct = alloc<WIN32_FILE_ATTRIBUTE_DATA>()
+
+        val result = GetFileAttributesExW(
+            path,
+            GET_FILEEX_INFO_LEVELS.GetFileExInfoStandard,
+            struct.ptr
+        )
+
+        if (!SUCCEEDED(result)) {
+            throwErrno()
+        }
+
+        return copyAttributes(struct)
+    }
+
+    /**
+     * Gets the file attributes for the specified path, returning null if the file is not found.
+     */
+    @OptIn(ExperimentalUnsignedTypes::class)
+    @Unsafe
+    public fun __get_attributes_safer(path: String): FileAttributes? = memScoped {
+        val struct = alloc<WIN32_FILE_ATTRIBUTE_DATA>()
+
+        val result = GetFileAttributesExW(
+            path,
+            GET_FILEEX_INFO_LEVELS.GetFileExInfoStandard,
+            struct.ptr
+        )
+
+        if (!SUCCEEDED(result)) {
+            val err = GetLastError().toInt()
+            if (err == ERROR_FILE_NOT_FOUND || err == ERROR_PATH_NOT_FOUND) return null
+            else throwErrno()
+        }
+
+        return copyAttributes(struct)
+    }
+
+    // non-standard name as this isn't a wrapper
+    /**
+     * Gets the real path of a symlink. Returns null if the symlink doesn't point anywhere valid.
+     */
+    @OptIn(ExperimentalUnsignedTypes::class)
+    @Unsafe
+    public fun __symlink_real_path(path: String): String? {
+        val handle = CreateFileW(
+            path,
+            GENERIC_READ,
+            FILE_SHARE_VALID_FLAGS, // allow all sharing since we only care about the target
+            null,
+            OPEN_EXISTING,
+            FILE_ATTRIBUTE_NORMAL,  // no flags, open target file directly
+            null,
+        )
+
+        if (handle == null || handle == INVALID_HANDLE_VALUE) {
+            val err = GetLastError().toInt()
+            // not found means that the symlink points to somewhere invalid
+            // so we just ignore it.
+            if (err == ERROR_FILE_NOT_FOUND || err == ERROR_PATH_NOT_FOUND) return null
+            throwErrno(err)
+        }
+
+        // evil solution for getting size of filename buffer
+        val size = GetFinalPathNameByHandleW(
+            handle, null, 0, FILE_NAME_NORMALIZED
+        )
+
+        if (size == 0u) { CloseHandle(handle); throwErrno() }
+
+        // actually do the read instead of torturing win32
+        val buf = UShortArray(size.toInt())
+        val res = buf.usePinned {
+            GetFinalPathNameByHandleW(
+                handle, it.addressOf(0), size, FILE_NAME_NORMALIZED
+            )
+        }
+
+        // always close by this point
+        CloseHandle(handle)
+
+        return when {
+            res == 0u -> throwErrno()
+            res > size -> throw Error("GetFinalPathNameByHandleW lied to us!")
+            else -> buf.utf16ToString(res.toInt())
+        }
+    }
+
+    /**
+     * Gets the full path name of a path.
+     */
+    @OptIn(ExperimentalUnsignedTypes::class)
+    @Unsafe
+    public fun GetFullPathName(path: String): String {
+        val size = GetFullPathNameW(path, 0, null, null)
+        if (size == 0u) throwErrno()
+
+        val buf = UShortArray(size.toInt())
+        val res = buf.usePinned {
+            GetFullPathNameW(path, size, it.addressOf(0), null)
+        }
+        if (res == 0u) throwErrno()
+        else return buf.utf16ToString(count = res.toInt())
+    }
+
+    // == Generic stuff == //
     /**
      * Gets the current username.
      */

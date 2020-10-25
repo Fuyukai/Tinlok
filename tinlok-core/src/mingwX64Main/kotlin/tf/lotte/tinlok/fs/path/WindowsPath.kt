@@ -10,8 +10,11 @@
 package tf.lotte.tinlok.fs.path
 
 import tf.lotte.cc.Unsafe
+import tf.lotte.cc.exc.FileNotFoundException
 import tf.lotte.cc.types.ByteString
 import tf.lotte.tinlok.fs.*
+import tf.lotte.tinlok.system.FileAttributes
+import tf.lotte.tinlok.system.Syscall
 
 internal class WindowsPath(
     driveLetter: ByteString?,
@@ -39,32 +42,65 @@ internal class WindowsPath(
         return WindowsPath(driveLetter, volume, parent.rest)
     }
 
+    @OptIn(Unsafe::class)
     override fun exists(): Boolean {
-        TODO("Not yet implemented")
+        return Syscall.PathFileExists(unsafeToString())
     }
 
+    /**
+     * Gets the attributes of a file, optionally following symlinks.
+     */
+    @Unsafe
+    private fun getAttributesSafe(followSymlinks: Boolean): FileAttributes? {
+        return if (followSymlinks) {
+            val realPath = Syscall.__symlink_real_path(unsafeToString()) ?: return null
+            Syscall.__get_attributes_safer(realPath)
+        } else {
+            Syscall.__get_attributes_safer(unsafeToString())
+        }
+    }
+
+    @OptIn(Unsafe::class)
     override fun isDirectory(followSymlinks: Boolean): Boolean {
-        TODO("Not yet implemented")
+        return getAttributesSafe(followSymlinks)?.isDirectory ?: false
     }
 
+    @OptIn(Unsafe::class)
     override fun isRegularFile(followSymlinks: Boolean): Boolean {
-        TODO("Not yet implemented")
+        return getAttributesSafe(followSymlinks)?.isRegularFile ?: false
     }
 
+    @OptIn(Unsafe::class)
     override fun isLink(): Boolean {
-        TODO("Not yet implemented")
+        return getAttributesSafe(followSymlinks = false)?.isSymlink ?: false
     }
 
+    @OptIn(Unsafe::class, ExperimentalUnsignedTypes::class)
     override fun size(): Long {
-        TODO("Not yet implemented")
+        return Syscall.GetFileAttributesEx(unsafeToString()).size.toLong()
     }
 
-    override fun linkTarget(): Path? {
-        TODO("Not yet implemented")
+    @OptIn(Unsafe::class)
+    override fun linkTarget(): WindowsPath? {
+        if (!isLink()) return null
+        val target = Syscall.__symlink_real_path(unsafeToString()) ?: return null
+        val pure = fromString(target)
+
+        return WindowsPath(pure.driveLetter, pure.volume, pure.rest)
     }
 
-    override fun toAbsolutePath(strict: Boolean): Path {
-        TODO("Not yet implemented")
+    @OptIn(Unsafe::class)
+    override fun toAbsolutePath(strict: Boolean): WindowsPath {
+        if (isAbsolute) return this
+        val strpath = Syscall.GetFullPathName(unsafeToString())
+        val pure = fromString(strpath)
+        val path = WindowsPath(pure.driveLetter, pure.volume, pure.rest)
+
+        if (strict && !path.exists()) {
+            throw FileNotFoundException(path.unsafeToString())
+        } else {
+            return path
+        }
     }
 
     override fun owner(followSymlinks: Boolean): String? {
@@ -87,7 +123,8 @@ internal class WindowsPath(
     }
 
     override fun isSafeToRename(path: Path): Boolean {
-        TODO("Not yet implemented")
+        // MoveFile does a copy + delete for us automatically if needed, so this is always fine
+        return true
     }
 
     override fun copyFile(path: PurePath): Path {
