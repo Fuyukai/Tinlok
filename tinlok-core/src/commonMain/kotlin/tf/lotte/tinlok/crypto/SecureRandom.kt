@@ -9,9 +9,7 @@
 
 package tf.lotte.tinlok.crypto
 
-import kotlin.random.Random
-
 /**
  * Implements a cryptographically secure random generator.
  */
-public expect object SecureRandom : Random
+public expect object SecureRandom : RandomShared
