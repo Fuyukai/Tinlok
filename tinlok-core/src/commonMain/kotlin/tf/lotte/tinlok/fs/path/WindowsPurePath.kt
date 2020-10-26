@@ -134,10 +134,12 @@ public open class WindowsPurePath protected constructor(
         }
 
         /**
-         * Creates a new [WindowsPurePath] from the specified ByteString.
+         * Parses a path into a Triple of (DriveLetter, VolumeName, Parts).
          */
         @OptIn(Unsafe::class)
-        public fun fromByteString(bs: ByteString): WindowsPurePath {
+        protected fun parsePath(
+            bs: ByteString
+        ): Triple<ByteString?, ByteString?, List<ByteString>> {
             if (bs.substring(1, 3) == DRIVE_SEP) {
                 // path one: absolute path, with drive letter
                 val anchor = ByteString.fromUncopied(byteArrayOf(bs[0]))
@@ -148,20 +150,29 @@ public open class WindowsPurePath protected constructor(
                     bs.substring(4, bs.size)
                 } else bs.substring(3, bs.size)
 
-                return WindowsPurePath(driveLetter = anchor, volume = null, rest = splitPath(sub))
+                return Triple(anchor, null, splitPath(sub))
             } else if (bs.startsWith(UNC_SEP)) {
                 // path two: absolute path, with UNC
                 val anchorIdx = findUncAnchor(bs) + 1
                 val anchor = bs.substring(0, anchorIdx)
                 val rest = bs.substring(anchorIdx, bs.size)
-                return WindowsPurePath(driveLetter = null, volume = anchor, rest = splitPath(rest))
+                return Triple(null, anchor, splitPath(rest))
             } else if (bs.startsWith(SEP) || bs.startsWith(ALTSEP)) {
                 throw UnsupportedOperationException("Drive-letter relative paths are unsupported")
             } else {
                 // path four: relatives
                 val split = splitPath(bs)
-                return WindowsPurePath(driveLetter = null, volume = null, rest = split)
+                return Triple(null, null, split)
             }
+        }
+
+        /**
+         * Creates a new [WindowsPurePath] from the specified ByteString.
+         */
+        @OptIn(Unsafe::class)
+        public fun fromByteString(bs: ByteString): WindowsPurePath {
+            val parsed = parsePath(bs)
+            return WindowsPurePath(parsed.first, parsed.second, parsed.third)
         }
 
         /**

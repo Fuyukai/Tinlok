@@ -12,6 +12,7 @@ package tf.lotte.tinlok.fs.path
 import tf.lotte.cc.Unsafe
 import tf.lotte.cc.exc.FileNotFoundException
 import tf.lotte.cc.types.ByteString
+import tf.lotte.cc.types.toByteString
 import tf.lotte.tinlok.fs.*
 import tf.lotte.tinlok.system.FileAttributes
 import tf.lotte.tinlok.system.Syscall
@@ -84,17 +85,17 @@ internal class WindowsPath(
     override fun linkTarget(): WindowsPath? {
         if (!isLink()) return null
         val target = Syscall.__symlink_real_path(unsafeToString()) ?: return null
-        val pure = fromString(target)
+        val (letter, volume, rest) = parsePath(target.toByteString())
 
-        return WindowsPath(pure.driveLetter, pure.volume, pure.rest)
+        return WindowsPath(letter, volume, rest)
     }
 
     @OptIn(Unsafe::class)
     override fun toAbsolutePath(strict: Boolean): WindowsPath {
         if (isAbsolute) return this
         val strpath = Syscall.GetFullPathName(unsafeToString())
-        val pure = fromString(strpath)
-        val path = WindowsPath(pure.driveLetter, pure.volume, pure.rest)
+        val (letter, volume, rest) = parsePath(strpath.toByteString())
+        val path = WindowsPath(letter, volume, rest)
 
         if (strict && !path.exists()) {
             throw FileNotFoundException(path.unsafeToString())

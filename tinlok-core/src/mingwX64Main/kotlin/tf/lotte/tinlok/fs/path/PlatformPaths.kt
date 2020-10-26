@@ -13,6 +13,7 @@ package tf.lotte.tinlok.fs.path
 
 import tf.lotte.cc.Unsafe
 import tf.lotte.cc.types.ByteString
+import tf.lotte.cc.types.b
 
 /**
  * Defines the [PurePath] that for the current platform.
@@ -25,7 +26,7 @@ public actual typealias PlatformPurePath = WindowsPurePath
 public actual object PlatformPaths {
     /** The path separator that separates individual path components. */
     public actual val pathSeparator: ByteString
-        get() = TODO("not implemented")
+        get() = b("\\")
 
     /**
      * Creates a new [PurePath] for the current working directory.
