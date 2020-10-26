@@ -145,6 +145,6 @@ internal class WindowsPath(
 
     @Unsafe
     override fun unsafeOpen(vararg modes: FileOpenMode): FilesystemFile {
-        TODO("Not yet implemented")
+        return WindowsSyncFile(this, modes as Array<FileOpenMode>)
     }
 }

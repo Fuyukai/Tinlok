@@ -17,6 +17,10 @@ import tf.lotte.cc.exc.*
 import tf.lotte.tinlok.exc.WindowsException
 import tf.lotte.tinlok.util.utf16ToString
 
+/**
+ * Platform call container object for all Win32 calls.
+ */
+@OptIn(ExperimentalUnsignedTypes::class)
 public actual object Syscall {
     // == Macros and helpers == //
     /** Corresponds to the windows SUCCEEDED macro. */
@@ -30,6 +34,37 @@ public actual object Syscall {
     @OptIn(ExperimentalUnsignedTypes::class)
     public fun FILETIME.toULong(): ULong {
         return (dwHighDateTime.toULong().shl(32)).or(dwLowDateTime.toULong())
+    }
+
+    /**
+     * Closes the specified [handle].
+     */
+    @Unsafe
+    public fun CloseHandle(handle: HANDLE) {
+        val res = platform.windows.CloseHandle(handle)
+        if (!SUCCEEDED(res)) {
+            throwErrno()
+        }
+    }
+
+    /**
+     * Closes all of the specified handles.
+     */
+    @Unsafe
+    public fun __closeall(vararg handles: HANDLE) {
+        var lastErrno = 0
+        var errored = false
+        for (handle in handles) {
+            val res = platform.windows.CloseHandle(handle)
+            if (!SUCCEEDED(res)) {
+                errored = true
+                lastErrno = GetLastError().toInt()
+            }
+        }
+
+        if (errored) {
+            throwErrno(lastErrno)
+        }
     }
 
     // == Syscall definitions == //
@@ -144,6 +179,21 @@ public actual object Syscall {
     }
 
     /**
+     * Gets the file size of the file at [handle].
+     */
+    @Unsafe
+    public fun GetFileSize(handle: HANDLE): Long = memScoped {
+        val value = alloc<LARGE_INTEGER>()
+        val res = GetFileSizeEx(handle, value.ptr)
+
+        if (!SUCCEEDED(res)) {
+            throwErrno()
+        }
+
+        return value.QuadPart
+    }
+
+    /**
      * Copies the attributes from a WIN32_FILE_ATTRIBUTE_DATA object to a [FileAttributes] object.
      */
     @OptIn(ExperimentalUnsignedTypes::class)
@@ -176,7 +226,7 @@ public actual object Syscall {
         )
 
         if (!SUCCEEDED(result)) {
-            throwErrno()
+            throwErrnoPath(GetLastError().toInt(), path)
         }
 
         return copyAttributes(struct)
@@ -199,7 +249,7 @@ public actual object Syscall {
         if (!SUCCEEDED(result)) {
             val err = GetLastError().toInt()
             if (err == ERROR_FILE_NOT_FOUND || err == ERROR_PATH_NOT_FOUND) return null
-            else throwErrno()
+            else throwErrnoPath(err, path)
         }
 
         return copyAttributes(struct)
@@ -227,7 +277,7 @@ public actual object Syscall {
             // not found means that the symlink points to somewhere invalid
             // so we just ignore it.
             if (err == ERROR_FILE_NOT_FOUND || err == ERROR_PATH_NOT_FOUND) return null
-            throwErrno(err)
+            throwErrnoPath(GetLastError().toInt(), path)
         }
 
         // evil solution for getting size of filename buffer
@@ -235,7 +285,7 @@ public actual object Syscall {
             handle, null, 0, FILE_NAME_NORMALIZED
         )
 
-        if (size == 0u) { CloseHandle(handle); throwErrno() }
+        if (size == 0u) { CloseHandle(handle); throwErrnoPath(GetLastError().toInt(), path)}
 
         // actually do the read instead of torturing win32
         val buf = UShortArray(size.toInt())
@@ -262,14 +312,116 @@ public actual object Syscall {
     @Unsafe
     public fun GetFullPathName(path: String): String {
         val size = GetFullPathNameW(path, 0, null, null)
-        if (size == 0u) throwErrno()
+        if (size == 0u) throwErrnoPath(GetLastError().toInt(), path)
 
         val buf = UShortArray(size.toInt())
         val res = buf.usePinned {
             GetFullPathNameW(path, size, it.addressOf(0), null)
         }
-        if (res == 0u) throwErrno()
+
+        if (res == 0u) throwErrnoPath(GetLastError().toInt(), path)
         else return buf.utf16ToString(count = res.toInt())
+    }
+
+    /**
+     * Creates or opens a new file.
+     */
+    @Unsafe
+    public fun CreateFile(
+        path: String,
+        desiredAccess: Int,
+        creationMode: Int,
+        flagsAttributes: Int,
+    ): HANDLE {
+        val handle = CreateFileW(
+            path, desiredAccess.toUInt(),
+            FILE_SHARE_VALID_FLAGS,
+            null,
+            creationMode.toUInt(),
+            flagsAttributes.toUInt(),
+            null,
+        )
+
+        if (handle == null || handle == INVALID_HANDLE_VALUE) {
+            throwErrnoPath(GetLastError().toInt(), path)
+        }
+
+        return handle
+    }
+
+
+    /**
+     * Sets the file pointer for a handle. (equiv. to lseek)
+     */
+    @Unsafe
+    public fun SetFilePointer(handle: HANDLE, count: Long, whence: SeekWhence): Long = memScoped {
+        val out = alloc<LARGE_INTEGER>()
+        val i = cValue<LARGE_INTEGER> {
+            QuadPart = count
+        }
+
+        val res = SetFilePointerEx(handle, i, out.ptr, whence.number.toUInt())
+        if (!SUCCEEDED(res)) {
+            throwErrno()
+        }
+
+        return out.QuadPart
+    }
+
+    /**
+     * Reads [count] bytes into the buffer [buf] from the specified [handle].
+     */
+    @Unsafe
+    public fun ReadFile(
+        handle: HANDLE, buf: ByteArray,
+        count: Int = buf.size, offset: Int = 0
+    ): Int = memScoped {
+        require(offset <= count) { "Offset must be less than count!" }
+        val readCnt = alloc<UIntVar>()
+
+        val res = buf.usePinned {
+            platform.windows.ReadFile(
+                handle,
+                it.addressOf(offset),
+                count.toUInt(),
+                readCnt.ptr,
+                null
+            )
+        }
+
+        if (!SUCCEEDED(res)) {
+            throwErrno()
+        }
+
+        return readCnt.value.toInt()
+    }
+
+    /**
+     * Writes [count] bytes from the buffer [buf] into the specified [handle].
+     */
+    @Unsafe
+    public fun WriteFile(
+        handle: HANDLE, buf: ByteArray,
+        count: Int = buf.size, offset: Int = 0
+    ): Int = memScoped {
+        require(offset <= count) { "Offset must be less than count!" }
+
+        val writtenCnt = alloc<UIntVar>()
+        val res = buf.usePinned {
+            platform.windows.WriteFile(
+                handle,
+                it.addressOf(offset),
+                count.toUInt(),
+                writtenCnt.ptr,
+                null
+            )
+        }
+
+        if (!SUCCEEDED(res)) {
+            throwErrno()
+        }
+
+        return writtenCnt.value.toInt()
     }
 
     // == Generic stuff == //

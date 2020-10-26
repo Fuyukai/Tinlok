@@ -324,8 +324,8 @@ public actual object Syscall {
      * Performs a seek operation on the file descriptor [fd].
      */
     @Unsafe
-    public fun lseek(fd: FD, position: Long, whence: Int): Long {
-        val res = platform.posix.lseek(fd, position, whence)
+    public fun lseek(fd: FD, position: Long, whence: SeekWhence): Long {
+        val res = platform.posix.lseek(fd, position, whence.number)
         if (res.isError) {
             throwErrno(errno)
         }

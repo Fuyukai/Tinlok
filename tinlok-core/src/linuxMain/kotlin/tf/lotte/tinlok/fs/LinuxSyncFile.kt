@@ -16,6 +16,7 @@ import tf.lotte.cc.types.ByteString
 import tf.lotte.tinlok.fs.StandardOpenModes.*
 import tf.lotte.tinlok.fs.path.LinuxPath
 import tf.lotte.tinlok.system.FD
+import tf.lotte.tinlok.system.SeekWhence
 import tf.lotte.tinlok.system.Syscall
 import tf.lotte.tinlok.util.AtomicBoolean
 
@@ -72,19 +73,19 @@ internal class LinuxSyncFile(
     @OptIn(Unsafe::class)
     override fun cursor(): Long {
         if (!isOpen.value) throw ClosedException("This file is closed")
-        return Syscall.lseek(fd, 0L, SEEK_CUR)
+        return Syscall.lseek(fd, 0L, SeekWhence.CURRENT)
     }
 
     @OptIn(Unsafe::class)
     override fun seekAbsolute(position: Long) {
         if (!isOpen.value) throw ClosedException("This file is closed")
-        Syscall.lseek(fd, position, SEEK_SET)
+        Syscall.lseek(fd, position, SeekWhence.START)
     }
 
     @OptIn(Unsafe::class)
     override fun seekRelative(position: Long) {
         if (!isOpen.value) throw ClosedException("This file is closed")
-        Syscall.lseek(fd, position, SEEK_CUR)
+        Syscall.lseek(fd, position, SeekWhence.CURRENT)
     }
 
     override fun readInto(buf: ByteArray, offset: Int, size: Int): Int {
