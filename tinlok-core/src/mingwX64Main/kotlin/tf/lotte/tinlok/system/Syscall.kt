@@ -26,11 +26,6 @@ import tf.lotte.tinlok.util.utf16ToString
 @OptIn(ExperimentalUnsignedTypes::class)
 public actual object Syscall {
     // == Macros and helpers == //
-    /** Corresponds to the windows SUCCEEDED macro. */
-    public fun SUCCEEDED(result: HRESULT): Boolean {
-        return (result >= 0)
-    }
-
     /**
      * Converts a FILETIME struct into a single ULong.
      */
@@ -45,7 +40,7 @@ public actual object Syscall {
     @Unsafe
     public fun CloseHandle(handle: HANDLE) {
         val res = platform.windows.CloseHandle(handle)
-        if (!SUCCEEDED(res)) {
+        if (res != TRUE) {
             throwErrno()
         }
     }
@@ -59,7 +54,7 @@ public actual object Syscall {
         var errored = false
         for (handle in handles) {
             val res = platform.windows.CloseHandle(handle)
-            if (!SUCCEEDED(res)) {
+            if (res != TRUE) {
                 errored = true
                 lastErrno = GetLastError().toInt()
             }
@@ -178,7 +173,7 @@ public actual object Syscall {
     @Unsafe
     public fun PathFileExists(path: String): Boolean {
         val exists = PathFileExistsW(path)
-        return SUCCEEDED(exists)
+        return exists == TRUE
     }
 
     /**
@@ -189,7 +184,7 @@ public actual object Syscall {
         val value = alloc<LARGE_INTEGER>()
         val res = GetFileSizeEx(handle, value.ptr)
 
-        if (!SUCCEEDED(res)) {
+        if (res != TRUE) {
             throwErrno()
         }
 
@@ -228,7 +223,7 @@ public actual object Syscall {
             struct.ptr
         )
 
-        if (!SUCCEEDED(result)) {
+        if (result != TRUE) {
             throwErrnoPath(GetLastError().toInt(), path)
         }
 
@@ -249,7 +244,7 @@ public actual object Syscall {
             struct.ptr
         )
 
-        if (!SUCCEEDED(result)) {
+        if (result != TRUE) {
             val err = GetLastError().toInt()
             if (err == ERROR_FILE_NOT_FOUND || err == ERROR_PATH_NOT_FOUND) return null
             else throwErrnoPath(err, path)
@@ -403,7 +398,7 @@ public actual object Syscall {
     @Unsafe
     public fun CreateDirectory(path: String, existOk: Boolean = false) {
         val result = CreateDirectoryW(path, null)
-        if (!SUCCEEDED(result)) {
+        if (result != TRUE) {
             val err = GetLastError().toInt()
             if (err == ERROR_FILE_EXISTS && existOk) return
             else throwErrnoPath(err, path)
@@ -416,7 +411,7 @@ public actual object Syscall {
     @Unsafe
     public fun RemoveDirectory(path: String) {
         val result = RemoveDirectoryW(path)
-        if (!SUCCEEDED(result)) {
+        if (result != TRUE) {
             val code = GetLastError().toInt()
             throwErrnoPath(code, path)
         }
@@ -463,9 +458,11 @@ public actual object Syscall {
     @Unsafe
     public fun FindNextFile(context: DirectoryScanContext): DirEntry? = memScoped {
         val result = FindNextFileW(context.handle, context.struct.ptr)
-        if (!SUCCEEDED(result)) {
+        if (result != TRUE) {
             val res = GetLastError().toInt()
-            if (res == ERROR_NO_MORE_FILES) return null
+            if (res == ERROR_NO_MORE_FILES) {
+                return null
+            }
         }
 
         return findFileShared(context)
@@ -527,7 +524,7 @@ public actual object Syscall {
             )
         }
 
-        if (!SUCCEEDED(res)) {
+        if (res != TRUE) {
             throwErrno()
         }
 
@@ -555,7 +552,7 @@ public actual object Syscall {
             )
         }
 
-        if (!SUCCEEDED(res)) {
+        if (res != TRUE) {
             throwErrno()
         }
 
@@ -568,7 +565,7 @@ public actual object Syscall {
     @Unsafe
     public fun DeleteFile(path: String) {
         val res = DeleteFileW(path)
-        if (!SUCCEEDED(res)) {
+        if (res != TRUE) {
             throwErrno()
         }
     }
@@ -589,7 +586,7 @@ public actual object Syscall {
             GetUserNameW(ptr, sizePtr.ptr)
         }
 
-        if (!SUCCEEDED(result)) {
+        if (result != TRUE) {
             throwErrno()
         }
 
