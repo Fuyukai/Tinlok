@@ -9,6 +9,8 @@
 
 package tf.lotte.tinlok.util
 
+import kotlin.random.Random
+
 
 /**
  * Converts this short array into a string (assuming it is UTF-16).
@@ -31,4 +33,24 @@ public fun UShortArray.utf16ToString(count: Int = this.size): String {
         ca[idx] = this[idx].toShort().toChar()
     }
     return ca.concatToString()
+}
+
+/**
+ * Generates a random ASCII string of the specified [size].
+ */
+public fun Random.randomAsciiString(size: Int): String {
+    val arr = CharArray(size)
+
+    for (idx in 0 until size) {
+        val isHigher = nextBoolean()
+        val i = if (isHigher) {
+            nextInt(0x41, 0x5b)
+        } else {
+            nextInt(0x61, 0x7b)
+        }
+        val char = i.toChar()
+        arr[idx] = char
+    }
+
+    return arr.concatToString()
 }

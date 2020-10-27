@@ -22,6 +22,23 @@ internal class WindowsPath(
     volume: ByteString?,
     rest: List<ByteString>
 ) : Path, WindowsPurePath(driveLetter, volume, rest) {
+    companion object {
+        /**
+         * Creates a new [WindowsPath] from a [ByteString].
+         */
+        fun fromByteString(bs: ByteString): WindowsPath {
+            val (letter, volume, rest) = parsePath(bs)
+            return WindowsPath(letter, volume, rest)
+        }
+
+        /**
+         * Creates a new [WindowsPath] from a [WindowsPurePath].
+         */
+        fun fromPurePath(purePath: WindowsPurePath): WindowsPath {
+            return WindowsPath(purePath.driveLetter, purePath.volume, purePath.rest)
+        }
+    }
+
     // == purepath functionality == //
     override fun resolveChild(other: PurePath): WindowsPath {
         val pure = super.resolveChild(other)

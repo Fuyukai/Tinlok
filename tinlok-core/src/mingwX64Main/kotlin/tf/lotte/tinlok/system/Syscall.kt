@@ -301,6 +301,7 @@ public actual object Syscall {
         return when {
             res == 0u -> throwErrno()
             res > size -> throw Error("GetFinalPathNameByHandleW lied to us!")
+            // no \0 !
             else -> buf.utf16ToString(res.toInt())
         }
     }
@@ -320,7 +321,50 @@ public actual object Syscall {
         }
 
         if (res == 0u) throwErrnoPath(GetLastError().toInt(), path)
+        // no \0 !
         else return buf.utf16ToString(count = res.toInt())
+    }
+
+    /**
+     * Gets the current directory.
+     */
+    @Unsafe
+    public fun GetCurrentDirectory(): String {
+        val size = GetCurrentDirectoryW(0, null)
+
+        val buf = UShortArray(size.toInt())
+        val res = buf.usePinned {
+            GetCurrentDirectoryW(size, it.addressOf(0))
+        }
+
+        return when {
+            res == 0u -> throwErrno()
+            // recursive call is basically a retry loop, in case it got longer
+            res > size -> GetCurrentDirectory()
+            // no \0 !
+            else -> buf.utf16ToString(size.toInt())
+        }
+    }
+
+    /**
+     * Gets the path to the temporary directory.
+     */
+    @Unsafe
+    public fun GetTempPath(): String {
+        val size = GetTempPathW(0, null)
+        if (size == 0u) throwErrno()
+
+        val buf = UShortArray(size.toInt())
+        val res = buf.usePinned {
+            GetTempPathW(size, it.addressOf(0))
+        }
+
+        return when {
+            res == 0u -> throwErrno()
+            res > size -> throw Error("GetTempPathW lied")
+            // no trailing null
+            else -> buf.utf16ToString(size.toInt())
+        }
     }
 
     /**
@@ -446,7 +490,7 @@ public actual object Syscall {
 
         val count = sizePtr.value.toInt()
 
-        return buf.utf16ToString(count)
+        return buf.utf16ToString(count - 1)
     }
 
     /**
@@ -475,6 +519,28 @@ public actual object Syscall {
             else throwErrno(err)
         }
 
+        // no trailing \0
         return buf.utf16ToString(count)
+    }
+
+    /**
+     * Expands an environment string into its real value (e.g. ``%PATH%``).
+     */
+    @Unsafe
+    public fun ExpandEnvironmentStrings(name: String): String {
+        val size = ExpandEnvironmentStringsW(name, null, 0)
+        if (size == 0u) throwErrno()
+
+        val buf = UShortArray(size.toInt())
+        val res = buf.usePinned {
+            ExpandEnvironmentStringsW(name, it.addressOf(0), size)
+        }
+
+        // DOES include a trailing \0
+        return when {
+            res == 0u -> throwErrno()
+            res.toInt() > buf.size -> throw Error("ExpandEnvironmentStringsW lied")
+            else -> buf.utf16ToString(count = (res - 1u).toInt())
+        }
     }
 }

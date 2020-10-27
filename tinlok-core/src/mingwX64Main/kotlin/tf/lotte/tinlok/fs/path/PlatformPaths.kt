@@ -12,8 +12,13 @@
 package tf.lotte.tinlok.fs.path
 
 import tf.lotte.cc.Unsafe
+import tf.lotte.cc.exc.FileAlreadyExistsException
 import tf.lotte.cc.types.ByteString
 import tf.lotte.cc.types.b
+import tf.lotte.cc.types.toByteString
+import tf.lotte.tinlok.crypto.SecureRandom
+import tf.lotte.tinlok.system.Syscall
+import tf.lotte.tinlok.util.randomAsciiString
 
 /**
  * Defines the [PurePath] that for the current platform.
@@ -31,29 +36,33 @@ public actual object PlatformPaths {
     /**
      * Creates a new [PurePath] for the current working directory.
      */
+    @OptIn(Unsafe::class)
     public actual fun cwd(): Path {
-        TODO("not implemented")
+        val path = Syscall.GetCurrentDirectory()
+        return WindowsPath.fromByteString(path.toByteString())
     }
 
     /**
      * Creates a new [PurePath] for the current user's home directory.
      */
+    @OptIn(Unsafe::class)
     public actual fun home(): Path {
-        TODO("not implemented")
+        val path = Syscall.ExpandEnvironmentStrings("%userprofile%")
+        return WindowsPath.fromByteString(path.toByteString())
     }
 
     /**
      * Creates a new platform [Path] from the given [ByteString].
      */
     public actual fun path(of: ByteString): Path {
-        TODO("not implemented")
+        return WindowsPath.fromByteString(of)
     }
 
     /**
      * Creates a new platform Path from the given [PurePath].
      */
     public actual fun path(of: PlatformPurePath): Path {
-        TODO("not implemented")
+        return WindowsPath.fromPurePath(of)
     }
 
     /**
@@ -68,7 +77,21 @@ public actual object PlatformPaths {
      */
     @Unsafe
     actual fun makeTempDirectory(prefix: String): Path {
-        TODO("not implemented")
+        val path = path(Syscall.GetTempPath().toByteString())
+
+        // retry loop to try and find an unused random string
+        for (unused in 0..10) {
+            val name = SecureRandom.randomAsciiString(8)
+            val newPath = path.resolveChild(name)
+            try {
+                newPath.createDirectory(parents = false, existOk = false)
+                return newPath
+            } catch (e: FileAlreadyExistsException) {
+                continue
+            }
+        }
+
+        throw Exception("Unable to create a unique temporary directory")
     }
 
 }
