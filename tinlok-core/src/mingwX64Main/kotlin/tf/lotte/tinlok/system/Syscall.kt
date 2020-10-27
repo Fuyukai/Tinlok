@@ -460,6 +460,8 @@ public actual object Syscall {
      */
     @Unsafe
     public fun FindNextFile(context: DirectoryScanContext): DirEntry? = memScoped {
+        requireNotNull(context.handle) { "Must call FindFirstFile before this!" }
+        
         val result = FindNextFileW(context.handle, context.struct.ptr)
         if (result != TRUE) {
             val res = GetLastError().toInt()

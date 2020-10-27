@@ -30,7 +30,7 @@ public class DirectoryScanContext(internal val path: Path) : Closeable {
 
     internal var isOpen: Boolean = false
     internal var isClosed: Boolean = false
-    internal lateinit var handle: HANDLE
+    internal var handle: HANDLE? = null
 
     init {
         ensureNeverFrozen()
@@ -41,7 +41,9 @@ public class DirectoryScanContext(internal val path: Path) : Closeable {
         isClosed = true
         arena.clear()
 
-        Syscall.FindClose(this)
+        if (handle != null) {
+            Syscall.FindClose(this)
+        }
     }
 
     /**
