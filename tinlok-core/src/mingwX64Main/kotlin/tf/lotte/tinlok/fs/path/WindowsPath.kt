@@ -13,7 +13,9 @@ import tf.lotte.cc.Unsafe
 import tf.lotte.cc.exc.FileNotFoundException
 import tf.lotte.cc.types.ByteString
 import tf.lotte.cc.types.toByteString
+import tf.lotte.cc.use
 import tf.lotte.tinlok.fs.*
+import tf.lotte.tinlok.system.DirectoryScanContext
 import tf.lotte.tinlok.system.FileAttributes
 import tf.lotte.tinlok.system.Syscall
 
@@ -140,8 +142,14 @@ internal class WindowsPath(
         Syscall.CreateDirectory(unsafeToString(), existOk)
     }
 
+    @OptIn(Unsafe::class)
     override fun scanDir(block: (DirEntry) -> Unit) {
-        TODO("Not yet implemented")
+        DirectoryScanContext(this).use {
+            while (true) {
+                val next = it.next() ?: break
+                block(next)
+            }
+        }
     }
 
     @Unsafe
@@ -162,8 +170,9 @@ internal class WindowsPath(
         TODO("Not yet implemented")
     }
 
+    @OptIn(Unsafe::class)
     override fun removeDirectory() {
-        TODO("Not yet implemented")
+        Syscall.RemoveDirectory(unsafeToString())
     }
 
     override fun unlink() {

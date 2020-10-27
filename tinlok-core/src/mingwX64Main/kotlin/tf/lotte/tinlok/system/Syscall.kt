@@ -15,6 +15,9 @@ import platform.windows.*
 import tf.lotte.cc.Unsafe
 import tf.lotte.cc.exc.*
 import tf.lotte.tinlok.exc.WindowsException
+import tf.lotte.tinlok.fs.DirEntry
+import tf.lotte.tinlok.fs.FileType
+import tf.lotte.tinlok.fs.path.resolveChild
 import tf.lotte.tinlok.util.utf16ToString
 
 /**
@@ -404,6 +407,66 @@ public actual object Syscall {
             if (err == ERROR_FILE_EXISTS && existOk) return
             else throwErrnoPath(err, path)
         }
+    }
+
+    /**
+     * Removes an empty directory.
+     */
+    @Unsafe
+    public fun RemoveDirectory(path: String) {
+        val result = RemoveDirectoryW(path)
+        if (!SUCCEEDED(result)) {
+            val code = GetLastError().toInt()
+            throwErrnoPath(code, path)
+        }
+    }
+
+    /**
+     * Creates a [DirEntry] from the result of the last FindXFile call.
+     */
+    @Unsafe
+    private fun findFileShared(context: DirectoryScanContext): DirEntry {
+        // copy data into a better object cos the raw struct sucks
+        val name = context.struct.cFileName.toKStringFromUtf16()
+        val subPath = context.path.resolveChild(name)
+
+        // turn the gross bitfield into a nice enumeration
+        val attrs = context.struct.dwFileAttributes.toInt()
+        val type = when {
+            (attrs.and(FILE_ATTRIBUTE_DIRECTORY)) != 0 -> FileType.DIRECTORY
+            (attrs.and(FILE_ATTRIBUTE_REPARSE_POINT)) != 0 -> FileType.SYMLINK  // TODO: Not true~!
+            else -> FileType.REGULAR_FILE
+        }
+
+        return DirEntry(subPath, type)
+    }
+
+    /**
+     * Finds the first file in the specified path.
+     */
+    @Unsafe
+    public fun FindFirstFile(context: DirectoryScanContext): DirEntry? = memScoped {
+        val strPath = context.path.unsafeToString()
+        val result = FindFirstFileW(strPath, context.struct.ptr)
+        if (result == null || result == INVALID_HANDLE_VALUE) {
+            val res = GetLastError().toInt()
+            if (res == ERROR_FILE_NOT_FOUND) return null
+            throwErrnoPath(res, strPath)
+        }
+        context.handle = result
+
+        return findFileShared(context)
+    }
+
+    @Unsafe
+    public fun FindNextFile(context: DirectoryScanContext): DirEntry? = memScoped {
+        val result = FindNextFileW(context.handle, context.struct.ptr)
+        if (!SUCCEEDED(result)) {
+            val res = GetLastError().toInt()
+            if (res == ERROR_NO_MORE_FILES) return null
+        }
+
+        return findFileShared(context)
     }
 
     /**
