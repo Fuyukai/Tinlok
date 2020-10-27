@@ -421,9 +421,8 @@ public actual object Syscall {
      * Creates a [DirEntry] from the result of the last FindXFile call.
      */
     @Unsafe
-    private fun findFileShared(context: DirectoryScanContext): DirEntry {
+    private fun findFileShared(context: DirectoryScanContext, name: String): DirEntry {
         // copy data into a better object cos the raw struct sucks
-        val name = context.struct.cFileName.toKStringFromUtf16()
         val subPath = context.path.resolveChild(name)
 
         // turn the gross bitfield into a nice enumeration
@@ -442,7 +441,9 @@ public actual object Syscall {
      */
     @Unsafe
     public fun FindFirstFile(context: DirectoryScanContext): DirEntry? = memScoped {
-        val strPath = context.path.unsafeToString()
+        var strPath = context.path.unsafeToString()
+        // fix dumb bug wrt scanning directories
+        if (!strPath.endsWith("\\")) strPath += "\\"
         val result = FindFirstFileW(strPath, context.struct.ptr)
         if (result == null || result == INVALID_HANDLE_VALUE) {
             val res = GetLastError().toInt()
@@ -452,7 +453,14 @@ public actual object Syscall {
         context.isOpen = true
         context.handle = result
 
-        return findFileShared(context)
+        // skip over current and parent directory by calling the next file functiion if its that
+        // name
+        val name = context.struct.cFileName.toKStringFromUtf16()
+        if (name == "." || name == "..") {
+            return FindNextFile(context)
+        }
+
+        return findFileShared(context, name)
     }
 
     /**
@@ -470,7 +478,13 @@ public actual object Syscall {
             }
         }
 
-        return findFileShared(context)
+        // see FindFirstFile
+        val name = context.struct.cFileName.toKStringFromUtf16()
+        if (name == "." || name == "..") {
+            return FindNextFile(context)
+        }
+
+        return findFileShared(context, name)
     }
 
     /**
