@@ -175,12 +175,13 @@ internal class WindowsPath(
         Syscall.RemoveDirectory(unsafeToString())
     }
 
+    @OptIn(Unsafe::class)
     override fun unlink() {
-        TODO("Not yet implemented")
+        Syscall.DeleteFile(unsafeToString())
     }
 
     @Unsafe
     override fun unsafeOpen(vararg modes: FileOpenMode): FilesystemFile {
-        return WindowsSyncFile(this, modes as Array<FileOpenMode>)
+        return WindowsSyncFile(this, modes)
     }
 }

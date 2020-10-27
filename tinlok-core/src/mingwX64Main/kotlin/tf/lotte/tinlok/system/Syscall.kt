@@ -560,6 +560,17 @@ public actual object Syscall {
         return writtenCnt.value.toInt()
     }
 
+    /**
+     * Deletes a file.
+     */
+    @Unsafe
+    public fun DeleteFile(path: String) {
+        val res = DeleteFileW(path)
+        if (!SUCCEEDED(res)) {
+            throwErrno()
+        }
+    }
+
     // == Generic stuff == //
     /**
      * Gets the current username.

@@ -26,7 +26,7 @@ import tf.lotte.tinlok.util.AtomicBoolean
 @OptIn(ExperimentalUnsignedTypes::class)
 public class WindowsSyncFile(
     override val path: Path,
-    modes: Array<FileOpenMode>
+    modes: Array<out FileOpenMode>
 ) : FilesystemFile {
     private val handle: HANDLE
 
