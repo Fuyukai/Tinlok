@@ -454,6 +454,7 @@ public actual object Syscall {
             if (res == ERROR_FILE_NOT_FOUND) return null
             throwErrnoPath(res, strPath)
         }
+        context.isOpen = true
         context.handle = result
 
         return findFileShared(context)
