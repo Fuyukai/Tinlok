@@ -69,17 +69,19 @@ public class WindowsSyncFile(
 
     @OptIn(Unsafe::class)
     override fun cursor(): Long {
-        return Syscall.SetFilePointer(handle, 0L, SeekWhence.CURRENT)
+        return Syscall.SetFilePointer(handle, 0, SeekWhence.CURRENT)
     }
 
     @OptIn(Unsafe::class)
     override fun seekAbsolute(position: Long) {
-        Syscall.SetFilePointer(handle, position, SeekWhence.START)
+        // TODO: Reimpl so that this doesn't truncate.
+        Syscall.SetFilePointer(handle, position.toInt(), SeekWhence.START)
     }
 
     @OptIn(Unsafe::class)
     override fun seekRelative(position: Long) {
-        Syscall.SetFilePointer(handle, position, SeekWhence.CURRENT)
+        // TODO: Reimpl so that this doesn't truncate.
+        Syscall.SetFilePointer(handle, position.toInt(), SeekWhence.CURRENT)
     }
 
     @OptIn(Unsafe::class)
