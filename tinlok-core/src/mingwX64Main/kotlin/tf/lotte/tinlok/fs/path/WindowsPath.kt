@@ -125,10 +125,19 @@ internal class WindowsPath(
         TODO("Not yet implemented")
     }
 
+    @OptIn(Unsafe::class)
     override fun createDirectory(
         parents: Boolean, existOk: Boolean, vararg permissions: FilePermission,
     ) {
-        TODO("Not yet implemented")
+        if (parents) {
+            for (parent in allParents().reversed()) {
+                // this should always be correct
+                val p = parent as WindowsPath
+                p.createDirectory(parents = false, existOk = true, *permissions)
+            }
+        }
+
+        Syscall.CreateDirectory(unsafeToString(), existOk)
     }
 
     override fun scanDir(block: (DirEntry) -> Unit) {

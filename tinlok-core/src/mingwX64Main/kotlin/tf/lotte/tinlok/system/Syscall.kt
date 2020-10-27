@@ -393,6 +393,18 @@ public actual object Syscall {
         return handle
     }
 
+    /**
+     * Creates a new directory.
+     */
+    @Unsafe
+    public fun CreateDirectory(path: String, existOk: Boolean = false) {
+        val result = CreateDirectoryW(path, null)
+        if (!SUCCEEDED(result)) {
+            val err = GetLastError().toInt()
+            if (err == ERROR_FILE_EXISTS && existOk) return
+            else throwErrnoPath(err, path)
+        }
+    }
 
     /**
      * Sets the file pointer for a handle. (equiv. to lseek)
