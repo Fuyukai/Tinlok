@@ -21,16 +21,16 @@ public actual object Sys {
     /**
      * Gets an environmental variable named [key].
      */
-    @OptIn(ExperimentalUnsignedTypes::class)
-    actual fun getenv(key: String): String? {
-
+    @OptIn(ExperimentalUnsignedTypes::class, Unsafe::class)
+    public actual fun getenv(key: String): String? {
+        return Syscall.GetEnvironmentVariable(key)
     }
 
     /**
      * Gets the current process ID.
      */
     @OptIn(ExperimentalUnsignedTypes::class)
-    actual fun getPID(): UInt {
+    public actual fun getPID(): UInt {
         return GetCurrentProcessId()
     }
 
@@ -38,10 +38,10 @@ public actual object Sys {
      * Gets the current username of the user running this application.
      */
     @OptIn(ExperimentalUnsignedTypes::class, Unsafe::class)
-    actual fun getUsername(): String? = Syscall.GetUserName()
+    public actual fun getUsername(): String? = Syscall.GetUserName()
 
     /** Information object about the current OS. */
-    actual val osInfo: OsInfo = object : OsInfo {
+    public actual val osInfo: OsInfo = object : OsInfo {
         override val isLinux: Boolean get() = false
         override val isMacOs: Boolean get() = false
         override val isPosix: Boolean get() = true

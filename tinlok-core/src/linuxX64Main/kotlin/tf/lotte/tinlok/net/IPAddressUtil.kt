@@ -10,7 +10,6 @@
 package tf.lotte.tinlok.net
 
 import kotlinx.cinterop.*
-import platform.posix.INET6_ADDRSTRLEN
 import tf.lotte.cc.Unsafe
 import tf.lotte.tinlok.interop.ipv6.ipv6_address_full_t
 import tf.lotte.tinlok.interop.ipv6.ipv6_from_str
@@ -19,6 +18,9 @@ import tf.lotte.tinlok.interop.ipv6.ipv6_to_str
 // DON'T FUCKING TOUCH
 // ON THREAT OF DEATH
 // This gave me about an hour of debugging!!!
+
+// not defined on windows
+internal const val INET6_ADDRSTRLEN: Int = 46
 
 /**
  * Implements IPv6 parsing using ipv6-parse C library.
