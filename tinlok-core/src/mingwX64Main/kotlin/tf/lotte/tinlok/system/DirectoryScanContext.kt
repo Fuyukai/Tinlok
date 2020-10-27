@@ -15,6 +15,7 @@ import platform.windows.HANDLE
 import platform.windows.WIN32_FIND_DATAW
 import tf.lotte.cc.Closeable
 import tf.lotte.cc.Unsafe
+import tf.lotte.cc.exc.ClosedException
 import tf.lotte.tinlok.fs.DirEntry
 import tf.lotte.tinlok.fs.path.Path
 import kotlin.native.concurrent.ensureNeverFrozen
@@ -28,6 +29,7 @@ public class DirectoryScanContext(internal val path: Path) : Closeable {
     internal val struct = arena.alloc<WIN32_FIND_DATAW>()
 
     internal var isOpen: Boolean = false
+    internal var isClosed: Boolean = true
     internal lateinit var handle: HANDLE
 
     init {
@@ -35,14 +37,19 @@ public class DirectoryScanContext(internal val path: Path) : Closeable {
     }
 
     override fun close() {
+        if (isClosed) return
+        isClosed = true
         arena.clear()
-        Syscall.CloseHandle(handle)
+
+        Syscall.FindClose(this)
     }
 
     /**
      * Gets the next [DirEntry] for this context.
      */
     public fun next(): DirEntry? {
+        if (isClosed) throw ClosedException("This context is closed")
+
         return if (!isOpen) {
             Syscall.FindFirstFile(this)
         } else {

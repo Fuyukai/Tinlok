@@ -455,6 +455,9 @@ public actual object Syscall {
         return findFileShared(context)
     }
 
+    /**
+     * Gets the next file for the current [DirectoryScanContext].
+     */
     @Unsafe
     public fun FindNextFile(context: DirectoryScanContext): DirEntry? = memScoped {
         val result = FindNextFileW(context.handle, context.struct.ptr)
@@ -466,6 +469,17 @@ public actual object Syscall {
         }
 
         return findFileShared(context)
+    }
+
+    /**
+     * Closes the specified scan context.
+     */
+    @Unsafe
+    public fun FindClose(context: DirectoryScanContext) {
+        val res = FindClose(context.handle)
+        if (res != TRUE) {
+            throwErrno()
+        }
     }
 
     /**
