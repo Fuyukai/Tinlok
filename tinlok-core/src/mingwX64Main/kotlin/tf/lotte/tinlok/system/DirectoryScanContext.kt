@@ -29,7 +29,7 @@ public class DirectoryScanContext(internal val path: Path) : Closeable {
     internal val struct = arena.alloc<WIN32_FIND_DATAW>()
 
     internal var isOpen: Boolean = false
-    internal var isClosed: Boolean = true
+    internal var isClosed: Boolean = false
     internal lateinit var handle: HANDLE
 
     init {
