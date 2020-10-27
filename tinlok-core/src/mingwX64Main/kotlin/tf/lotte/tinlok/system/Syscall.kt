@@ -381,7 +381,8 @@ public actual object Syscall {
         flagsAttributes: Int,
     ): HANDLE {
         val handle = CreateFileW(
-            path, desiredAccess.toUInt(),
+            path,
+            desiredAccess.toUInt(),
             FILE_SHARE_VALID_FLAGS,
             null,
             creationMode.toUInt(),

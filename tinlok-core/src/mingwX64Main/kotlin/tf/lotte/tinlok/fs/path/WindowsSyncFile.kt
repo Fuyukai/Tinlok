@@ -45,7 +45,7 @@ public class WindowsSyncFile(
         val creationFlag = when {
             modes.contains(CREATE) -> OPEN_ALWAYS
             modes.contains(CREATE_NEW) -> platform.windows.CREATE_NEW
-            else -> 0
+            else -> OPEN_EXISTING
         }
 
         @OptIn(Unsafe::class)

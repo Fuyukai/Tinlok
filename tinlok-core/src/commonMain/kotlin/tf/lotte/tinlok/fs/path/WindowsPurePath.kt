@@ -142,7 +142,7 @@ public open class WindowsPurePath protected constructor(
         ): Triple<ByteString?, ByteString?, List<ByteString>> {
             if (bs.substring(1, 3) == DRIVE_SEP) {
                 // path one: absolute path, with drive letter
-                val anchor = ByteString.fromUncopied(byteArrayOf(bs[0]))
+                val anchor = ByteString.fromUncopied(byteArrayOf(bs[0], bs[1]))
                 // some weird paths may use the C:\\ form, even though that hasn't been needed in
                 // years
 
