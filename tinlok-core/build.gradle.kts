@@ -34,11 +34,55 @@ kotlin {
         }
     }
 
+    mingwX64() {
+        val mingwX64Main by sourceSets.getting {
+            dependencies {
+                implementation(project(":tinlok-static-ipv6"))
+                implementation(project(":tinlok-static-monocypher"))
+            }
+        }
+    }
+
     sourceSets.commonMain {
         dependencies {
             api(project(":copperchain"))
         }
     }
+}
+
+// commonizer hack
+tasks.register("copyCommonCBindings") {
+    copy {
+        from(
+            "src/linuxX64Main/kotlin/tf/lotte/tinlok/crypto/Blake2b.kt",
+            "src/linuxX64Main/kotlin/tf/lotte/tinlok/crypto/Argon2i.kt",
+            "src/linuxX64Main/kotlin/tf/lotte/tinlok/crypto/CryptoLLA.kt"
+        )
+        into("src/linuxArm64Main/kotlin/tf/lotte/tinlok/crypto")
+    }
+
+    copy {
+        from(
+            "src/linuxX64Main/kotlin/tf/lotte/tinlok/crypto/Blake2b.kt",
+            "src/linuxX64Main/kotlin/tf/lotte/tinlok/crypto/Argon2i.kt",
+            "src/linuxX64Main/kotlin/tf/lotte/tinlok/crypto/CryptoLLA.kt"
+        )
+        into("src/mingwX64Main/kotlin/tf/lotte/tinlok/crypto")
+    }
+
+    copy {
+        from("src/linuxX64Main/kotlin/tf/lotte/tinlok/net/IPAddressUtil.kt")
+        into("src/linuxArm64Main/kotlin/tf/lotte/tinlok/net/")
+    }
+
+    copy {
+        from("src/linuxX64Main/kotlin/tf/lotte/tinlok/net/IPAddressUtil.kt")
+        into("src/mingwX64Main/kotlin/tf/lotte/tinlok/net/")
+    }
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile> {
+    dependsOn(tasks.named("copyCommonCBindings"))
 }
 
 publishing {

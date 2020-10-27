@@ -25,7 +25,6 @@ public actual interface Closeable {
     public actual fun close()
 }
 
-
 @OptIn(ExperimentalContracts::class)
 public actual inline fun <T : Closeable, R> T.use(block: (T) -> R): R {
     contract {
