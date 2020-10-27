@@ -34,7 +34,7 @@ internal class LinuxTcpSocket(
     }
 
     @OptIn(Unsafe::class)
-    override fun readInto(buf: ByteArray, offset: Int, bytes: Int): Int {
+    override fun readInto(buf: ByteArray, offset: Int, size: Int): Int {
         if (!isOpen.value) throw ClosedException("This socket is closed")
         return Syscall.recv(fd, buffer = buf, offset = offset)
     }

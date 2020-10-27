@@ -76,7 +76,7 @@ public actual object PlatformPaths {
      * Creates a new temporary directory and returns its path.
      */
     @Unsafe
-    actual fun makeTempDirectory(prefix: String): Path {
+    public actual fun makeTempDirectory(prefix: String): Path {
         val path = path(Syscall.GetTempPath().toByteString())
 
         // retry loop to try and find an unused random string
