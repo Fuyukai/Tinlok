@@ -473,18 +473,35 @@ public actual object Syscall {
      * Sets the file pointer for a handle. (equiv. to lseek)
      */
     @Unsafe
-    public fun SetFilePointer(handle: HANDLE, count: Long, whence: SeekWhence): Long = memScoped {
-        val out = alloc<LARGE_INTEGER>()
-        val i = cValue<LARGE_INTEGER> {
-            QuadPart = count
+    public fun SetFilePointer(handle: HANDLE, count: Int, whence: SeekWhence): Long = memScoped {
+        // ECH
+        val result = platform.windows.SetFilePointer(
+            handle,
+            count,
+            null,
+            whence.number.toUInt()
+        )
+
+        run {
+            val err = GetLastError().toInt()
+            if (result == INVALID_SET_FILE_POINTER && err != NO_ERROR) {
+                throwErrno(err)
+            }
         }
 
-        val res = SetFilePointerEx(handle, i, out.ptr, whence.number.toUInt())
-        if (!SUCCEEDED(res)) {
-            throwErrno()
+        // now get the current address
+        val higher = alloc<IntVar>()
+        val result2 = platform.windows.SetFilePointer(
+            handle, 0, higher.ptr,
+            FILE_CURRENT.toUInt()
+        )
+
+        val err = GetLastError().toInt()
+        if (result2 == INVALID_SET_FILE_POINTER && err != NO_ERROR) {
+            throwErrno(err)
         }
 
-        return out.QuadPart
+        return (higher.value.toLong().shl(32)).or(result2.toLong())
     }
 
     /**
