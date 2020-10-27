@@ -345,7 +345,7 @@ public actual object Syscall {
             // recursive call is basically a retry loop, in case it got longer
             res > size -> GetCurrentDirectory()
             // no \0 !
-            else -> buf.utf16ToString(size.toInt())
+            else -> buf.utf16ToString(res.toInt())
         }
     }
 
@@ -366,7 +366,7 @@ public actual object Syscall {
             res == 0u -> throwErrno()
             res > size -> throw Error("GetTempPathW lied")
             // no trailing null
-            else -> buf.utf16ToString(size.toInt())
+            else -> buf.utf16ToString(res.toInt())
         }
     }
 
