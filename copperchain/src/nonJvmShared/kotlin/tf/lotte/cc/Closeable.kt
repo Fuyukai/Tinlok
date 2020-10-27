@@ -9,6 +9,10 @@
 
 package tf.lotte.cc
 
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
+
 /**
  * Represents any object that is closeable.
  */
@@ -20,3 +24,18 @@ public actual interface Closeable {
      */
     public actual fun close()
 }
+
+
+@OptIn(ExperimentalContracts::class)
+public actual inline fun <T : Closeable, R> T.use(block: (T) -> R): R {
+    contract {
+        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+    }
+
+    try {
+        return block(this)
+    } finally {
+        close()
+    }
+}
+

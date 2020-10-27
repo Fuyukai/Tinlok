@@ -11,5 +11,22 @@
 @file:JvmName("__CloseableKt")
 package tf.lotte.cc
 
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
+
 // simple typealias for AutoCloseable, as it has the same semantics
 public actual typealias Closeable = AutoCloseable
+
+@OptIn(ExperimentalContracts::class)
+public actual inline fun <T : Closeable, R> T.use(block: (T) -> R): R {
+    contract {
+        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+    }
+
+    try {
+        return block(this)
+    } finally {
+        close()
+    }
+}

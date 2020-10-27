@@ -9,10 +9,6 @@
 
 package tf.lotte.cc
 
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.InvocationKind
-import kotlin.contracts.contract
-
 /**
  * Represents any object that is closeable.
  */
@@ -29,15 +25,4 @@ public expect interface Closeable {
  * Using the specified [Closeable], runs the lambda [block] and automatically closes the object
  * afterwards.
  */
-@OptIn(ExperimentalContracts::class)
-public inline fun <T : Closeable, R> T.use(block: (T) -> R): R {
-    contract {
-        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
-    }
-
-    try {
-        return block(this)
-    } finally {
-        close()
-    }
-}
+public expect inline fun <T: Closeable, R> T.use(block: (T) -> R): R
