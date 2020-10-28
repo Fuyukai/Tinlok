@@ -39,7 +39,7 @@ public constructor(
  */
 public open class FileNotFoundException
 constructor(
-    public  val path: String,
+    public val path: String,
     cause: Throwable?
 ) : OSException(message = "File not found: $path", cause = cause) {
     public constructor(path: String) : this(path, null)
@@ -51,9 +51,20 @@ constructor(
  */
 public open class IsADirectoryException
 constructor(
-    public  val path: String,
+    public val path: String,
     cause: Throwable?
 ) : OSException(message = "Is a directory: $path", cause = cause) {
+    public constructor(path: String) : this(path, null)
+}
+
+/**
+ * Thrown when a path is a directory and it is not empty.
+ */
+public open class DirectoryNotEmptyException
+constructor(
+    public val path: String,
+    cause: Throwable?
+) : OSException(message = "Directory not empty: $path", cause = cause) {
     public constructor(path: String) : this(path, null)
 }
 

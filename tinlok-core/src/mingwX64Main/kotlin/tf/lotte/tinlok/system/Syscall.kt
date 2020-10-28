@@ -87,7 +87,7 @@ public actual object Syscall {
      */
     @OptIn(ExperimentalUnsignedTypes::class)
     @Unsafe
-    public fun FormatMessage(code: Int): String {
+    public fun FormatMessage(code: Int): String = memScoped {
         // NB: we manually free because windows allocates it and I don't think K/N will
         // deallocate it properly. I might be wrong about that, but this code is correct no
         // matter what.
@@ -96,27 +96,18 @@ public actual object Syscall {
             .or(FORMAT_MESSAGE_IGNORE_INSERTS).toUInt()
 
         // scary!
-        val ptr = nativeHeap.alloc<LPWSTRVar>()
+        val ptr = alloc<LPWSTRVar>()
 
-        val result = try {
-            FormatMessageW(
-                flags, null, code.toUInt(),
-                0,  // default language according to MSDN
-                ptr.ptr.reinterpret(), 0, null
-            )
-        } catch (e: Throwable) {
-            // just in case toUInt/reinterpret throws... (maybe in the future?)
-            HeapFree(GetProcessHeap(), 0, ptr.ptr)
-            throw e
-        }
+        val result = FormatMessageW(
+            flags, null, code.toUInt(),
+            0,  // default language according to MSDN
+            ptr.ptr.reinterpret(), 0, null
+        )
 
         if (result == 0U) {
-            HeapFree(GetProcessHeap(), 0, ptr.ptr)
             throw Error("FormatMessageW failed!")
         } else {
-            val data = ptr.value?.toKStringFromUtf16() ?: "Unknown error"
-            HeapFree(GetProcessHeap(), 0, ptr.ptr)
-            return data
+            return ptr.value?.toKStringFromUtf16() ?: "Unknown error"
         }
     }
 
@@ -159,6 +150,7 @@ public actual object Syscall {
         throw when (code) {
             ERROR_FILE_NOT_FOUND, ERROR_PATH_NOT_FOUND -> FileNotFoundException(path)
             ERROR_FILE_EXISTS -> FileAlreadyExistsException(path)
+            ERROR_DIR_NOT_EMPTY -> DirectoryNotEmptyException(path)
 
             ERROR_INVALID_NAME -> IllegalArgumentException("Invalid name: $path")
 
