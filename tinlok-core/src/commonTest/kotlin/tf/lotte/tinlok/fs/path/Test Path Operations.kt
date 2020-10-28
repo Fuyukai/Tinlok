@@ -29,7 +29,7 @@ class `Test Path Operations` {
     }
 
     @Test
-    fun `Test mkdir`() = Path.makeTempDirectory("Tinlok-test-") {
+    fun `Test mkdir`(): Unit = Path.makeTempDirectory("Tinlok-test-") {
         val newPath = it.resolveChild("mkdir-test")
         newPath.createDirectory(parents = false, existOk = false)
 
@@ -38,14 +38,13 @@ class `Test Path Operations` {
     }
 
     @Test
-    fun `Test owner`() = Path.makeTempDirectory("Tinlok-test-") {
+    fun `Test owner`(): Unit = Path.makeTempDirectory("Tinlok-test-") {
         val username = Sys.getUsername()
         assertEquals(it.owner(), username)
     }
 
-
     @Test
-    fun `Test stat`() = Path.makeTempDirectory("Tinlok-test-") {
+    fun `Test stat`(): Unit = Path.makeTempDirectory("Tinlok-test-") {
         assertTrue(it.isDirectory())
         assertFalse(it.isRegularFile())
 
@@ -73,7 +72,7 @@ class `Test Path Operations` {
 
     @OptIn(Unsafe::class)
     @Test
-    fun `Test rename`() = Path.makeTempDirectory("Tinlok-test-") {
+    fun `Test rename`(): Unit = Path.makeTempDirectory("Tinlok-test-") {
         val first = it.resolveChild("test1.txt")
         val second = it.resolveChild("test2.txt")
 
@@ -92,7 +91,7 @@ class `Test Path Operations` {
     }
 
     @Test
-    fun `Test copy`() = Path.makeTempDirectory("Tinlok-test-") {
+    fun `Test copy`(): Unit = Path.makeTempDirectory("Tinlok-test-") {
         val first = it.resolveChild("test1.txt")
         val second = it.resolveChild("test2.txt")
 
@@ -106,7 +105,7 @@ class `Test Path Operations` {
     }
 
     @Test
-    fun `Test symlink`() = Path.makeTempDirectory("Tinlok-test-") {
+    fun `Test symlink`(): Unit = Path.makeTempDirectory("Tinlok-test-") {
         val first = it.resolveChild("test1.txt")
         // continuation indents are possiibly the dumbest form of kotlin formatting
         // big personal fuck you to whoever made those part of the formatting
@@ -125,6 +124,23 @@ class `Test Path Operations` {
 
         val read = second.readAllBytes()
         assertEquals(read, toWrite)
+    }
+
+    /**
+     * Tests listing files in a directory.
+     */
+    @OptIn(Unsafe::class)
+    @Test
+    fun `Test scandir/listdir`(): Unit = Path.makeTempDirectory("Tinlok-test-") { parent ->
+        // this is implicitly done with the recursiveDelete used all up here
+        // but given my struggles with it on Win32, I figured I should add its own test too.
+        parent.resolveChild("one.txt").touch()
+        parent.resolveChild("two.txt").touch()
+
+        val files = parent.listDir()
+        assertEquals(2, files.size)
+        val one = files.find { it.path.name == "one.txt" }
+        assertNotNull(one)
     }
 
 }

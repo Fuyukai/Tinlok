@@ -11,6 +11,7 @@ package tf.lotte.tinlok.fs.path
 
 import tf.lotte.cc.Unsafe
 import tf.lotte.cc.exc.FileNotFoundException
+import tf.lotte.cc.exc.IsADirectoryException
 import tf.lotte.cc.types.ByteString
 import tf.lotte.cc.types.toByteString
 import tf.lotte.cc.use
@@ -160,7 +161,9 @@ internal class WindowsPath(
 
     @Unsafe
     override fun rename(path: PurePath): Path {
-        TODO("Not yet implemented")
+        require(path is WindowsPurePath) { "Can only rename to a Windows path!" }
+        Syscall.MoveFile(unsafeToString(), path.unsafeToString())
+        return fromPurePath(path)
     }
 
     override fun isSafeToRename(path: Path): Boolean {
@@ -188,6 +191,9 @@ internal class WindowsPath(
 
     @Unsafe
     override fun unsafeOpen(vararg modes: FileOpenMode): FilesystemFile {
+        if (isDirectory(followSymlinks = true)) {
+            throw IsADirectoryException(unsafeToString())
+        }
         return WindowsSyncFile(this, modes)
     }
 }

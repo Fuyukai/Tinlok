@@ -281,7 +281,7 @@ public actual object Syscall {
         )
 
         if (size == 0u) {
-            CloseHandle(handle);
+            CloseHandle(handle)
             throwErrnoPath(GetLastError().toInt(), path)
         }
 
@@ -596,6 +596,17 @@ public actual object Syscall {
     @Unsafe
     public fun DeleteFile(path: String) {
         val res = DeleteFileW(path)
+        if (res != TRUE) {
+            throwErrno()
+        }
+    }
+
+    /**
+     * Moves a file from its original path to the destination path.
+     */
+    @Unsafe
+    public fun MoveFile(from: String, to: String) {
+        val res = MoveFileW(from, to)
         if (res != TRUE) {
             throwErrno()
         }
