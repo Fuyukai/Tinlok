@@ -97,4 +97,27 @@ class `Test Path Extensions` {
 
         Unit
     }
+
+    /**
+     * Ensures makeTempDirectory works properly.
+     */
+    @Test
+    fun `Test makeTempDirectory`() {
+        Path.makeTempDirectory("Tinlok-test-") { one ->
+            assertTrue(one.exists())
+            val name1 = one.name
+            assertNotNull(name1)
+            assertTrue(name1.startsWith("Tinlok-test-"))
+
+            // nested because it fine for two to have the same namee when one is deleted
+            Path.makeTempDirectory("Tinlok-test-") { two ->
+                assertTrue(two.exists())
+                val name2 = two.name
+                assertNotNull(name2)
+                assertTrue(name2.startsWith("Tinlok-test-"))
+                assertNotEquals(name1, name2)
+            }
+        }
+
+    }
 }

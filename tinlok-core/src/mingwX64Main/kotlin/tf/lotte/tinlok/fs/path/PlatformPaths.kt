@@ -81,7 +81,7 @@ public actual object PlatformPaths {
 
         // retry loop to try and find an unused random string
         for (unused in 0..10) {
-            val name = SecureRandom.randomAsciiString(8)
+            val name = prefix + SecureRandom.randomAsciiString(8)
             val newPath = path.resolveChild(name)
             try {
                 newPath.createDirectory(parents = false, existOk = false)
