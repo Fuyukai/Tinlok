@@ -435,7 +435,8 @@ public actual object Syscall {
     public fun FindFirstFile(context: DirectoryScanContext): DirEntry? = memScoped {
         var strPath = context.path.unsafeToString()
         // fix dumb bug wrt scanning directories
-        if (!strPath.endsWith("\\")) strPath += "\\"
+        if (!strPath.endsWith("\\*")) strPath += "\\*"
+
         val result = FindFirstFileW(strPath, context.struct.ptr)
         if (result == null || result == INVALID_HANDLE_VALUE) {
             val res = GetLastError().toInt()
