@@ -73,8 +73,14 @@ internal class WindowsPath(
     @Unsafe
     private fun getAttributesSafe(followSymlinks: Boolean): FileAttributes? {
         return if (followSymlinks) {
-            val realPath = Syscall.__symlink_real_path(unsafeToString()) ?: return null
-            Syscall.__get_attributes_safer(realPath)
+            val realPath = Syscall.__real_path(unsafeToString())
+
+            // weird, gross, ew
+            if (realPath == null) {
+                Syscall.__get_attributes_safer(unsafeToString())
+            } else {
+                Syscall.__get_attributes_safer(realPath)
+            }
         } else {
             Syscall.__get_attributes_safer(unsafeToString())
         }
@@ -103,7 +109,7 @@ internal class WindowsPath(
     @OptIn(Unsafe::class)
     override fun linkTarget(): WindowsPath? {
         if (!isLink()) return null
-        val target = Syscall.__symlink_real_path(unsafeToString()) ?: return null
+        val target = Syscall.__real_path(unsafeToString()) ?: return null
         val (letter, volume, rest) = parsePath(target.toByteString())
 
         return WindowsPath(letter, volume, rest)

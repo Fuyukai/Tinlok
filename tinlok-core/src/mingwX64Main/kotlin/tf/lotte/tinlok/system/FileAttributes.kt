@@ -34,7 +34,7 @@ public constructor(
     public val isDirectory: Boolean get() = (attributes.and(FILE_ATTRIBUTE_DIRECTORY)) != 0
 
     /** If this file is a symbolic link. */
-    public val isSymlink: Boolean get() = (attributes.and(FILE_ATTRIBUTE_REPARSE_POINT)) == 0
+    public val isSymlink: Boolean get() = (attributes.and(FILE_ATTRIBUTE_REPARSE_POINT)) != 0
 
     /** If this file is just a regular file. */
     public val isRegularFile: Boolean get() {

@@ -251,7 +251,11 @@ public actual object Syscall {
      */
     @OptIn(ExperimentalUnsignedTypes::class)
     @Unsafe
-    public fun __symlink_real_path(path: String): String? {
+    public fun __real_path(path: String): String? {
+        // gross extra FileAttributesW call, but oh well
+        val attributes = __get_attributes_safer(path) ?: return null
+        if (!attributes.isSymlink) return path
+
         val handle = CreateFileW(
             path,
             GENERIC_READ,
@@ -263,6 +267,7 @@ public actual object Syscall {
         )
 
         if (handle == null || handle == INVALID_HANDLE_VALUE) {
+            println("CreateFileW failed")
             val err = GetLastError().toInt()
             // not found means that the symlink points to somewhere invalid
             // so we just ignore it.
@@ -275,7 +280,10 @@ public actual object Syscall {
             handle, null, 0, FILE_NAME_NORMALIZED
         )
 
-        if (size == 0u) { CloseHandle(handle); throwErrnoPath(GetLastError().toInt(), path)}
+        if (size == 0u) {
+            CloseHandle(handle);
+            throwErrnoPath(GetLastError().toInt(), path)
+        }
 
         // actually do the read instead of torturing win32
         val buf = UShortArray(size.toInt())
