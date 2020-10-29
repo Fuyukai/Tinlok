@@ -111,7 +111,6 @@ internal class WindowsPath(
     override fun linkTarget(): WindowsPath? {
         if (!isLink()) return null
         val target = Syscall.__real_path(unsafeToString()) ?: return null
-        println("link target: $target")
         val (letter, volume, rest) = parsePath(target.toByteString())
 
         return WindowsPath(letter, volume, rest)
@@ -119,10 +118,9 @@ internal class WindowsPath(
 
     @OptIn(Unsafe::class)
     override fun resolveFully(strict: Boolean): WindowsPath {
-        if (isAbsolute) return this
+        val realPath = Syscall.__real_path(unsafeToString())
+        val strpath = realPath ?: Syscall.GetFullPathName(unsafeToString())
 
-
-        val strpath = Syscall.GetFullPathName(unsafeToString())
         val (letter, volume, rest) = parsePath(strpath.toByteString())
         val path = WindowsPath(letter, volume, rest)
 
