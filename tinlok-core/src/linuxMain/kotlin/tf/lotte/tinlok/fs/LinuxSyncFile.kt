@@ -98,7 +98,7 @@ internal class LinuxSyncFile(
         if (!isOpen.value) throw ClosedException("This file is closed")
 
         // get the correct size for symlinks
-        val realPath = path.toAbsolutePath(strict = true)
+        val realPath = path.resolveFully(strict = true)
         val size = realPath.size() - cursor()
         if (size >= Syscall.IO_MAX) {
             throw UnsupportedOperationException("File is too big to read in one go currently")

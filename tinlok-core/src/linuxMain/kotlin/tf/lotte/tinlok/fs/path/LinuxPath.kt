@@ -125,9 +125,9 @@ internal class LinuxPath(rawParts: List<ByteString>) : Path, PosixPurePath(rawPa
     }
 
     @OptIn(Unsafe::class)
-    override fun toAbsolutePath(strict: Boolean): Path {
+    override fun resolveFully(strict: Boolean): Path {
         if (!strict) TODO("Pure-Kotlin resolving")
-        val realPath = memScoped { Syscall.realpath(this, unsafeToString()) }
+        val realPath = Syscall.realpath(unsafeToString())
         return LinuxPath(splitParts(realPath))
     }
 

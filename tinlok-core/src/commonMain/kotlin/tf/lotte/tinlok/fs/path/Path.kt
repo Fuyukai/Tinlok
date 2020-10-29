@@ -88,12 +88,12 @@ public interface Path : PurePath {
 
     // See: pathlib.Path.resolve()
     /**
-     * Resolves a path into an absolute path, returning the new resolved path.
+     * Resolves a path into an absolute path, following symlinks, returning the new resolved path.
      *
      * If [strict] is true, the path must exist and [FileNotFoundException] will be raised if it
      * is not. If [strict] is false, the path will be resolved as far as possible.
      */
-    public fun toAbsolutePath(strict: Boolean = true): Path
+    public fun resolveFully(strict: Boolean = true): Path
 
     /**
      * Gets the owner username for this file, or null if this file doesn't have an owner (some

@@ -122,7 +122,7 @@ public fun Path.recursiveCopy(to: Path) {
     // TODO: This can error falsely if the directory is deleted between the exists() and
     //  isDirectory check.
 
-    val fromAbsolute = this.toAbsolutePath(strict = true)
+    val fromAbsolute = this.resolveFully(strict = true)
     // this is reversed because the paths are in nested to unnested order, whereas we need
     // to make them in the opposite order
     val allPaths = fromAbsolute.flattenTree().asReversed()
@@ -255,7 +255,7 @@ public fun Path.writeBytes(bs: ByteString, atomic: Boolean = true) {
             }
 
             // resolve through symlinks
-            this.toAbsolutePath(strict = true)
+            this.resolveFully(strict = true)
         } else this
 
         val tempName = realPath.withName(rawName!! + TEMP_SUFFIX)

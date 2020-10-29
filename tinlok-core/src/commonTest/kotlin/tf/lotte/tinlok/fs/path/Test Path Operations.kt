@@ -120,7 +120,7 @@ class `Test Path Operations` {
         second.symlinkTo(first)
         assertTrue(second.exists())
         assertTrue(second.isLink())
-        assertEquals(second.toAbsolutePath(strict = true), first.toAbsolutePath(strict = true))
+        assertEquals(second.resolveFully(strict = true), first.resolveFully(strict = true))
 
         val read = second.readAllBytes()
         assertEquals(read, toWrite)

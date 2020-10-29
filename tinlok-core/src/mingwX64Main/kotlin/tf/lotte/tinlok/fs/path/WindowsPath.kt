@@ -118,8 +118,10 @@ internal class WindowsPath(
     }
 
     @OptIn(Unsafe::class)
-    override fun toAbsolutePath(strict: Boolean): WindowsPath {
+    override fun resolveFully(strict: Boolean): WindowsPath {
         if (isAbsolute) return this
+
+
         val strpath = Syscall.GetFullPathName(unsafeToString())
         val (letter, volume, rest) = parsePath(strpath.toByteString())
         val path = WindowsPath(letter, volume, rest)

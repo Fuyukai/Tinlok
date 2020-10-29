@@ -58,7 +58,7 @@ class `Test Path Extensions` {
             val p = resolveChild("one.txt").also { one ->
                 one.writeString("one!")
             }
-            resolveChild("two.txt").symlinkTo(p.toAbsolutePath())
+            resolveChild("two.txt").symlinkTo(p.resolveFully())
         }
 
         val copyTo = it.resolveChild("parent2")

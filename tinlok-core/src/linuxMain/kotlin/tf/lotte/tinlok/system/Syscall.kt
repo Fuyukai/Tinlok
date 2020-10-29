@@ -475,8 +475,8 @@ public actual object Syscall {
      */
     @Suppress("FoldInitializerAndIfToElvis")
     @Unsafe
-    public fun realpath(alloc: NativePlacement, path: String): ByteString {
-        val buffer = alloc.allocArray<ByteVar>(PATH_MAX)
+    public fun realpath( path: String): ByteString = memScoped {
+        val buffer = allocArray<ByteVar>(PATH_MAX)
         val res = realpath(path, buffer)
         if (res == null) {
             throwErrnoPath(errno, path)
