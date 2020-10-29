@@ -75,7 +75,7 @@ class `Test Path Extensions` {
     }
 
     @Test
-    fun `Test writeAll`() = Path.makeTempDirectory("Tinlok-test-") {
+    fun `Test writeAll`(): Unit = Path.makeTempDirectory("Tinlok-test-") {
         // ensure atomic writes work properly
         val fileA = it.resolveChild("fileA")
         fileA.writeString("test!", atomic = true)
@@ -94,8 +94,6 @@ class `Test Path Extensions` {
         assertFailsWith<IsADirectoryException> {
             fileB.writeString("failure!", atomic = true)
         }
-
-        Unit
     }
 
     /**

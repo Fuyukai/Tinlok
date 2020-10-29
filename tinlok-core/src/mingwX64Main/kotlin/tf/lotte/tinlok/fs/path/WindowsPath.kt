@@ -111,6 +111,7 @@ internal class WindowsPath(
     override fun linkTarget(): WindowsPath? {
         if (!isLink()) return null
         val target = Syscall.__real_path(unsafeToString()) ?: return null
+        println("link target: $target")
         val (letter, volume, rest) = parsePath(target.toByteString())
 
         return WindowsPath(letter, volume, rest)
@@ -159,7 +160,7 @@ internal class WindowsPath(
         }
     }
 
-    @Unsafe
+    @OptIn(Unsafe::class)
     override fun rename(path: PurePath): Path {
         require(path is WindowsPurePath) { "Can only rename to a Windows path!" }
         Syscall.MoveFile(unsafeToString(), path.unsafeToString())
@@ -171,12 +172,16 @@ internal class WindowsPath(
         return true
     }
 
+    @OptIn(Unsafe::class)
     override fun copyFile(path: PurePath): Path {
-        TODO("Not yet implemented")
+        require(path is WindowsPurePath) { "Can only copy to a Windows path!" }
+        Syscall.CopyFile(unsafeToString(), path.unsafeToString(), true)
+        return fromPurePath(path)
     }
 
+    @OptIn(Unsafe::class)
     override fun symlinkTo(path: Path) {
-        TODO("Not yet implemented")
+        Syscall.CreateSymbolicLink(unsafeToString(), path.unsafeToString())
     }
 
     @OptIn(Unsafe::class)

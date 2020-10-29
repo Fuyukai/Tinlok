@@ -25,6 +25,7 @@ public open class WindowsPurePath protected constructor(
         protected const val ALTSEP: Byte = '/'.toByte()
         protected val DRIVE_SEP: ByteString = b(":\\")
         protected val UNC_SEP: ByteString = b("\\\\")
+        protected val LONGPATH: ByteString = b("\\\\?\\")
         protected val ILLEGAL: Set<Byte> = listOf(
             '<', '>', ':', '"', '|', '?', '*', '\\', '/'
         ).mapTo(mutableSetOf()) { it.toByte() }
@@ -119,7 +120,7 @@ public open class WindowsPurePath protected constructor(
             var foundFirst = false
             while (true) {
                 // EOF, just assume this is entirely anchor
-                if (path.size >= cursor) {
+                if (cursor >= path.size) {
                     return path.size
                 }
 
@@ -140,28 +141,35 @@ public open class WindowsPurePath protected constructor(
         protected fun parsePath(
             bs: ByteString
         ): Triple<ByteString?, ByteString?, List<ByteString>> {
-            if (bs.substring(1, 3) == DRIVE_SEP) {
+            // strip \\?\ returned by various W functions
+            val realPath = if (bs.startsWith(LONGPATH)) {
+                bs.substring(4, bs.size)
+            } else {
+                bs
+            }
+
+            if (realPath.substring(1, 3) == DRIVE_SEP) {
                 // path one: absolute path, with drive letter
-                val anchor = ByteString.fromUncopied(byteArrayOf(bs[0], bs[1]))
+                val anchor = ByteString.fromUncopied(byteArrayOf(realPath[0], realPath[1]))
                 // some weird paths may use the C:\\ form, even though that hasn't been needed in
                 // years
 
-                val sub = if (bs.size >= 4 && bs[3] == '\\'.toByte()) {
-                    bs.substring(4, bs.size)
-                } else bs.substring(3, bs.size)
+                val sub = if (realPath.size >= 4 && realPath[3] == '\\'.toByte()) {
+                    realPath.substring(4, realPath.size)
+                } else realPath.substring(3, realPath.size)
 
                 return Triple(anchor, null, splitPath(sub))
-            } else if (bs.startsWith(UNC_SEP)) {
+            } else if (realPath.startsWith(UNC_SEP)) {
                 // path two: absolute path, with UNC
-                val anchorIdx = findUncAnchor(bs) + 1
-                val anchor = bs.substring(0, anchorIdx)
-                val rest = bs.substring(anchorIdx, bs.size)
+                val anchorIdx = findUncAnchor(realPath) + 1
+                val anchor = realPath.substring(0, anchorIdx)
+                val rest = realPath.substring(anchorIdx, realPath.size)
                 return Triple(null, anchor, splitPath(rest))
-            } else if (bs.startsWith(SEP) || bs.startsWith(ALTSEP)) {
+            } else if (realPath.startsWith(SEP) || realPath.startsWith(ALTSEP)) {
                 throw UnsupportedOperationException("Drive-letter relative paths are unsupported")
             } else {
                 // path four: relatives
-                val split = splitPath(bs)
+                val split = splitPath(realPath)
                 return Triple(null, null, split)
             }
         }

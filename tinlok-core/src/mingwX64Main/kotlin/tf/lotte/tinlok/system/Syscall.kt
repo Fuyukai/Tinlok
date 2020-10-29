@@ -400,7 +400,7 @@ public actual object Syscall {
         val result = CreateDirectoryW(path, null)
         if (result != TRUE) {
             val err = GetLastError().toInt()
-            if (err == ERROR_FILE_EXISTS && existOk) return
+            if (err == ERROR_ALREADY_EXISTS && existOk) return
             else throwErrnoPath(err, path)
         }
     }
@@ -608,6 +608,35 @@ public actual object Syscall {
     public fun MoveFile(from: String, to: String) {
         val res = MoveFileW(from, to)
         if (res != TRUE) {
+            throwErrno()
+        }
+    }
+
+    /**
+     * Copes a file from its original location to the destination location.
+     */
+    @Unsafe
+    public fun CopyFile(from: String, to: String, existOk: Boolean) {
+        val bool = if (existOk) TRUE else FALSE
+        val res = CopyFileW(from, to, bool)
+        if (res != TRUE) {
+            throwErrno()
+        }
+    }
+
+    /**
+     * Creates a new symbolic link.
+     */
+    @Unsafe
+    public fun CreateSymbolicLink(from: String, to: String) {
+        val attributes = GetFileAttributesEx(to)
+        var flags = SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE
+        if (attributes.isDirectory) {
+            flags = flags.or(SYMBOLIC_LINK_FLAG_DIRECTORY)
+        }
+
+        val res = CreateSymbolicLinkW(from, to, flags.toUInt())
+        if (res == (0u).toUByte()) {
             throwErrno()
         }
     }

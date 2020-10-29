@@ -101,7 +101,7 @@ class `Test Path Operations` {
 
         assertTrue(first.exists())
         assertTrue(second.exists())
-        assertEquals(first.readAllText(), toWrite)
+        assertEquals(toWrite, second.readAllText())
     }
 
     @Test

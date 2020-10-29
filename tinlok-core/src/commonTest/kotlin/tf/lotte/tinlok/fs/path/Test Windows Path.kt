@@ -130,4 +130,26 @@ class `Test Windows Path` {
         val otherDrive = WindowsPurePath.fromString("D:\\")
         assertFalse(windows.isChildOf(otherDrive))
     }
+
+    /**
+     * Ensures parsing volumes works correctly.
+     */
+    @Test
+    fun `Test volume parsing`() {
+        val path = WindowsPurePath.fromString("\\\\SERVER\\share\\path")
+        assertTrue(path.isAbsolute)
+        assertEquals("\\\\SERVER\\share\\", path.anchor)
+        assertEquals("path", path.name)
+    }
+
+    /**
+     * Ensures \\\\?\\ paths get parsed correctly.
+     */
+    @Test
+    fun `Test long path parsing`() {
+        val path = WindowsPurePath.fromString("C:\\Windows")
+        val path2 = WindowsPurePath.fromString("\\\\?\\C:\\Windows")
+        assertEquals(path.anchor, path2.anchor)
+        assertEquals(path.components.size, path2.components.size)
+    }
 }
