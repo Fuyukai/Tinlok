@@ -13,8 +13,6 @@ Here's a list of issues I know about with the codebase:
 
   - This is both slower, and (potentially) riskier.
 
-* No Windows-style paths yet
-
 * Non-unicode paths don't work
 
   - This is a Kotlin issue; see `KT-41853`_.
@@ -38,6 +36,13 @@ Here's a list of issues I know about with the codebase:
 * Low-level system interface doesn't support non-blocking sockets
 
 * If you are stupid and do fork-exec file descriptors will be copied (no O_CLOEXC yet)
+
+* Win32 path methods will do a LOT of system calls
+
+  - Thank its weird concept of symbolic links for this.
+
+  - Linux doesn't have this issue because symlinks can always be treated as just files, and it
+    has realpath() to do the symlink shenanigans for us.
 
 .. _ipaddress: https://docs.python.org/3/library/ipaddress.html
 .. _KT-41853: https://youtrack.jetbrains.com/issue/KT-41853

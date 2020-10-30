@@ -43,9 +43,6 @@ public data class DirEntry(
 
     /** Returns true if this entry represents a symlink. */
     public fun isSymlink(): Boolean {
-        if (type == FileType.UNKNOWN) {
-            return path.isLink()
-        }
-        return type == FileType.REGULAR_FILE
+        return path.isLink()
     }
 }

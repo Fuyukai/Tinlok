@@ -127,6 +127,26 @@ class `Test Path Operations` {
     }
 
     /**
+     * Ensures directory symlinks work properly.
+     */
+    @Test
+    fun `Test symlink for directories`(): Unit = Path.makeTempDirectory("Tinlok-test-") {
+        val parent = it.resolveChild("parent")
+        parent.createDirectory(parents = false, existOk = false)
+        parent.resolveChild("test.txt").writeString("the sign")
+
+        val symParent = it.resolveChild("parent2")
+        symParent.symlinkTo(parent)
+
+        assertTrue(symParent.isDirectory(followSymlinks = true))
+
+        val symChild = symParent.resolveChild("test.txt")
+
+        assertTrue(symChild.exists())
+        assertEquals("the sign", symChild.readAllText())
+    }
+
+    /**
      * Tests listing files in a directory.
      */
     @OptIn(Unsafe::class)

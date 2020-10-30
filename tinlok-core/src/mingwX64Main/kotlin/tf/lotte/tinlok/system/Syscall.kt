@@ -9,6 +9,7 @@
 
 package tf.lotte.tinlok.system
 
+import ddk._K_REPARSE_DATA_BUFFER
 import kotlinx.cinterop.*
 import platform.posix.memcpy
 import platform.windows.*
@@ -18,6 +19,8 @@ import tf.lotte.tinlok.exc.WindowsException
 import tf.lotte.tinlok.fs.DirEntry
 import tf.lotte.tinlok.fs.FileType
 import tf.lotte.tinlok.fs.path.resolveChild
+import tf.lotte.tinlok.util.flagged
+import tf.lotte.tinlok.util.flags
 import tf.lotte.tinlok.util.utf16ToString
 
 /**
@@ -184,15 +187,66 @@ public actual object Syscall {
     }
 
     /**
+     * Checks if a file is a symbolic link.
+     *
+     * The specified file MUST have the reparse point flag set.
+     */
+    @Unsafe
+    public fun __is_symlink(path: String): Boolean = memScoped {
+        // open symlink directly otherwise deviceiocontrol gets pissy
+        val handle = CreateFileW(
+            path,
+            GENERIC_READ,
+            FILE_SHARE_VALID_FLAGS,
+            null,
+            OPEN_EXISTING,
+            flags(FILE_FLAG_BACKUP_SEMANTICS, FILE_FLAG_OPEN_REPARSE_POINT).toUInt(),
+            null,
+        )
+        if (handle == null || handle == INVALID_HANDLE_VALUE) {
+            val err = GetLastError().toInt()
+            throwErrnoPath(err, path)
+        }
+        defer { CloseHandle(handle) }
+
+        // copied from some online article...
+        // nb: with windows extending the path limitation i'm not sure how this will fare.
+        // but blame MS if this clobbers all your memory!
+        val size = 16 * 1024
+        val buffer = alloc(size, 1).reinterpret<_K_REPARSE_DATA_BUFFER>()
+
+        val bytesReturned = alloc<UIntVar>()
+
+        val res = DeviceIoControl(
+            handle,                                 // symlink file
+            FSCTL_GET_REPARSE_POINT,                // get reparse details
+            null, 0,            // empty input buffer
+            buffer.reinterpret(), size.toUInt(),    // output REPARSE_DATA_BUFFER
+            bytesReturned.ptr,                      // self-explanatory
+            null                         // we don't do overlapped I/O (yet)
+        )
+
+        if (res != TRUE) {
+            val err = GetLastError().toInt()
+            println("deviceiocontrol failed")
+            throwErrnoPath(err, path)
+        }
+        // this is the only thing we care about
+        val flags = buffer.ReparseTag
+        return flagged(flags, IO_REPARSE_TAG_SYMLINK)
+    }
+
+    /**
      * Copies the attributes from a WIN32_FILE_ATTRIBUTE_DATA object to a [FileAttributes] object.
      */
     @OptIn(ExperimentalUnsignedTypes::class)
-    private fun copyAttributes(struct: WIN32_FILE_ATTRIBUTE_DATA): FileAttributes {
+    private fun copyAttributes(path: String, struct: WIN32_FILE_ATTRIBUTE_DATA): FileAttributes {
         val size = (struct.nFileSizeHigh.toULong().shl(32)).or(struct.nFileSizeLow.toULong())
 
         // copy attributes from the struct into our own data class so that the runtime can manage
         // it instead of our memory scope
         return FileAttributes(
+            path = path,
             attributes = struct.dwFileAttributes.toInt(),
             size = size,
             creationTime = struct.ftCreationTime.toULong(),
@@ -219,7 +273,7 @@ public actual object Syscall {
             throwErrnoPath(GetLastError().toInt(), path)
         }
 
-        return copyAttributes(struct)
+        return copyAttributes(path, struct)
     }
 
     /**
@@ -242,7 +296,7 @@ public actual object Syscall {
             else throwErrnoPath(err, path)
         }
 
-        return copyAttributes(struct)
+        return copyAttributes(path, struct)
     }
 
     // non-standard name as this isn't a wrapper
@@ -252,9 +306,15 @@ public actual object Syscall {
     @OptIn(ExperimentalUnsignedTypes::class)
     @Unsafe
     public fun __real_path(path: String): String? {
-        // gross extra FileAttributesW call, but oh well
-        val attributes = __get_attributes_safer(path) ?: return null
-        if (!attributes.isSymlink) return path
+        // gross amount of driver calls...
+        val attrs = __get_attributes_safer(path) ?: return null
+        if (!attrs.isSymlink()) return path
+
+        val openFlag = if (attrs.isDirectory) {
+            FILE_FLAG_BACKUP_SEMANTICS
+        } else {
+            FILE_ATTRIBUTE_NORMAL
+        }.toUInt()
 
         val handle = CreateFileW(
             path,
@@ -262,12 +322,11 @@ public actual object Syscall {
             FILE_SHARE_VALID_FLAGS, // allow all sharing since we only care about the target
             null,
             OPEN_EXISTING,
-            FILE_ATTRIBUTE_NORMAL,  // no flags, open target file directly
+            openFlag,  // open as directory if needed
             null,
         )
 
         if (handle == null || handle == INVALID_HANDLE_VALUE) {
-            println("CreateFileW failed")
             val err = GetLastError().toInt()
             // not found means that the symlink points to somewhere invalid
             // so we just ignore it.
@@ -297,7 +356,7 @@ public actual object Syscall {
         CloseHandle(handle)
 
         return when {
-            res == 0u -> throwErrno()
+            res == 0u -> throwErrnoPath(GetLastError().toInt(), path)
             res > size -> throw Error("GetFinalPathNameByHandleW lied to us!")
             // no \0 !
             else -> buf.utf16ToString(res.toInt())
@@ -638,6 +697,26 @@ public actual object Syscall {
         val res = CreateSymbolicLinkW(from, to, flags.toUInt())
         if (res == (0u).toUByte()) {
             throwErrno()
+        }
+    }
+
+    /**
+     * Implements sane high-level unlink(3) like semantics (unlike DeleteFile).
+     *
+     * This means:
+     *   - Deletes regular files using DeleteFileW (thus fails on directories)
+     *   - Deletes regular symlinks using DeleteFileW
+     *   - Deletes directory symlinks using RemoveDirectoryW
+     */
+    // thanks to: https://stackoverflow.com/questions/1485155/check-if-a-file-is-real-or-a-symbolic-link
+    @OptIn(Unsafe::class)
+    public fun __highlevel_unlink(path: String) {
+        val attrs = GetFileAttributesEx(path)
+        val isLink = attrs.isSymlink()
+        return if (!isLink) DeleteFile(path)
+        else {
+            if (attrs.isDirectory) RemoveDirectory(path)
+            else DeleteFile(path)
         }
     }
 

@@ -12,6 +12,7 @@ package tf.lotte.tinlok.fs.path
 import tf.lotte.cc.ClosingScope
 import tf.lotte.cc.Unsafe
 import tf.lotte.cc.exc.FileAlreadyExistsException
+import tf.lotte.cc.exc.FileNotFoundException
 import tf.lotte.cc.exc.IsADirectoryException
 import tf.lotte.cc.io.writeAll
 import tf.lotte.cc.types.ByteString
@@ -101,10 +102,16 @@ public fun Path.recursiveDelete() {
 
     // remove all entries in the tree from most deeply nested to least deeply nested
     for (i in flattened) {
-        if (!i.isDirectory(followSymlinks = false)) {
-            i.path.unlink()
-        } else {
-            i.path.removeDirectory()
+        try {
+            if (!i.isDirectory(followSymlinks = false)) {
+                i.path.unlink()
+            } else {
+                i.path.removeDirectory()
+            }
+        } catch (e: FileNotFoundException) {
+            // who cares
+            // usually because we tried to remove a file inside a symlink'd directory after the
+            // original file
         }
     }
 

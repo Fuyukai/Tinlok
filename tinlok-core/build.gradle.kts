@@ -41,6 +41,13 @@ kotlin {
                 implementation(project(":tinlok-static-monocypher"))
             }
         }
+
+        val main by compilations.getting {
+            val ddk by cinterops.creating {
+                val path = project.file("src/mingwX64Main/cinterop/ddk.def")
+                defFile(path)
+            }
+        }
     }
 
     sourceSets.commonMain {

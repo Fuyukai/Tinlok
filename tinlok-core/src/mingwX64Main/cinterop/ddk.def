@@ -1,0 +1,33 @@
+# This is an empty definition used to re-export the REPARSE_DATA_BUFFER type.
+# It's not included in the standard
+---
+#include <windows.h>
+
+// https://github.com/mirror/mingw-w64/blob/master/mingw-w64-headers/ddk/include/ddk/ntifs.h
+// Renamed for kotlin
+
+typedef struct __K_REPARSE_DATA_BUFFER {
+  ULONG ReparseTag;
+  USHORT ReparseDataLength;
+  USHORT Reserved;
+  _ANONYMOUS_UNION union {
+    struct {
+      USHORT SubstituteNameOffset;
+      USHORT SubstituteNameLength;
+      USHORT PrintNameOffset;
+      USHORT PrintNameLength;
+      ULONG Flags;
+      WCHAR PathBuffer[1];
+    } SymbolicLinkReparseBuffer;
+    struct {
+      USHORT SubstituteNameOffset;
+      USHORT SubstituteNameLength;
+      USHORT PrintNameOffset;
+      USHORT PrintNameLength;
+      WCHAR PathBuffer[1];
+    } MountPointReparseBuffer;
+    struct {
+      UCHAR DataBuffer[1];
+    } GenericReparseBuffer;
+  } DUMMYUNIONNAME;
+} _K_REPARSE_DATA_BUFFER, *_K_PREPARSE_DATA_BUFFER;

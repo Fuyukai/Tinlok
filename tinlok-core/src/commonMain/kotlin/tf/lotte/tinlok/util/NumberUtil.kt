@@ -169,3 +169,43 @@ public inline val Long.upperByte: Long
  */
 public inline val Long.lowerByte: Long
     get() = (this and 0x00000000000000FF)
+
+
+/**
+ * Creates a new int with all of the specified [flag] values OR'd together.
+ */
+public fun flags(vararg flag: Int): Int {
+    var acc = 0
+    for (f in flag) {
+        acc = acc.or(f)
+    }
+    return acc
+}
+
+/**
+ * Checks if [input] has bits from [flag] set.
+ */
+public fun flagged(input: Int, flag: Int): Boolean {
+    return input.and(flag) != 0
+}
+
+/**
+ * Checks if [input] has bits from [flag] set.
+ */
+public fun flagged(input: Int, flag: UInt): Boolean {
+    return input.toUInt().and(flag) != 0u
+}
+
+/**
+ * Checks if [input] has bits from [flag] set.
+ */
+public fun flagged(input: UInt, flag: Int): Boolean {
+    return input.and(flag.toUInt()) != 0u
+}
+
+/**
+ * Checks if [input] has bits from [flag] set.
+ */
+public fun flagged(input: UInt, flag: UInt): Boolean {
+    return input.and(flag) != 0u
+}

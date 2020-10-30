@@ -99,7 +99,7 @@ internal class WindowsPath(
 
     @OptIn(Unsafe::class)
     override fun isLink(): Boolean {
-        return getAttributesSafe(followSymlinks = false)?.isSymlink ?: false
+        return getAttributesSafe(followSymlinks = false)?.isSymlink() ?: false
     }
 
     @OptIn(Unsafe::class, ExperimentalUnsignedTypes::class)
@@ -109,11 +109,14 @@ internal class WindowsPath(
 
     @OptIn(Unsafe::class)
     override fun linkTarget(): WindowsPath? {
-        if (!isLink()) return null
         val target = Syscall.__real_path(unsafeToString()) ?: return null
-        val (letter, volume, rest) = parsePath(target.toByteString())
 
-        return WindowsPath(letter, volume, rest)
+        // gross!
+        val (letter, volume, rest) = parsePath(target.toByteString())
+        val path = WindowsPath(letter, volume, rest)
+
+        return if (path == this) null
+        else path
     }
 
     @OptIn(Unsafe::class)
@@ -191,7 +194,7 @@ internal class WindowsPath(
 
     @OptIn(Unsafe::class)
     override fun unlink() {
-        Syscall.DeleteFile(unsafeToString())
+        return Syscall.__highlevel_unlink(unsafeToString())
     }
 
     @Unsafe
