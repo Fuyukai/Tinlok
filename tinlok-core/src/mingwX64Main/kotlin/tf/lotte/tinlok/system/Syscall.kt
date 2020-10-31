@@ -11,6 +11,7 @@ package tf.lotte.tinlok.system
 
 import ddk._K_REPARSE_DATA_BUFFER
 import kotlinx.cinterop.*
+import platform.posix.WSAData
 import platform.posix.memcpy
 import platform.windows.*
 import tf.lotte.cc.Unsafe
@@ -28,6 +29,18 @@ import tf.lotte.tinlok.util.utf16ToString
  */
 @OptIn(ExperimentalUnsignedTypes::class)
 public actual object Syscall {
+    private val _WSADATA = nativeHeap.allocPointerTo<WSAData>()
+
+    /** The winsock data information. */
+    public val WSADATA: WSAData get() = _WSADATA.pointed!!
+
+    init {
+        val res = WSAStartup(514u /* (2 << 8) | 2 */, _WSADATA.value)
+        if (res != 0) {
+            throw Error("Winsock failed to initialise")
+        }
+    }
+
     // == Macros and helpers == //
     /**
      * Converts a FILETIME struct into a single ULong.
