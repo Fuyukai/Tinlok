@@ -10,13 +10,12 @@
 package tf.lotte.tinlok.fs.path
 
 import tf.lotte.tinlok.Sys
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
+import kotlin.test.*
 
 /**
  * Tests the special path functions.
  */
+@Ignore
 class `Test special Paths`() {
     @Test
     public fun `Test home`() {
