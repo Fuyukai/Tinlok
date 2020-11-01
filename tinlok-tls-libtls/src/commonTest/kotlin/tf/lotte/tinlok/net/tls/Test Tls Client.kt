@@ -9,6 +9,8 @@
 
 package tf.lotte.tinlok.net.tls
 
+import tf.lotte.cc.io.readUpTo
+import tf.lotte.cc.io.writeAll
 import tf.lotte.cc.types.b
 import tf.lotte.tinlok.net.tcp.TcpSocketAddress
 import kotlin.test.*
@@ -22,7 +24,7 @@ public class `Test Tls Client` {
         val addr = TcpSocketAddress.resolve(host, port)
         TlsClientSocket.connect(addr, config) { sock ->
             val toWrite = b("GET / HTTP/1.1\r\nHost: $host:$port\r\n\r\n")
-            sock.writeAllFrom(toWrite)
+            sock.writeAll(toWrite)
 
             // won't fit, but we only check for a starts with
             val data = sock.readUpTo(256)

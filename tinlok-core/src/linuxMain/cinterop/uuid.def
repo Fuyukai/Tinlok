@@ -1,5 +1,13 @@
-linkerOpts = -luuid
 package = platform.linux.util
+# various conventions
+
+linkerOpts.linux_x64 = -L/usr/x86_64-pc-linux-gnu -L/usr/lib/x86_64-pc-linux-gnu \
+    -L/usr/x86_64-linux-gnu/lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib -L/lib/x86_64-linux-gnu \
+    -luuid
+
+linkerOpts.linux_arm64 = -L/usr/lib/aarch64-linux-gnu -L/lib/aarch64-linux-gnu \
+    -L/usr/aarch64-linux-gnu/lib -L/usr/lib \
+    -luuid
 ---
 /*
  * Public include file for the UUID library

@@ -7,37 +7,114 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
+@file:Suppress("PropertyName")
+
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+import java.nio.file.Files
+import java.nio.file.Path
+
+
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
     id("maven-publish")
 }
 
+
+// == Architecture detection == //
+val ARCH = DefaultNativePlatform.getCurrentArchitecture()
+val DEFAULT_SEARCH_PATHS = listOf("/usr/lib", "/lib").map { Path.of(it) }
+
+/**
+ * Gets the AArch64 library paths for linking.
+ */
+fun getAarch64LibraryPaths(): List<Path> {
+    // native ARM library path
+    if (ARCH.isArm) return DEFAULT_SEARCH_PATHS
+
+    // dpkg multiplatform path, debian cross-compiler lib path
+    val tryPaths = listOf(
+        "/usr/lib/aarch64-linux-gnu",
+        "/lib/aarch64-linux-gnu",
+        "/usr/aarch64-linux-gnu/lib"
+    )
+    return tryPaths.map { Path.of(it) }.filter { Files.exists(it) }
+}
+
+/**
+ * Determines if the current system is AArch64, or if we have a cross-compiler installed.
+ */
+fun hasAarch64(): Boolean {
+    if (DefaultNativePlatform.getCurrentArchitecture().isArm) {
+        return true
+    }
+
+    return getAarch64LibraryPaths().isNotEmpty()
+}
+
+/**
+ * Gets the AMD64 library paths for linking.
+ */
+fun getAMD64LibraryPaths(): List<Path> {
+    // our own native paths
+    if (ARCH.isAmd64) return DEFAULT_SEARCH_PATHS
+
+    // this can be a few paths...
+    val tryPaths = listOf(
+        "/usr/x86_64-pc-linux-gnu",  // Arch convention
+        "/usr/lib/x86_64-pc-linux-gnu",
+
+        "/usr/x86_64-linux-gnu/lib",  // dpkg cross-compile convention
+        "/usr/lib/x86_64-linux-gnu",
+        "/lib/x86_64-linux-gnu"
+    )
+
+    // dpkg multiplatform path, debian cross-compiler lib path
+    return tryPaths.map { Path.of(it) }.filter { Files.exists(it) }
+}
+
+/**
+ * Determines if the current system is AMD64, or if we have a cross-compiler installed.
+ */
+fun hasAmd64(): Boolean {
+    if (ARCH.isAmd64) {
+        return true
+    }
+    return getAMD64LibraryPaths().isNotEmpty()
+}
+// == End architecture detection == //
+
 kotlin {
-    val x64 = linuxX64() {
-        val linuxX64Main by sourceSets.getting {
-            dependencies {
-                implementation(project(":tinlok-static-ipv6"))
-                implementation(project(":tinlok-static-monocypher"))
+
+    if (hasAmd64()) {
+        val x64 = linuxX64() {
+            val linuxX64Main by sourceSets.getting {
+                dependencies {
+                    implementation(project(":tinlok-static-ipv6"))
+                    implementation(project(":tinlok-static-monocypher"))
+                }
+            }
+
+            val main = compilations.getByName("main")
+            main.cinterops.create("uuid") {
+                defFile(project.file("src/linuxMain/cinterop/uuid.def"))
             }
         }
     }
 
-    val arm64 = linuxArm64() {
-        val linuxMain by sourceSets.getting
-        val linuxArm64Main by sourceSets.getting {
-            dependsOn(linuxMain)
-
-            dependencies {
-                implementation(project(":tinlok-static-ipv6"))
-                implementation(project(":tinlok-static-monocypher"))
+    if (hasAarch64()) {
+        val arm64 = linuxArm64() {
+            val linuxMain by sourceSets.getting
+            val linuxArm64Main by sourceSets.getting {
+                dependencies {
+                    implementation(project(":tinlok-static-ipv6"))
+                    implementation(project(":tinlok-static-monocypher"))
+                }
             }
-        }
-    }
 
-    listOf(x64, arm64).forEach {
-        val main = it.compilations.getByName("main")
-        val uuid by main.cinterops.creating {
-            defFile(project.file("src/linuxMain/cinterop/uuid.def"))
+            val main = compilations.getByName("main")
+            main.cinterops.create("uuid") {
+                defFile(project.file("src/linuxMain/cinterop/uuid.def"))
+            }
         }
     }
 
@@ -49,11 +126,10 @@ kotlin {
             }
         }
 
-        val main by compilations.getting {
-            val ddk by cinterops.creating {
-                val path = project.file("src/mingwX64Main/cinterop/ddk.def")
-                defFile(path)
-            }
+        val main = compilations.getByName("main")
+        main.cinterops.create("ddk") {
+            val path = project.file("src/mingwX64Main/cinterop/ddk.def")
+            defFile(path)
         }
     }
 
