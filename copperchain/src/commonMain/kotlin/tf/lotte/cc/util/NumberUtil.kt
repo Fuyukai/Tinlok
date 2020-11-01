@@ -180,11 +180,11 @@ public inline fun ULong.toByteArrayLE(): ByteArray {
  * Decodes a size-4 byte array to an int in big endian mode.
  */
 /* @InlineOnly */
-public inline fun ByteArray.toInt(): Int {
-    return (((this[0].toInt()) shl 24)
-        or ((this[1].toInt()) shl 16)
-        or ((this[2].toInt()) shl 8)
-        or (this[3].toInt())
+public inline fun ByteArray.toInt(offset: Int = 0): Int {
+    return (((this[offset].toInt()) shl 24)
+        or ((this[offset + 1].toInt()) shl 16)
+        or ((this[offset + 2].toInt()) shl 8)
+        or (this[offset + 3].toInt())
         )
 }
 
@@ -192,11 +192,11 @@ public inline fun ByteArray.toInt(): Int {
  * Decodes a size-4 byte array to an int in little endian mode.
  */
 /* @InlineOnly */
-public inline fun ByteArray.toIntLE(): Int {
-    return (((this[3].toInt()) shl 24)
-        or ((this[2].toInt()) shl 16)
-        or ((this[1].toInt()) shl 8)
-        or (this[0].toInt())
+public inline fun ByteArray.toIntLE(offset: Int = 0): Int {
+    return (((this[offset + 3].toInt()) shl 24)
+        or ((this[offset + 2].toInt()) shl 16)
+        or ((this[offset + 1].toInt()) shl 8)
+        or (this[offset].toInt())
         )
 }
 
@@ -204,15 +204,15 @@ public inline fun ByteArray.toIntLE(): Int {
  * Decodes a size-8 byte array to a long in big endian mode.
  */
 /* @InlineOnly */
-public inline fun ByteArray.toLong(): Long {
-    return (((this[0].toLong()) shl 56)
-        or ((this[1].toLong()) shl 48)
-        or ((this[2].toLong()) shl 40)
-        or ((this[3].toLong()) shl 32)
-        or ((this[4].toLong()) shl 24)
-        or ((this[5].toLong()) shl 16)
-        or ((this[6].toLong()) shl 8)
-        or (this[7].toLong())
+public inline fun ByteArray.toLong(offset: Int = 0): Long {
+    return (((this[offset].toLong()) shl 56)
+        or ((this[offset + 1].toLong()) shl 48)
+        or ((this[offset + 2].toLong()) shl 40)
+        or ((this[offset + 3].toLong()) shl 32)
+        or ((this[offset + 4].toLong()) shl 24)
+        or ((this[offset + 5].toLong()) shl 16)
+        or ((this[offset + 6].toLong()) shl 8)
+        or (this[offset + 7].toLong())
         )
 }
 
@@ -220,14 +220,14 @@ public inline fun ByteArray.toLong(): Long {
  * Decodes a size-8 byte array to a long in little endian mode.
  */
 /* @InlineOnly */
-public inline fun ByteArray.toLongLE(): Long {
-    return (((this[7].toLong()) shl 56)
-        or ((this[6].toLong()) shl 48)
-        or ((this[5].toLong()) shl 40)
-        or ((this[4].toLong()) shl 32)
-        or ((this[3].toLong()) shl 24)
-        or ((this[2].toLong()) shl 16)
-        or ((this[1].toLong()) shl 8)
+public inline fun ByteArray.toLongLE(offset: Int = 0): Long {
+    return (((this[offset + 7].toLong()) shl 56)
+        or ((this[offset + 6].toLong()) shl 48)
+        or ((this[offset + 5].toLong()) shl 40)
+        or ((this[offset + 4].toLong()) shl 32)
+        or ((this[offset + 3].toLong()) shl 24)
+        or ((this[offset + 2].toLong()) shl 16)
+        or ((this[offset + 1].toLong()) shl 8)
         or (this[0].toLong())
         )
 }
@@ -236,11 +236,11 @@ public inline fun ByteArray.toLongLE(): Long {
  * Decodes a size-4 unsigned byte array to a uint in big endian mode.
  */
 /* @InlineOnly */
-public inline fun UByteArray.toUInt(): UInt {
-    return (((this[0].toUInt()) shl 24)
-        or ((this[1].toUInt()) shl 16)
-        or ((this[2].toUInt()) shl 8)
-        or (this[3].toUInt())
+public inline fun UByteArray.toUInt(offset: Int = 0): UInt {
+    return (((this[offset].toUInt()) shl 24)
+        or ((this[offset + 1].toUInt()) shl 16)
+        or ((this[offset + 2].toUInt()) shl 8)
+        or (this[offset + 3].toUInt())
         )
 }
 
@@ -248,11 +248,11 @@ public inline fun UByteArray.toUInt(): UInt {
  * Decodes a size-4 unsigned byte array to a uint in big endian mode.
  */
 /* @InlineOnly */
-public inline fun UByteArray.toUIntLE(): UInt {
-    return (((this[3].toUInt()) shl 24)
-        or ((this[2].toUInt()) shl 16)
-        or ((this[1].toUInt()) shl 8)
-        or (this[0].toUInt())
+public inline fun UByteArray.toUIntLE(offset: Int = 0): UInt {
+    return (((this[offset + 3].toUInt()) shl 24)
+        or ((this[offset + 2].toUInt()) shl 16)
+        or ((this[offset + 1].toUInt()) shl 8)
+        or (this[offset].toUInt())
         )
 }
 
@@ -260,15 +260,15 @@ public inline fun UByteArray.toUIntLE(): UInt {
  * Decodes a size-8 byte array to a ulong in big endian mode.
  */
 /* @InlineOnly */
-public inline fun ByteArray.toULong(): ULong {
-    return (((this[0].toULong()) shl 56)
-        or ((this[1].toULong()) shl 48)
-        or ((this[2].toULong()) shl 40)
-        or ((this[3].toULong()) shl 32)
-        or ((this[4].toULong()) shl 24)
-        or ((this[5].toULong()) shl 16)
-        or ((this[6].toULong()) shl 8)
-        or (this[7].toULong())
+public inline fun ByteArray.toULong(offset: Int = 0): ULong {
+    return (((this[offset].toULong()) shl 56)
+        or ((this[offset + 1].toULong()) shl 48)
+        or ((this[offset + 2].toULong()) shl 40)
+        or ((this[offset + 3].toULong()) shl 32)
+        or ((this[offset + 4].toULong()) shl 24)
+        or ((this[offset + 5].toULong()) shl 16)
+        or ((this[offset + 6].toULong()) shl 8)
+        or (this[offset + 7].toULong())
         )
 }
 
@@ -276,15 +276,15 @@ public inline fun ByteArray.toULong(): ULong {
  * Decodes a size-8 byte array to a ulong in little endian mode.
  */
 /* @InlineOnly */
-public inline fun ByteArray.toULongLE(): ULong {
-    return (((this[7].toULong()) shl 56)
-        or ((this[6].toULong()) shl 48)
-        or ((this[5].toULong()) shl 40)
-        or ((this[4].toULong()) shl 32)
-        or ((this[3].toULong()) shl 24)
-        or ((this[2].toULong()) shl 16)
-        or ((this[1].toULong()) shl 8)
-        or (this[0].toULong())
+public inline fun ByteArray.toULongLE(offset: Int = 0): ULong {
+    return (((this[offset + 7].toULong()) shl 56)
+        or ((this[offset + 6].toULong()) shl 48)
+        or ((this[offset + 5].toULong()) shl 40)
+        or ((this[offset + 4].toULong()) shl 32)
+        or ((this[offset + 3].toULong()) shl 24)
+        or ((this[offset + 2].toULong()) shl 16)
+        or ((this[offset + 1].toULong()) shl 8)
+        or (this[offset].toULong())
         )
 }
 
