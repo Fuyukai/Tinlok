@@ -13,7 +13,7 @@ plugins {
 }
 
 kotlin {
-    linuxX64() {
+    val x64 = linuxX64() {
         val linuxX64Main by sourceSets.getting {
             dependencies {
                 implementation(project(":tinlok-static-ipv6"))
@@ -22,7 +22,7 @@ kotlin {
         }
     }
 
-    linuxArm64() {
+    val arm64 = linuxArm64() {
         val linuxMain by sourceSets.getting
         val linuxArm64Main by sourceSets.getting {
             dependsOn(linuxMain)
@@ -31,6 +31,13 @@ kotlin {
                 implementation(project(":tinlok-static-ipv6"))
                 implementation(project(":tinlok-static-monocypher"))
             }
+        }
+    }
+
+    listOf(x64, arm64).forEach {
+        val main = it.compilations.getByName("main")
+        val uuid by main.cinterops.creating {
+            defFile(project.file("src/linuxMain/cinterop/uuid.def"))
         }
     }
 
