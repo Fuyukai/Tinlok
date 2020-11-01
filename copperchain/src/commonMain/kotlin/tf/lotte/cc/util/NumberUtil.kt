@@ -72,7 +72,7 @@ public inline val Int.byte3: Int
 public inline val UInt.byte3: UInt
     get() = (this shr 8) and 0xFFu
 
-
+// Number --> ByteArray
 /**
  * Decodes this int into a [ByteArray] in big endian mode.
  */
@@ -173,9 +173,28 @@ public inline fun ULong.toByteArrayLE(): ByteArray {
     )
 }
 
+// ByteArray --> Number
 
-// wtf past me
-// this was this[0], this[1], this[0], this[0]
+/**
+ * Decodes the two bytes in this ByteArray from [offset] onwards into a single short value in big
+ * endian mode.
+ */
+public inline fun ByteArray.toShort(offset: Int = 0): Short {
+    val i1 = (this[offset].toInt().shl(16))
+    val i2 = (this[offset + 1].toInt())
+    return (i1.or(i2)).toShort()
+}
+
+/**
+ * Decodes the two bytes in this ByteArray from [offset] onwards into a single short value in
+ * little endian mode.
+ */
+public inline fun ByteArray.toShortLE(offset: Int = 0): Short {
+    val i1 = (this[offset + 1].toInt().shl(16))
+    val i2 = (this[offset].toInt())
+    return (i1.or(i2)).toShort()
+}
+
 /**
  * Decodes a size-4 byte array to an int in big endian mode.
  */
