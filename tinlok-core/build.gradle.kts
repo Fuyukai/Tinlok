@@ -41,17 +41,6 @@ fun getAarch64LibraryPaths(): List<Path> {
 }
 
 /**
- * Determines if the current system is AArch64, or if we have a cross-compiler installed.
- */
-fun hasAarch64(): Boolean {
-    if (DefaultNativePlatform.getCurrentArchitecture().isArm) {
-        return true
-    }
-
-    return getAarch64LibraryPaths().isNotEmpty()
-}
-
-/**
  * Gets the AMD64 library paths for linking.
  */
 fun getAMD64LibraryPaths(): List<Path> {
@@ -72,49 +61,35 @@ fun getAMD64LibraryPaths(): List<Path> {
     return tryPaths.map { Path.of(it) }.filter { Files.exists(it) }
 }
 
-/**
- * Determines if the current system is AMD64, or if we have a cross-compiler installed.
- */
-fun hasAmd64(): Boolean {
-    if (ARCH.isAmd64) {
-        return true
-    }
-    return getAMD64LibraryPaths().isNotEmpty()
-}
 // == End architecture detection == //
 
 kotlin {
-
-    if (hasAmd64()) {
-        val x64 = linuxX64() {
-            val linuxX64Main by sourceSets.getting {
-                dependencies {
-                    implementation(project(":tinlok-static-ipv6"))
-                    implementation(project(":tinlok-static-monocypher"))
-                }
+    val x64 = linuxX64() {
+        val linuxX64Main by sourceSets.getting {
+            dependencies {
+                implementation(project(":tinlok-static-ipv6"))
+                implementation(project(":tinlok-static-monocypher"))
             }
+        }
 
-            val main = compilations.getByName("main")
-            main.cinterops.create("uuid") {
-                defFile(project.file("src/linuxMain/cinterop/uuid.def"))
-            }
+        val main = compilations.getByName("main")
+        main.cinterops.create("uuid") {
+            defFile(project.file("src/linuxMain/cinterop/uuid.def"))
         }
     }
 
-    if (hasAarch64()) {
-        val arm64 = linuxArm64() {
-            val linuxMain by sourceSets.getting
-            val linuxArm64Main by sourceSets.getting {
-                dependencies {
-                    implementation(project(":tinlok-static-ipv6"))
-                    implementation(project(":tinlok-static-monocypher"))
-                }
+    val arm64 = linuxArm64() {
+        val linuxMain by sourceSets.getting
+        val linuxArm64Main by sourceSets.getting {
+            dependencies {
+                implementation(project(":tinlok-static-ipv6"))
+                implementation(project(":tinlok-static-monocypher"))
             }
+        }
 
-            val main = compilations.getByName("main")
-            main.cinterops.create("uuid") {
-                defFile(project.file("src/linuxMain/cinterop/uuid.def"))
-            }
+        val main = compilations.getByName("main")
+        main.cinterops.create("uuid") {
+            defFile(project.file("src/linuxMain/cinterop/uuid.def"))
         }
     }
 

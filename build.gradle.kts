@@ -114,13 +114,9 @@ subprojects {
 
         // == Linux Targets == //
         // = AMD64 = //
-        if (hasAmd64()) {
-            linuxX64()
-        }
+        linuxX64()
         // = AArch64 = //
-        if (hasAarch64()) {
-            linuxArm64()
-        }
+        linuxArm64()
 
         // == Darwin Targets == //
         // = OSX (Intel) = //
@@ -153,16 +149,11 @@ subprojects {
 
             // linux sourcesets all share a sourceset
             val linuxMain by creating { dependsOn(nativeMain) }
+            val linuxMainX64 = sourceSets.getByName("linuxX64Main")
+            linuxMainX64.dependsOn(linuxMain)
 
-            if (hasAmd64()) {
-                val main = sourceSets.getByName("linuxX64Main")
-                main.dependsOn(linuxMain)
-            }
-
-            if (hasAarch64()) {
-                val main = sourceSets.getByName("linuxArm64Main")
-                main.dependsOn(linuxMain)
-            }
+            val linuxMainArm = sourceSets.getByName("linuxArm64Main")
+            linuxMainArm.dependsOn(linuxMain)
 
             val mingwX64Main by getting {
                 dependsOn(nativeMain)
@@ -186,6 +177,16 @@ subprojects {
             }
         }
     }*/
+
+    val linkTasks = tasks.filter { it.name.startsWith("link") }
+    for (task in linkTasks) {
+        if (task.name.endsWith("Arm64")) {
+            // disable all arm64 tasks, temporarily
+            task.enabled = hasAarch64()
+        } else if (task.name.endsWith("X64")) {
+            task.enabled = hasAmd64()
+        }
+    }
 }
 
 val sphinxClean = tasks.register<Exec>("sphinxClean") {

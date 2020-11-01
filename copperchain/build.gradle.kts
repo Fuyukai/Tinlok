@@ -60,6 +60,12 @@ kotlin {
                 implementation(kotlin("test-annotations-common"))
             }
         }
+
+        val jvmTest by getting {
+            dependencies {
+                implementation(kotlin("test-junit"))
+            }
+        }
     }
 
     sourceSets.all {
@@ -71,6 +77,5 @@ kotlin {
         languageSettings.apply {
             useExperimentalAnnotation("kotlin.RequiresOptIn")
         }
-
     }
 }
