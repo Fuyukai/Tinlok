@@ -7,17 +7,22 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
-package tf.lotte.tinlok
+// TEMPORARY
+@file:Suppress("ClassName", "RemoveRedundantBackticks")
+
+package tf.lotte.cc
 
 import tf.lotte.cc.types.*
 import kotlin.test.*
 
+// See: https://youtrack.jetbrains.com/issue/KT-42821
+// for why these functions use underscored_names (temporarily).
 /**
  * Tests [ByteString] functionality.
  */
-class `Test ByteString` {
+class `Test_ByteString` {
     @Test
-    fun `Test ByteString split basic`() {
+    fun `Test_ByteString_split_basic`() {
         val bs = b("abc, def, ghi, jkl")
         val split = bs.split(b(", "))
 
@@ -29,7 +34,7 @@ class `Test ByteString` {
     }
 
     @Test
-    fun `Test ByteString split with leading delimiter`() {
+    fun `Test_ByteString_split_with_leading_delimiter`() {
         val bs = b(",abc,def,ghi")
         val split = bs.split(b(","))
 
@@ -38,7 +43,7 @@ class `Test ByteString` {
     }
 
     @Test
-    fun `Test ByteString split with no matches`() {
+    fun `Test_ByteString_split_with_no_matches`() {
         val bs = b("A-Set, you bet!")
         val split = bs.split(b("."))
 
@@ -47,7 +52,7 @@ class `Test ByteString` {
     }
 
     @Test
-    fun `Test ByteString join`() {
+    fun `Test_ByteString_join`() {
         val items = listOf(b("one"), b("two"), b("three"))
         val expected = b("one two three")
 
@@ -61,7 +66,7 @@ class `Test ByteString` {
     }
 
     @Test
-    fun `Test ByteString hexlify`() {
+    fun `Test_ByteString_hexlify`() {
         val str = b("jpN")
         val hex = str.hexlify()
 
@@ -69,7 +74,7 @@ class `Test ByteString` {
     }
 
     @Test
-    fun `Test ByteString unhexlify`() {
+    fun `Test_ByteString_unhexlify`() {
         assertEquals("6a704E".unhexlify(), b("jpN"))
         // empty string
         assertEquals("".unhexlify(), b(""))

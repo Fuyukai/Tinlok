@@ -18,12 +18,6 @@ kotlin {
     // == JVM targets == //
     jvm()
 
-    // == JS targets == //
-    /*js() {
-        browser()
-        nodejs()
-    }*/
-
     // == Native targets == //
     // = Linux = //
     linuxArm32Hfp()
@@ -47,9 +41,6 @@ kotlin {
     tvosX64()
     tvosArm64()
 
-    // = Misc = //
-    wasm32()
-
     sourceSets {
         val nonJvmShared by creating {
             dependsOn(commonMain.get())
@@ -61,6 +52,13 @@ kotlin {
         }
         configure(filtered) {
             dependsOn(nonJvmShared)
+        }
+
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test-common"))
+                implementation(kotlin("test-annotations-common"))
+            }
         }
     }
 
