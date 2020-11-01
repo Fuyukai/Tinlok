@@ -16,12 +16,12 @@ import platform.posix.memcpy
 import platform.windows.*
 import tf.lotte.cc.Unsafe
 import tf.lotte.cc.exc.*
+import tf.lotte.cc.util.flagged
+import tf.lotte.cc.util.flags
 import tf.lotte.tinlok.exc.WindowsException
 import tf.lotte.tinlok.fs.DirEntry
 import tf.lotte.tinlok.fs.FileType
 import tf.lotte.tinlok.fs.path.resolveChild
-import tf.lotte.tinlok.util.flagged
-import tf.lotte.tinlok.util.flags
 import tf.lotte.tinlok.util.utf16ToString
 
 /**
@@ -153,7 +153,10 @@ public actual object Syscall {
             WSAESHUTDOWN -> SocketShutdownException()
             WSAENETUNREACH -> NetworkUnreachableException()
 
-            else -> WindowsException(winerror = code, message = FormatMessage(code))
+            else -> WindowsException(
+                winerror = code,
+                message = "[WinError ${code}] ${FormatMessage(code)}"
+            )
         }
     }
 

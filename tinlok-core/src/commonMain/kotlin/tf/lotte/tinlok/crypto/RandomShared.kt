@@ -9,8 +9,8 @@
 
 package tf.lotte.tinlok.crypto
 
-import tf.lotte.tinlok.util.toInt
-import tf.lotte.tinlok.util.toLong
+import tf.lotte.cc.util.toInt
+import tf.lotte.cc.util.toLong
 import kotlin.experimental.and
 import kotlin.random.Random
 

@@ -10,7 +10,7 @@
 package tf.lotte.tinlok.net
 
 import tf.lotte.cc.Unsafe
-import tf.lotte.tinlok.util.toByteArray
+import tf.lotte.cc.util.toByteArray
 
 // see: https://docs.python.org/3/library/ipaddress.html
 // see: https://doc.rust-lang.org/std/net/enum.IpAddr.html

@@ -16,11 +16,11 @@ import platform.posix.*
 import tf.lotte.cc.Unsafe
 import tf.lotte.cc.exc.*
 import tf.lotte.cc.types.ByteString
+import tf.lotte.cc.util.toByteArray
+import tf.lotte.cc.util.toUInt
 import tf.lotte.tinlok.net.*
 import tf.lotte.tinlok.net.dns.GAIException
 import tf.lotte.tinlok.net.socket.LinuxSocketOption
-import tf.lotte.tinlok.util.toByteArray
-import tf.lotte.tinlok.util.toUInt
 import kotlin.experimental.ExperimentalTypeInference
 
 internal typealias FD = Int
@@ -110,7 +110,7 @@ public actual object Syscall {
 
             EINVAL -> IllegalArgumentException()
 
-            else -> OSException(message = strerror(errno))
+            else -> OSException(message = "[errno ${errno}] ${strerror(errno)}")
         }
     }
 

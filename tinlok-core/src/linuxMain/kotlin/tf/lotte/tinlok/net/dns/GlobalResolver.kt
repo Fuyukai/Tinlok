@@ -12,12 +12,12 @@ package tf.lotte.tinlok.net.dns
 import kotlinx.cinterop.*
 import platform.posix.*
 import tf.lotte.cc.Unsafe
+import tf.lotte.cc.util.toByteArray
 import tf.lotte.tinlok.net.*
 import tf.lotte.tinlok.net.tcp.TcpConnectionInfo
 import tf.lotte.tinlok.net.udp.UdpConnectionInfo
 import tf.lotte.tinlok.system.Syscall
 import tf.lotte.tinlok.system.readBytesFast
-import tf.lotte.tinlok.util.toByteArray
 
 @ExperimentalUnsignedTypes
 public actual object GlobalResolver : AddressResolver {
