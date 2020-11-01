@@ -13,7 +13,7 @@ package tf.lotte.cc.types
  * Simple implementation of a [ByteStringHolder].
  */
 public class ByteArrayByteStringHolder(private val ba: ByteArray) : ByteStringHolder {
-    override val size: Int by ba::size
+    override val size: Int get() = ba.size
 
     override fun get(idx: Int): Byte = ba[idx]
     override fun contains(other: Byte): Boolean = ba.contains(other)
