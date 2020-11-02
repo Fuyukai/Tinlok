@@ -99,7 +99,10 @@ public fun Collection<ByteString>.join(delim: ByteString): ByteString {
     return ByteString.fromUncopied(final)
 }
 
-private val HEX_ALPHABET =
+/**
+ * An array corresponding to the hex alphabet.
+ */
+public val HEX_ALPHABET =
     arrayOf(
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
         'a', 'b', 'c', 'd', 'e', 'f'
@@ -132,7 +135,7 @@ internal fun Char.toInt16(): Int {
         'd', 'D' -> 13
         'e', 'E' -> 14
         'f', 'F' -> 15
-        else -> toInt()  // real numbers
+        else -> this.toString().toInt()  // real numbers
     }
 }
 
@@ -159,6 +162,118 @@ public fun String.unhexlify(): ByteString {
     return ByteString.fromUncopied(buf)
 }
 
+// ByteString -> Numbers
+
+/**
+ * Decodes the bytes in this ByteString to a short in big endian mode, starting from [offset].
+ */
+public inline fun ByteString.toShort(offset: Int = 0): Short {
+    val i1 = (this[offset].toInt().shl(16))
+    val i2 = (this[offset + 1].toInt())
+    return (i1.or(i2)).toShort()
+}
+
+/**
+ * Decodes the bytes in this ByteString to an short in big endian mode, starting from [offset].
+ */
+public inline fun ByteString.toShortLE(offset: Int = 0): Short {
+    val i1 = (this[offset + 1].toInt().shl(16))
+    val i2 = (this[offset].toInt())
+    return (i1.or(i2)).toShort()
+}
+
+/**
+ * Decodes the bytes in this ByteString to an int in big endian mode, starting from [offset].
+ */
+/* @InlineOnly */
+public inline fun ByteString.toInt(offset: Int = 0): Int {
+    return (((this[offset].toInt()) shl 24)
+        or ((this[offset + 1].toInt()) shl 16)
+        or ((this[offset + 2].toInt()) shl 8)
+        or (this[offset + 3].toInt())
+        )
+}
+
+/**
+ * Decodes the bytes in this ByteString to an int in little endian mode, starting from [offset].
+ */
+/* @InlineOnly */
+public inline fun ByteString.toIntLE(offset: Int = 0): Int {
+    return (((this[offset + 3].toInt()) shl 24)
+        or ((this[offset + 2].toInt()) shl 16)
+        or ((this[offset + 1].toInt()) shl 8)
+        or (this[offset].toInt())
+        )
+}
+
+/**
+ * Decodes the bytes in this ByteString to a long in big endian mode, starting from [offset].
+ */
+/* @InlineOnly */
+public inline fun ByteArray.toLong(offset: Int = 0): Long {
+    return (((this[offset].toLong()) shl 56)
+        or ((this[offset + 1].toLong()) shl 48)
+        or ((this[offset + 2].toLong()) shl 40)
+        or ((this[offset + 3].toLong()) shl 32)
+        or ((this[offset + 4].toLong()) shl 24)
+        or ((this[offset + 5].toLong()) shl 16)
+        or ((this[offset + 6].toLong()) shl 8)
+        or (this[offset + 7].toLong())
+        )
+}
+
+/**
+ * Decodes the bytes in this ByteString to a long in little endian mode, starting from [offset].
+ */
+/* @InlineOnly */
+public inline fun ByteString.toLongLE(offset: Int = 0): Long {
+    return (((this[offset + 7].toLong()) shl 56)
+        or ((this[offset + 6].toLong()) shl 48)
+        or ((this[offset + 5].toLong()) shl 40)
+        or ((this[offset + 4].toLong()) shl 32)
+        or ((this[offset + 3].toLong()) shl 24)
+        or ((this[offset + 2].toLong()) shl 16)
+        or ((this[offset + 1].toLong()) shl 8)
+        or (this[0].toLong())
+        )
+}
+
+/**
+ * Decodes the bytes in this ByteString to an unsigned long in big endian mode, starting from
+ * [offset].
+ */
+/* @InlineOnly */
+@OptIn(ExperimentalUnsignedTypes::class)
+public inline fun ByteString.toULong(offset: Int = 0): ULong {
+    return (((this[offset].toULong()) shl 56)
+        or ((this[offset + 1].toULong()) shl 48)
+        or ((this[offset + 2].toULong()) shl 40)
+        or ((this[offset + 3].toULong()) shl 32)
+        or ((this[offset + 4].toULong()) shl 24)
+        or ((this[offset + 5].toULong()) shl 16)
+        or ((this[offset + 6].toULong()) shl 8)
+        or (this[offset + 7].toULong())
+        )
+}
+
+/**
+ * Decodes the bytes in this ByteString to an unsigned long in little endian mode, starting from
+ * [offset].
+ */
+/* @InlineOnly */
+@OptIn(ExperimentalUnsignedTypes::class)
+public inline fun ByteString.toULongLE(offset: Int = 0): ULong {
+    return (((this[offset + 7].toULong()) shl 56)
+        or ((this[offset + 6].toULong()) shl 48)
+        or ((this[offset + 5].toULong()) shl 40)
+        or ((this[offset + 4].toULong()) shl 32)
+        or ((this[offset + 3].toULong()) shl 24)
+        or ((this[offset + 2].toULong()) shl 16)
+        or ((this[offset + 1].toULong()) shl 8)
+        or (this[offset].toULong())
+        )
+}
+
 /**
  * Creates a new [ByteString] from this [String].
  */
@@ -168,6 +283,22 @@ public fun String.toByteString(): ByteString = ByteString.fromString(this)
  * Creates a new [ByteString] from this [ByteArray].
  */
 public fun ByteArray.toByteString(): ByteString = ByteString.fromByteArray(this)
+
+// uncopied because toByteArray copies it.
+/**
+ * Creates a new [ByteString] from this [UByteArray].
+ */
+@OptIn(Unsafe::class, ExperimentalUnsignedTypes::class)
+public fun UByteArray.toByteString(): ByteString = ByteString.fromUncopied(toByteArray())
+
+/**
+ * Creates a [ByteString] filled with zeroes.
+ */
+@OptIn(Unsafe::class)
+public fun ByteString.Companion.zeroed(size: Int): ByteString {
+    val ba = ByteArray(size)
+    return fromUncopied(ba)
+}
 
 /**
  * Helper function for ByteString, similar to Python b"abc".

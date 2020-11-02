@@ -45,6 +45,7 @@ private constructor(
         /**
          * Creates a new [ByteString] from a raw [ByteStringHolder].
          */
+        @Suppress("unused")
         public fun fromRawHolder(holder: ByteStringHolder): ByteString = ByteString(holder)
     }
 

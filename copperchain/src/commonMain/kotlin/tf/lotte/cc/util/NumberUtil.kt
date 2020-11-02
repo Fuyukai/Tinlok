@@ -13,7 +13,6 @@
 package tf.lotte.cc.util
 
 
-// safe conversion
 /**
  * Gets the upper byte of this Int.
  */
@@ -71,6 +70,22 @@ public inline val Int.byte3: Int
 /* @InlineOnly */
 public inline val UInt.byte3: UInt
     get() = (this shr 8) and 0xFFu
+
+/**
+ * Gets the upper byte of this Long.
+ */
+/* @InlineOnly */
+public inline val Long.upperByte: Long
+    get() = ((this.toULong()) and 0xFF00000000000000UL).toLong()
+
+/**
+ * Gets the lower byte of this Long.
+ */
+/* @InlineOnly */
+public inline val Long.lowerByte: Long
+    get() = (this and 0x00000000000000FF)
+
+
 
 // Number --> ByteArray
 /**
@@ -176,9 +191,9 @@ public inline fun ULong.toByteArrayLE(): ByteArray {
 // ByteArray --> Number
 
 /**
- * Decodes the two bytes in this ByteArray from [offset] onwards into a single short value in big
- * endian mode.
+ * Decodes the bytes in this ByteArray to a short in big endian mode, starting from [offset].
  */
+/* @InlineOnly */
 public inline fun ByteArray.toShort(offset: Int = 0): Short {
     val i1 = (this[offset].toInt().shl(16))
     val i2 = (this[offset + 1].toInt())
@@ -186,9 +201,9 @@ public inline fun ByteArray.toShort(offset: Int = 0): Short {
 }
 
 /**
- * Decodes the two bytes in this ByteArray from [offset] onwards into a single short value in
- * little endian mode.
+ * Decodes the bytes in this ByteArray to an short in big endian mode, starting from [offset].
  */
+/* @InlineOnly */
 public inline fun ByteArray.toShortLE(offset: Int = 0): Short {
     val i1 = (this[offset + 1].toInt().shl(16))
     val i2 = (this[offset].toInt())
@@ -196,7 +211,7 @@ public inline fun ByteArray.toShortLE(offset: Int = 0): Short {
 }
 
 /**
- * Decodes a size-4 byte array to an int in big endian mode.
+ * Decodes the bytes in this ByteArray to an int in big endian mode, starting from [offset].
  */
 /* @InlineOnly */
 public inline fun ByteArray.toInt(offset: Int = 0): Int {
@@ -208,7 +223,7 @@ public inline fun ByteArray.toInt(offset: Int = 0): Int {
 }
 
 /**
- * Decodes a size-4 byte array to an int in little endian mode.
+ * Decodes the bytes in this ByteArray to an int in little endian mode, starting from [offset].
  */
 /* @InlineOnly */
 public inline fun ByteArray.toIntLE(offset: Int = 0): Int {
@@ -220,7 +235,7 @@ public inline fun ByteArray.toIntLE(offset: Int = 0): Int {
 }
 
 /**
- * Decodes a size-8 byte array to a long in big endian mode.
+ * Decodes the bytes in this ByteArray to a long in big endian mode, starting from [offset].
  */
 /* @InlineOnly */
 public inline fun ByteArray.toLong(offset: Int = 0): Long {
@@ -236,7 +251,7 @@ public inline fun ByteArray.toLong(offset: Int = 0): Long {
 }
 
 /**
- * Decodes a size-8 byte array to a long in little endian mode.
+ * Decodes the bytes in this ByteArray to a long in little endian mode, starting from [offset].
  */
 /* @InlineOnly */
 public inline fun ByteArray.toLongLE(offset: Int = 0): Long {
@@ -248,6 +263,42 @@ public inline fun ByteArray.toLongLE(offset: Int = 0): Long {
         or ((this[offset + 2].toLong()) shl 16)
         or ((this[offset + 1].toLong()) shl 8)
         or (this[0].toLong())
+        )
+}
+
+/**
+ * Decodes the bytes in this ByteArray to an unsigned long in big endian mode, starting from
+ * [offset].
+ */
+/* @InlineOnly */
+@OptIn(ExperimentalUnsignedTypes::class)
+public inline fun ByteArray.toULong(offset: Int = 0): ULong {
+    return (((this[offset].toULong()) shl 56)
+        or ((this[offset + 1].toULong()) shl 48)
+        or ((this[offset + 2].toULong()) shl 40)
+        or ((this[offset + 3].toULong()) shl 32)
+        or ((this[offset + 4].toULong()) shl 24)
+        or ((this[offset + 5].toULong()) shl 16)
+        or ((this[offset + 6].toULong()) shl 8)
+        or (this[offset + 7].toULong())
+        )
+}
+
+/**
+ * Decodes the bytes in this ByteArray to an unsigned long in little endian mode, starting from
+ * [offset].
+ */
+/* @InlineOnly */
+@OptIn(ExperimentalUnsignedTypes::class)
+public inline fun ByteArray.toULongLE(offset: Int = 0): ULong {
+    return (((this[offset + 7].toULong()) shl 56)
+        or ((this[offset + 6].toULong()) shl 48)
+        or ((this[offset + 5].toULong()) shl 40)
+        or ((this[offset + 4].toULong()) shl 32)
+        or ((this[offset + 3].toULong()) shl 24)
+        or ((this[offset + 2].toULong()) shl 16)
+        or ((this[offset + 1].toULong()) shl 8)
+        or (this[offset].toULong())
         )
 }
 
@@ -275,53 +326,7 @@ public inline fun UByteArray.toUIntLE(offset: Int = 0): UInt {
         )
 }
 
-/**
- * Decodes a size-8 byte array to a ulong in big endian mode.
- */
-/* @InlineOnly */
-public inline fun ByteArray.toULong(offset: Int = 0): ULong {
-    return (((this[offset].toULong()) shl 56)
-        or ((this[offset + 1].toULong()) shl 48)
-        or ((this[offset + 2].toULong()) shl 40)
-        or ((this[offset + 3].toULong()) shl 32)
-        or ((this[offset + 4].toULong()) shl 24)
-        or ((this[offset + 5].toULong()) shl 16)
-        or ((this[offset + 6].toULong()) shl 8)
-        or (this[offset + 7].toULong())
-        )
-}
-
-/**
- * Decodes a size-8 byte array to a ulong in little endian mode.
- */
-/* @InlineOnly */
-public inline fun ByteArray.toULongLE(offset: Int = 0): ULong {
-    return (((this[offset + 7].toULong()) shl 56)
-        or ((this[offset + 6].toULong()) shl 48)
-        or ((this[offset + 5].toULong()) shl 40)
-        or ((this[offset + 4].toULong()) shl 32)
-        or ((this[offset + 3].toULong()) shl 24)
-        or ((this[offset + 2].toULong()) shl 16)
-        or ((this[offset + 1].toULong()) shl 8)
-        or (this[offset].toULong())
-        )
-}
-
-/**
- * Gets the upper byte of this Long.
- */
-/* @InlineOnly */
-public inline val Long.upperByte: Long
-    get() = ((this.toULong()) and 0xFF00000000000000UL).toLong()
-
-/**
- * Gets the lower byte of this Long.
- */
-/* @InlineOnly */
-public inline val Long.lowerByte: Long
-    get() = (this and 0x00000000000000FF)
-
-
+// misc helpers
 /**
  * Creates a new int with all of the specified [flag] values OR'd together.
  */
@@ -371,3 +376,35 @@ public fun flagged(input: UInt, flag: Int): Boolean {
 public fun flagged(input: UInt, flag: UInt): Boolean {
     return input.and(flag) != 0u
 }
+
+/**
+ * Checks if the bit [idx] (one-indexed) is flagged in this [Long].
+ */
+public fun Long.bit(idx: Int): Boolean {
+    return (this.shr(idx - 1).and(1)) == 1L
+}
+
+/**
+ * Checks if the bit [idx] (one-indexed) is flagged in this [Long].
+ */
+public fun ULong.bit(idx: Int): Boolean = toLong().bit(idx)
+
+/**
+ * Checks if the bit [idx] (one-indexed) is flagged in this [Int].
+ */
+public fun Int.bit(idx: Int): Boolean = toLong().bit(idx)
+
+/**
+ * Checks if the bit [idx] (one-indexed) is flagged in this [UInt].
+ */
+public fun UInt.bit(idx: Int): Boolean = toLong().bit(idx)
+
+/**
+ * Checks if the bit [idx] (one-indexed) is flagged in this [Byte].
+ */
+public fun Byte.bit(idx: Int): Boolean = toLong().bit(idx)
+
+/**
+ * Checks if the bit [idx] (one-indexed) is flagged in this [UByte].
+ */
+public fun UByte.bit(idx: Int): Boolean = toLong().bit(idx)
