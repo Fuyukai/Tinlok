@@ -199,7 +199,6 @@ public class UUID(
             uuidChars.copyInto(chars, 16, 19, 23)
             uuidChars.copyInto(chars, 20, 24, 36)
             val hexString = chars.concatToString()
-            println("raw string: $hexString")
             val bs = hexString.unhexlify()
             return UUID(bs)
         }
