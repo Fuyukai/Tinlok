@@ -144,6 +144,11 @@ tasks.register("copyCommonCBindings") {
         from("src/linuxX64Main/kotlin/tf/lotte/tinlok/net/IPAddressUtil.kt")
         into("src/mingwX64Main/kotlin/tf/lotte/tinlok/net/")
     }
+
+    copy {
+        from("src/linuxX64Main/kotlin/tf/lotte/tinlok/types/UuidPlatform.kt")
+        into("src/linuxArm64Main/kotlin/tf/lotte/tinlok/types/")
+    }
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile> {
