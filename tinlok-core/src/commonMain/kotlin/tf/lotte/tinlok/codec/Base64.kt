@@ -7,6 +7,8 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
+@file:Suppress("unused")
+
 package tf.lotte.tinlok.codec
 
 import tf.lotte.cc.Unsafe
@@ -250,7 +252,7 @@ public fun base64Decode(str: String): ByteString {
  * Encodes this [ByteString] using Base64.
  */
 public fun ByteString.encodeBase64(urlSafe: Boolean = false): String {
-    return base64Encode(this)
+    return base64Encode(this, urlSafe = urlSafe)
 }
 
 /**
