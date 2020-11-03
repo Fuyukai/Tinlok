@@ -19,6 +19,9 @@ public inline class BlockingResult(public val count: Long) {
     public companion object {
         /** Singleton failure result. */
         public val WOULD_BLOCK: BlockingResult = BlockingResult(-1L)
+
+        /** Singleton success result, for results without a meaningful count. */
+        public val DIDNT_BLOCK: BlockingResult = BlockingResult(0L)
     }
 
     /**

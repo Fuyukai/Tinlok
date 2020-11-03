@@ -631,6 +631,38 @@ public actual object Syscall {
 
     /**
      * Connects a socket to an address.
+     */
+    @Unsafe
+    public fun connect(sock: FD, info: InetConnectionInfo): BlockingResult = memScoped {
+        val struct: sockaddr
+        val size: UInt
+
+        when (info.family) {
+            AddressFamily.AF_INET6 -> {
+                struct = __ipv6_to_sockaddr(this, info.ip as IPv6Address, info.port)
+                size = sizeOf<sockaddr_in6>().toUInt()
+            }
+            AddressFamily.AF_INET -> {
+                struct = __ipv4_to_sockaddr(this, info.ip as IPv4Address, info.port)
+                size = sizeOf<sockaddr_in>().toUInt()
+            }
+            else -> throw UnsupportedOperationException("Don't know how to use $info")
+        }
+
+        return when (val res = connect(sock, struct.ptr, size)) {
+            0 -> BlockingResult.DIDNT_BLOCK
+            ERROR -> {
+                when (errno) {
+                    EINTR, EINPROGRESS, EWOULDBLOCK -> BlockingResult.WOULD_BLOCK
+                    else -> throwErrno(errno)
+                }
+            }
+            else -> error("Unknown return value: $res")
+        }
+    }
+
+    /**
+     * Connects a socket to an address.
      *
      * The [timeout] param defines how long to wait when connecting, in milliseconds. A
      * reasonable default of 30 seconds is set.
@@ -638,57 +670,29 @@ public actual object Syscall {
     @Unsafe
     public fun __connect_blocking(sock: FD, info: InetConnectionInfo, timeout: Int = 30_000) {
         memScoped {
-            val struct: sockaddr
-            val size: UInt
-
-            when (info.family) {
-                AddressFamily.AF_INET6 -> {
-                    struct = __ipv6_to_sockaddr(this, info.ip as IPv6Address, info.port)
-                    size = sizeOf<sockaddr_in6>().toUInt()
-                }
-                AddressFamily.AF_INET -> {
-                    struct = __ipv4_to_sockaddr(this, info.ip as IPv4Address, info.port)
-                    size = sizeOf<sockaddr_in>().toUInt()
-                }
-                else -> throw UnsupportedOperationException("Don't know how to use $info")
-            }
-
             // less than zero timeouts go on the fast path, which is a standard blocking connect
             if (timeout < 0) {
-                val res = connect(sock, struct.ptr, size)
-                if (res.isError) {
-                throwErrno(errno)
+                val res = connect(sock, info)
+                if (!res.isSuccess) {
+                    throw UnsupportedOperationException(
+                        "Attempted to do a blocking connect on a non-blocking socket"
+                    )
                 }
+
                 return
             }
 
             // actual timeout, so we go onto the complicated path
             // set non-blocking so we can do timeouts
-            val origin = fcntl(sock, F_GETFL)
-            if (origin.isError) {
-                throwErrno(errno)
-            }
-
-            // inside a run {} block to prevent polluting my local variables...
-            run {
-                val fcres = fcntl(sock, F_SETFL, origin.or(O_NONBLOCK))
-                if (fcres.isError) {
-                    throwErrno(errno)
-                }
-            }
+            val origin = fcntl(sock, FcntlParam.F_GETFL)
+            fcntl(sock, FcntlParam.F_SETFL, origin.or(O_NONBLOCK))
 
             // actually run the connect
-            val res = connect(sock, struct.ptr, size)
-            if (res == 0) {
+            val res = connect(sock, info)
+            if (res.isSuccess) {
                 // immediately succeeded, set blocking and return
-                val r = fcntl(sock, F_SETFL, origin)
-                if (r.isError) {
-                    throwErrno(errno)
-                }
-
+                fcntl(sock, FcntlParam.F_SETFL, origin)
                 return
-            } else if (res.isError && (errno != EINTR && errno != EINPROGRESS)) {
-                throwErrno(errno)
             }
 
             // need to poll() until the socket is writeable
@@ -709,10 +713,19 @@ public actual object Syscall {
             // don't bother checking pollfd because we only used one socket anyway so we know
             // which one succeeded
             // and we also gotta set the socket to blocking mode again
-            val r = fcntl(sock, F_SETFL, origin)
-            if (r.isError) {
-                throwErrno(errno)
-            }
+            fcntl(sock, FcntlParam.F_SETFL, origin)
+        }
+    }
+
+    /**
+     * File CoNTroL. Manipulates a file
+     */
+    public fun fcntl(fd: FD, option: FcntlParam, vararg params: Any?): Int {
+        val res = platform.posix.fcntl(fd, option.number, *params as Array<Any?>)
+        if (res.isError) {
+            throwErrno(errno)
+        } else {
+            return res
         }
     }
 
