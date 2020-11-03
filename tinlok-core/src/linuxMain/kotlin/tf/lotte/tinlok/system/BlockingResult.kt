@@ -15,10 +15,15 @@ package tf.lotte.tinlok.system
  * If [count] is -1, the result of the platform call was EAGAIN/EWOULDBLOCK/EINPROGRESS. Otherwise, it
  * is usually a number that makes sense in context of the platform call.
  */
-public inline class BlockingResult(public val count: Int) {
+public inline class BlockingResult(public val count: Long) {
+    public companion object {
+        /** Singleton failure result. */
+        public val WOULD_BLOCK: BlockingResult = BlockingResult(-1L)
+    }
+
     /**
      * If this result didn't need a blocking call to be complete.
      */
     public val isSuccess: Boolean
-        get() = count != -1
+        get() = count != -1L
 }

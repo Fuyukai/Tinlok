@@ -234,7 +234,7 @@ public actual object Syscall {
      * [offset].
      */
     @Unsafe
-    public fun read(fd: FD, buf: ByteArray, count: Int, offset: Int = 0): Long {
+    public fun read(fd: FD, buf: ByteArray, count: Int, offset: Int = 0): BlockingResult {
         assert(count <= IO_MAX) { "Count is too high!" }
         assert(buf.size >= count) { "Buffer is too small!" }
 
@@ -244,12 +244,12 @@ public actual object Syscall {
 
         if (readCount.isError) {
             when (errno) {
-                EAGAIN -> TODO("EAGAIN")
+                EAGAIN -> BlockingResult.WOULD_BLOCK
                 else -> throwErrno(errno)
             }
         }
 
-        return readCount
+        return BlockingResult(readCount)
     }
 
     /**
@@ -259,12 +259,14 @@ public actual object Syscall {
      * This handles EINTR transparently, continuing a write if interrupted.
      */
     @Unsafe
-    public fun write(fd: FD, from: ByteArray, size: Int = from.size, offset: Int = 0): Long {
+    public fun write(
+        fd: FD, from: ByteArray, size: Int = from.size, offset: Int = 0
+    ): BlockingResult {
         assert(size <= IO_MAX) { "Count is too high!" }
         assert(from.size >= size) { "Buffer is too small!" }
 
-        // next of
         var nextOffset = offset
+        var hitAgain = false
 
         // head spinny logic
         from.usePinned {
@@ -275,8 +277,15 @@ public actual object Syscall {
                 )
 
                 // eintr means it didn't write anything, so we can transparently retry
-                if (written.isError && errno != EINTR) {
-                    throwErrno(errno)
+                if (written.isError) {
+                    when (errno) {
+                        EINTR -> continue
+                        EAGAIN -> {
+                            hitAgain = true
+                            break
+                        }
+                        else -> throwErrno(errno)
+                    }
                 }
 
                 // make sure we actually write all of the bytes we want to write
@@ -288,7 +297,12 @@ public actual object Syscall {
             }
         }
 
-        return nextOffset.toLong()
+        // if we hit EAGAIN, and nextOffset is 0, we didn't write anything
+        return if (hitAgain && nextOffset == 0) {
+            BlockingResult.WOULD_BLOCK
+        } else {
+            BlockingResult(nextOffset.toLong())
+        }
     }
 
     /**
@@ -325,7 +339,7 @@ public actual object Syscall {
      */
     @Unsafe
     public fun lseek(fd: FD, position: Long, whence: SeekWhence): Long {
-        val res = platform.posix.lseek(fd, position, whence.number)
+        val res = lseek(fd, position, whence.number)
         if (res.isError) {
             throwErrno(errno)
         }
@@ -798,7 +812,7 @@ public actual object Syscall {
         buffer: ByteArray,
         size: Int = buffer.size, offset: Int = 0,
         flags: Int = 0
-    ): Int {
+    ): BlockingResult {
         assert(size <= IO_MAX) { "Count is too high!" }
         assert(buffer.size >= size) { "Buffer is too small!" }
 
@@ -807,10 +821,11 @@ public actual object Syscall {
         }
 
         if (read.isError) {
+            if (errno == EAGAIN) return BlockingResult.WOULD_BLOCK
             throwErrno(errno)
         }
 
-        return read.toInt()
+        return BlockingResult(read)
     }
 
 
@@ -818,7 +833,9 @@ public actual object Syscall {
      * Writes bytes to a socket from the specified buffer.
      */
     @Unsafe
-    public fun send(sock: FD, buffer: ByteArray, size: Int = buffer.size, offset: Int = 0): Long {
+    public fun send(
+        sock: FD, buffer: ByteArray, size: Int = buffer.size, offset: Int = 0
+    ): BlockingResult {
         assert(size <= IO_MAX) { "Count is too high!" }
         assert(buffer.size >= size) { "Buffer is too small!" }
 
