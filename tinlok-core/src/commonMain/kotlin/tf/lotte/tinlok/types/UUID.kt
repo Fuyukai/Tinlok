@@ -60,6 +60,10 @@ public class UUID(
         ;
     }
 
+    init {
+        require(bytes.size == 16) { "UUID must be 16 bytes long" }
+    }
+
     // public fields
     /** The low field of the timestamp. */
     public val timeLow: UInt
