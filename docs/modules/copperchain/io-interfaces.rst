@@ -3,21 +3,22 @@
 I/O Interfaces
 ==============
 
-Tinlok Core provides several interfaces defining how synchronous I/O objects act. These are
-implemented by all I/O objects provided by the Tinlok Core library, such as files and sockets.
+Copperchain provides several interfaces defining how I/O objects act. Both synchronous and
+asynchronous variants exist.
 
 Core Interfaces
 ---------------
 
-There are four core interfaces:
+There are four primary interfaces:
 
-* ``Readable``, which defines ``readUpTo`` for consuming up to N bytes from an object.
+* ``Readable`` and ``AsyncReadable``, which define ``readInto`` for consuming up to N bytes from an
+  object.
 
-* ``Closeable``, which defines the idempotent ``close`` to close the resource, and the ``use``
-  extension method which automatically closes it.
+* ``Closeable`` and ``AsyncCloseable``, which define the idempotent ``close`` to close the
+  resource, and the ``use`` and ``ause`` extension methods which automatically closes them.
 
-* ``Writeable``, which defines ``writeAll`` for writing the entire contents of a ``ByteString``
-  to the object.
+* ``Writeable`` and ``AsyncWriteable``, which defines ``writeAll`` for writing the entire contents
+  of a ``ByteArray`` to the object.
 
 * ``Seekable``, which defines operations to get and change the cursor position for a resource.
 
@@ -27,13 +28,13 @@ Streams
 Streams are the combination of the ``Closeable`` interface, and any other core interfaces. Tinlok
 defines several:
 
-* ``ReadableStream`` is a closeable readable object.
+* ``(Async)ReadableStream`` is a closeable readable object.
 
-* ``WriteableStream`` is a closeable writeable object.
+* ``(Async)WriteableStream`` is a closeable writeable object.
 
-* ``BidirectionalStream`` is a closeable readable and writeable object.
+* ``(Async)BidirectionalStream`` is a closeable readable and writeable object.
 
-* ``HalfCloseableStream`` is a ``BidirectionalStream`` that can have the writing part closed
+* ``(Async)HalfCloseableStream`` is a ``BidirectionalStream`` that can have the writing part closed
   independently of the reading part.
 
 Summary
@@ -44,9 +45,9 @@ A table summarising the interfaces:
 +-------------------------+-----------------------------------------+------------------------------------------------+
 | Interface               | Inherits                                | Provides                                       |
 +=========================+=========================================+================================================+
-| ``Readable``            | None                                    | ``readUpTo``                                   |
+| ``Readable``            | None                                    | ``readInto``                                   |
 +-------------------------+-----------------------------------------+------------------------------------------------+
-| ``Writeable``           | None                                    | ``writeAll``                                   |
+| ``Writeable``           | None                                    | ``writeFrom``                                  |
 +-------------------------+-----------------------------------------+------------------------------------------------+
 | ``Closeable``           | None                                    | ``close``                                      |
 +-------------------------+-----------------------------------------+------------------------------------------------+
@@ -60,6 +61,8 @@ A table summarising the interfaces:
 +-------------------------+-----------------------------------------+------------------------------------------------+
 | ``HalfCloseableStream`` | ``BidirectionalStream``                 | ``sendEof``                                    |
 +-------------------------+-----------------------------------------+------------------------------------------------+
+
+All interfaces in this table have an ``Async``-prefixed counterpart which works in the same manner.
 
 Credits
 -------

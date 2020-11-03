@@ -4,7 +4,7 @@ Types - Bytestrings
 ===================
 
 A ``ByteString`` is an immutable sequence of singular bytes, or simply an immutable ``ByteArray``.
-It is used extensively within Tinlok whenever binary data is involved.
+It is used extensively whenever binary data is involved.
 
 Creation
 --------

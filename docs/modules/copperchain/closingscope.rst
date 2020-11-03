@@ -5,21 +5,21 @@ Closeable and ClosingScope
 
 .. note::
 
-    This applies to the version of Kotlin/Native with primitive ARC memory management (as of
-    writing, 1.4 and earlier). With a tracing GC, some form of finalizer may be added which may
-    make this less unsafe.
+    Parts of this applies to the version of Kotlin/Native with primitive ARC memory management
+    (as of writing, 1.4 and earlier). With a tracing GC, some form of finalizer may be added which
+    may make this less unsafe.
 
 In the native world, many things need to be opened, used, then closed. The opening part is easy
 but the closing part is hard; it can be forgotten or exceptions can occur, and then you have a
 memory leak or a file descriptor leak or other similarly vile issues.
 
-Tinlok solves this with a combination of the ``Unsafe`` annotation, and the ``Closeable``
-interface.
+Copperchain solves this with a combination of the ``Unsafe`` annotation, and the
+``Closeable`` interface.
 
 Closing safely
 --------------
 
-In any case where a Tinlok object needs to hold onto an external resource for a specified amount
+In any case where a native object needs to hold onto an external resource for a specified amount
 of time, such as a heap allocated C structure or a file descriptor, there are two design rules:
 
 1. The class holding the resource must be a ``Closeable``.
@@ -105,7 +105,7 @@ function:
 
     // example extension, assumes constructor is internal/unsafe
     @OptIn(Unsafe::class)
-    public fun SomeObject.create(scope: ClosingScope) {
+    public fun SomeObject.Companion.create(scope: ClosingScope) {
         val obb = SomeObject()
         scope.add(obb)
         return obb
@@ -134,6 +134,6 @@ When the block returns, all objects will be automatically closed safely.
 
     When a ``ClosingScope`` returns, only the LAST exception will be re-thrown.
 
-All Tinlok closeable objects provide extension functions for both the callback and the
+All closeable objects provide extension functions for both the callback and the
 ``ClosingScope`` forms.
 

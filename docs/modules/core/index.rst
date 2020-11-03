@@ -45,13 +45,10 @@ Contents
 --------
 
 .. toctree::
-   :maxdepth: 1
-
-   closingscope.rst
-   bytestring.rst
-   io-interfaces.rst
+   :maxdepth: 2
 
    cryptography.rst
+   uuid.rst
 
    paths/pure.rst
    paths/io.rst

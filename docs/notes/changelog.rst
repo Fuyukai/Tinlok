@@ -26,6 +26,8 @@ Changelog
    - Also, I don't see really any use for errno properties that wouldn't be better served with
      more specific subclasses.
 
+ - Add UUID support.
+
 1.1.0 (Released 2020-10-14)
 ---------------------------
 
