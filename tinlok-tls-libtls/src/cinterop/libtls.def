@@ -1,3 +1,0 @@
-headers = tls.h
-# hope you have openssl installed!
-linkerOpts.linux_x64 = -L/usr/lib -lssl -lcrypto -ltls
