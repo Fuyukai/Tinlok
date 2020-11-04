@@ -24,4 +24,13 @@ public actual class AtomicBoolean(value: Boolean) {
         set(value) { _value.value = if (value) 1 else 0 }
 
     public override fun toString(): String = value.toString()
+
+    /** Gets the inversion of this atomic boolean. */
+    public operator fun not(): Boolean = _value.value == 0
+
+    public fun compareAndSet(expected: Boolean, new: Boolean): Boolean {
+        val realExpected = if (expected) 1 else 0
+        val realNew = if (new) 1 else 0
+        return _value.compareAndSet(realExpected, realNew)
+    }
 }

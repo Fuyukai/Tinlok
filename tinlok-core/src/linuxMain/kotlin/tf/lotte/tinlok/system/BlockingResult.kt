@@ -27,6 +27,14 @@ public inline class BlockingResult(public val count: Long) {
     /**
      * If this result didn't need a blocking call to be complete.
      */
-    public val isSuccess: Boolean
+    public inline val isSuccess: Boolean
         get() = count != -1L
+}
+
+public inline fun BlockingResult.ensureNonBlock(): Long {
+    // todo: change error?
+    if (!isSuccess) throw IllegalStateException(
+        "Underlying operation is non-blocking, but was called in a blocking context"
+    )
+    return count
 }

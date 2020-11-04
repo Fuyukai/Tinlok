@@ -11,7 +11,6 @@ package tf.lotte.tinlok.net.tcp
 
 import platform.posix.SHUT_WR
 import tf.lotte.cc.Unsafe
-import tf.lotte.cc.exc.ClosedException
 import tf.lotte.tinlok.system.FD
 import tf.lotte.tinlok.system.Syscall
 
@@ -19,14 +18,8 @@ import tf.lotte.tinlok.system.Syscall
  * Implements a TCP socket on Linux.
  */
 internal class LinuxTcpSocket(
-    override val fd: FD, address: TcpConnectionInfo
-) : LinuxTcpParent(), TcpClientSocket {
-    init {
-        // this socket is always open initially
-        isOpen.value = true
-    }
-
-    override val remoteAddress = address
+    fd: FD, override val remoteAddress: TcpConnectionInfo
+) : LinuxTcpParent(fd), TcpClientSocket {
 
     @OptIn(Unsafe::class)
     override fun sendEof() {
@@ -34,14 +27,20 @@ internal class LinuxTcpSocket(
     }
 
     @OptIn(Unsafe::class)
-    override fun readInto(buf: ByteArray, offset: Int, size: Int): Int {
-        if (!isOpen.value) throw ClosedException("This socket is closed")
-        return Syscall.recv(fd, buffer = buf, offset = offset)
+    override fun readInto(buf: ByteArray, size: Int, offset: Int): Int {
+        val result = wrapper.read(buf, size, offset)
+        if (!result.isSuccess) {
+            error("The underlying socket is in non-blocking mode, but we are a blocking socket")
+        }
+        return result.count.toInt()
     }
 
     @OptIn(Unsafe::class)
     override fun writeAllFrom(buf: ByteArray): Int {
-        if (!isOpen.value) throw ClosedException("This socket is closed")
-        return Syscall.send(fd, buf).toInt()
+        val result = wrapper.write(buf, size = buf.size, offset = 0)
+        if (!result.isSuccess) {
+            error("The underlying socket is in non-blocking mode, but we are a blocking socket")
+        }
+        return result.count.toInt()
     }
 }

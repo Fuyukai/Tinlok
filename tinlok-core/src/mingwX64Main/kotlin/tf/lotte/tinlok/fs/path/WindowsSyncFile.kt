@@ -85,7 +85,7 @@ public class WindowsSyncFile(
     }
 
     @OptIn(Unsafe::class)
-    override fun readInto(buf: ByteArray, offset: Int, size: Int): Int {
+    override fun readInto(buf: ByteArray, size: Int, offset: Int): Int {
         return Syscall.ReadFile(handle, buf, size, offset)
     }
 

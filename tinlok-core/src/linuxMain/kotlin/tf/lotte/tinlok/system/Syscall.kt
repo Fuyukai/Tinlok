@@ -108,6 +108,12 @@ public actual object Syscall {
             ETIMEDOUT -> TimeoutException()
             ENETUNREACH -> NetworkUnreachableException()
 
+            // unsupporteed
+            ENOPROTOOPT -> UnsupportedOperationException(
+                "The specified option is not supported by this protocol."
+            )
+            ENOTSOCK -> UnsupportedOperationException("The specified fd is not a socket")
+
             EINVAL -> IllegalArgumentException()
 
             else -> OSException(message = "[errno ${errno}] ${strerror(errno)}")
@@ -243,7 +249,7 @@ public actual object Syscall {
         }
 
         if (readCount.isError) {
-            when (errno) {
+            return when (errno) {
                 EAGAIN -> BlockingResult.WOULD_BLOCK
                 else -> throwErrno(errno)
             }
@@ -720,14 +726,39 @@ public actual object Syscall {
     /**
      * File CoNTroL. Manipulates a file
      */
-    public fun fcntl(fd: FD, option: FcntlParam, vararg params: Any?): Int {
-        val res = platform.posix.fcntl(fd, option.number, *params as Array<Any?>)
+    @Unsafe
+    public fun fcntl(fd: FD, option: FcntlParam<*>): Int {
+        val res = platform.posix.fcntl(fd, option.number)
         if (res.isError) {
             throwErrno(errno)
-        } else {
-            return res
         }
+        return res
     }
+
+    /**
+     * Overloaded fcntl with one int parameter.
+     */
+    @Unsafe
+    public fun fcntl(fd: FD, option: FcntlParam<Int>, p1: Int): Int {
+        val res = platform.posix.fcntl(fd, option.number, p1)
+        if (res.isError) {
+            throwErrno(errno)
+        }
+        return res
+    }
+
+    /**
+     * Overloaded fcntl with one pointer parameter.
+     */
+    @Unsafe
+    public fun fcntl(fd: FD, option: FcntlParam<CPointer<*>>, p1: CPointer<*>): Int {
+        val res = platform.posix.fcntl(fd, option.number, p1)
+        if (res.isError) {
+            throwErrno(errno)
+        }
+        return res
+    }
+
 
     // this easily has the ability to be one of the grossest APIs in the entire library.
     /**
@@ -828,6 +859,7 @@ public actual object Syscall {
     ): BlockingResult {
         assert(size <= IO_MAX) { "Count is too high!" }
         assert(buffer.size >= size) { "Buffer is too small!" }
+        assert(offset + size <= buffer.size) { "offset + size > buffer.size" }
 
         val read = buffer.usePinned {
             retry { recv(sock, it.addressOf(offset), size.toULong(), flags) }

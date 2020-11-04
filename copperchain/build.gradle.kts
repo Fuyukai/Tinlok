@@ -66,6 +66,10 @@ kotlin {
                 implementation(kotlin("test-junit"))
             }
         }
+
+        all {
+            languageSettings.enableLanguageFeature("InlineClasses")
+        }
     }
 
     sourceSets.all {

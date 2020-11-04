@@ -19,9 +19,6 @@ rootProject.name = "tinlok"
 include("copperchain")
 include("tinlok-core")
 
-// extra modules
-include("tinlok-tls-libtls")
-
 // static libraries
 include("tinlok-static-ipv6")
 include("tinlok-static-monocypher")
