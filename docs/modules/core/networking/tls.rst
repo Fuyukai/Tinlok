@@ -23,6 +23,4 @@ specifically linking to a TLS backend library.
 * The ``TlsException`` is an exception class inheriting from ``OSException`` that is thrown on
   TLS errors. Its errno is always ``-1``.
 
-The core TLS support currently provides zero support for actually creating TLS sockets; you will
-need to use a specific extra dependency that may link against a different library (for example
-:ref:`module_libressl`).
+More to come; stay tuned.

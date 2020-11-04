@@ -33,16 +33,20 @@ Here's a list of issues I know about with the codebase:
 
   - Some methods like ``ByteString.split`` are particularly ripe for improvement
 
-* Low-level system interface doesn't support non-blocking sockets
-
 * If you are stupid and do fork-exec file descriptors will be copied (no O_CLOEXC yet)
 
-* Win32 path methods will do a LOT of system calls
+* Win32 support:
 
-  - Thank its weird concept of symbolic links for this.
+  * Win32 path methods will do a LOT of system calls
 
-  - Linux doesn't have this issue because symlinks can always be treated as just files, and it
-    has realpath() to do the symlink shenanigans for us.
+    - Thank its weird concept of symbolic links for this.
+
+    - Linux doesn't have this issue because symlinks can always be treated as just files, and it
+      has realpath() to do the symlink shenanigans for us.
+
+  * No winsock support (although Syscall does initialise WinSock)
+
+  * No overlapped support on files.
 
 .. _ipaddress: https://docs.python.org/3/library/ipaddress.html
 .. _KT-41853: https://youtrack.jetbrains.com/issue/KT-41853

@@ -67,7 +67,6 @@ In binary form, Tinlok can be found on Bintray:
 
    modules/copperchain/index.rst
    modules/core/index.rst
-   modules/libressl/index.rst
 
 
 

@@ -3,8 +3,8 @@
 Changelog
 =========
 
-1.2.0
------
+1.2.0 (Released 2020-11-04)
+---------------------------
 
  - Add ``WindowsPurePath``.
 
@@ -27,6 +27,21 @@ Changelog
      more specific subclasses.
 
  - Add UUID support.
+
+ - Add Windows support, using the Win32 API, for the following:
+
+   - Filesystem paths
+
+   - File I/O
+
+   - Cryptographically secure psuedorandom number generations
+
+   - Cryptography
+
+ - Add support for non-blocking I/O on Linux.
+
+   - The current blocking I/O functions wrap these, and will throw errors if they return in a
+     non-blocking mode.
 
 1.1.0 (Released 2020-10-14)
 ---------------------------
