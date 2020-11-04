@@ -10,36 +10,31 @@
 package tf.lotte.tinlok.net.tcp
 
 import tf.lotte.cc.Unsafe
+import tf.lotte.tinlok.io.FdWrapper
 import tf.lotte.tinlok.net.socket.StandardSocketOption
 import tf.lotte.tinlok.system.FD
-import tf.lotte.tinlok.system.Syscall
-import tf.lotte.tinlok.util.AtomicBoolean
 
 /**
  * Parent class for the two TCP socket classes.
  */
-internal abstract class LinuxTcpParent : TcpSocket {
-    /* socket has been opened and fd != -1 */
-    protected val isOpen = AtomicBoolean(false)
-
-    /* linux socket file descriptor */
-    protected abstract val fd: FD
+public abstract class LinuxTcpParent(
+    protected val fd: FD
+) : TcpSocket {
+    /* wrapper object around the file descriptor */
+    protected val wrapper: FdWrapper = FdWrapper(fd)
 
     @OptIn(Unsafe::class)
     override fun <T> getSocketOption(option: StandardSocketOption<T>): T {
-        return Syscall.getsockopt(fd, option)
+        return wrapper.getSocketOption(option)
     }
 
     @OptIn(Unsafe::class)
     override fun <T> setSocketOption(option: StandardSocketOption<T>, value: T) {
-        Syscall.setsockopt(fd, option, value)
+        return wrapper.setSocketOption(option, value)
     }
 
     @OptIn(Unsafe::class)
     override fun close() {
-        if (isOpen.value) return
-
-        Syscall.close(fd)
-        isOpen.value = false
+        wrapper.close()
     }
 }

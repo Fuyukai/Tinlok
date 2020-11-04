@@ -8,7 +8,7 @@
  */
 
 @file:OptIn(ExperimentalUnsignedTypes::class)
-@file:Suppress("unused")
+@file:Suppress("unused", "NOTHING_TO_INLINE")
 
 package tf.lotte.cc.util
 

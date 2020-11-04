@@ -9,15 +9,16 @@
 
 package tf.lotte.tinlok.net.dns
 
-import kotlinx.cinterop.*
-import platform.posix.*
+import kotlinx.cinterop.memScoped
+import kotlinx.cinterop.pointed
+import kotlinx.cinterop.ptr
+import platform.posix.addrinfo
 import tf.lotte.cc.Unsafe
-import tf.lotte.cc.util.toByteArray
 import tf.lotte.tinlok.net.*
 import tf.lotte.tinlok.net.tcp.TcpConnectionInfo
 import tf.lotte.tinlok.net.udp.UdpConnectionInfo
 import tf.lotte.tinlok.system.Syscall
-import tf.lotte.tinlok.system.readBytesFast
+import tf.lotte.tinlok.util.toKotlin
 
 @ExperimentalUnsignedTypes
 public actual object GlobalResolver : AddressResolver {
@@ -48,28 +49,7 @@ public actual object GlobalResolver : AddressResolver {
 
             // addresses with a nullptr IP are skipped because ???
             val sockaddr = info.ai_addr?.pointed ?: continue
-            val ip: IPAddress
-            val port: Int
-
-            when (family) {
-                AddressFamily.AF_INET -> {
-                    val real = sockaddr.reinterpret<sockaddr_in>()
-                    val ba = real.sin_addr.s_addr.toByteArray()
-                    ip = IPv4Address(ba)
-
-                    port = ntohs(real.sin_port).toInt()
-                }
-                AddressFamily.AF_INET6 -> {
-                    val real = sockaddr.reinterpret<sockaddr_in6>()
-                    // XX: Kotlin in6_addr has no fields!
-                    val addrPtr = real.sin6_addr.arrayMemberAt<ByteVar>(0L)
-                    val addr = addrPtr.readBytesFast(16)
-                    ip = IPv6Address(addr)
-
-                    port = ntohs(real.sin6_port).toInt()
-                }
-                else -> continue  // unknown or unsupported
-            }
+            val (ip, port) = sockaddr.toKotlin(family) ?: continue
 
             val finalAddr = when (type) {
                 SocketType.SOCK_STREAM -> {

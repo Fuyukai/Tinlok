@@ -15,9 +15,10 @@ import tf.lotte.cc.exc.ClosedException
 import tf.lotte.cc.types.ByteString
 import tf.lotte.tinlok.fs.StandardOpenModes.*
 import tf.lotte.tinlok.fs.path.LinuxPath
-import tf.lotte.tinlok.system.FD
+import tf.lotte.tinlok.io.FdWrapper
 import tf.lotte.tinlok.system.SeekWhence
 import tf.lotte.tinlok.system.Syscall
+import tf.lotte.tinlok.system.ensureNonBlock
 import tf.lotte.tinlok.util.AtomicBoolean
 
 /**
@@ -30,7 +31,7 @@ internal class LinuxSyncFile(
     permission: PosixFilePermission = PosixFilePermission.DEFAULT_FILE
 ) : FilesystemFile {
     /** The underlying file descriptor for this file. */
-    private val fd: FD
+    private val wrapper: FdWrapper
 
     init {
 
@@ -50,52 +51,51 @@ internal class LinuxSyncFile(
         }
 
         // only pass permission bit if O_CREAT is passed
-        fd = if ((mode and O_CREAT) == 0) {
+        val fd = if ((mode and O_CREAT) == 0) {
             Syscall.open(path.unsafeToString(), mode)
         } else {
             Syscall.open(path.unsafeToString(), mode, permission.bit)
         }
+
+        wrapper = FdWrapper(fd)
     }
 
-    // manually handled
-
-    // == closing == //
-    override val isOpen = AtomicBoolean(true)
+    override val isOpen: AtomicBoolean
+        get() = wrapper.isOpen
 
     @OptIn(Unsafe::class)
     override fun close() {
-        if (!isOpen.value) return
-
-        isOpen.value = false
-        Syscall.close(fd)
+        wrapper.close()
     }
 
     @OptIn(Unsafe::class)
     override fun cursor(): Long {
-        if (!isOpen.value) throw ClosedException("This file is closed")
-        return Syscall.lseek(fd, 0L, SeekWhence.CURRENT)
+        if (!isOpen) throw ClosedException("This file is closed")
+
+        return Syscall.lseek(wrapper.fd, 0L, SeekWhence.CURRENT)
     }
 
     @OptIn(Unsafe::class)
     override fun seekAbsolute(position: Long) {
-        if (!isOpen.value) throw ClosedException("This file is closed")
-        Syscall.lseek(fd, position, SeekWhence.START)
+        if (!isOpen) throw ClosedException("This file is closed")
+
+        Syscall.lseek(wrapper.fd, position, SeekWhence.START)
     }
 
     @OptIn(Unsafe::class)
     override fun seekRelative(position: Long) {
-        if (!isOpen.value) throw ClosedException("This file is closed")
-        Syscall.lseek(fd, position, SeekWhence.CURRENT)
+        if (!isOpen) throw ClosedException("This file is closed")
+
+        Syscall.lseek(wrapper.fd, position, SeekWhence.CURRENT)
     }
 
-    override fun readInto(buf: ByteArray, offset: Int, size: Int): Int {
-        if (!isOpen.value) throw ClosedException("This file is closed")
-        return Syscall.read(fd, buf, size, offset).toInt()
+    override fun readInto(buf: ByteArray, size: Int, offset: Int): Int {
+        val result = wrapper.read(buf, size, offset).ensureNonBlock()
+        return result.toInt()
     }
 
     @OptIn(Unsafe::class)
     override fun readAll(): ByteString {
-        if (!isOpen.value) throw ClosedException("This file is closed")
 
         // get the correct size for symlinks
         val realPath = path.resolveFully(strict = true)
@@ -106,7 +106,7 @@ internal class LinuxSyncFile(
 
         val sizeInt = size.toInt()
         val buf = ByteArray(sizeInt)
-        val cnt = Syscall.read(fd, buf, sizeInt)
+        val cnt = wrapper.read(buf, size = sizeInt).ensureNonBlock()
 
         // TODO: We can avoid this mess on the sad path by reading in chunks
         return ByteString.fromUncopied(if (cnt == buf.size.toLong()) {
@@ -123,7 +123,6 @@ internal class LinuxSyncFile(
     }
 
     override fun writeAllFrom(buf: ByteArray): Int {
-        if (!isOpen.value) throw ClosedException("This file is closed")
-        return Syscall.write(fd, buf, buf.size).toInt()
+        return wrapper.write(buf, buf.size, 0).ensureNonBlock().toInt()
     }
 }

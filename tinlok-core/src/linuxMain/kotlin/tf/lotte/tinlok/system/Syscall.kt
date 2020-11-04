@@ -16,11 +16,11 @@ import platform.posix.*
 import tf.lotte.cc.Unsafe
 import tf.lotte.cc.exc.*
 import tf.lotte.cc.types.ByteString
-import tf.lotte.cc.util.toByteArray
 import tf.lotte.cc.util.toUInt
 import tf.lotte.tinlok.net.*
 import tf.lotte.tinlok.net.dns.GAIException
 import tf.lotte.tinlok.net.socket.LinuxSocketOption
+import tf.lotte.tinlok.util.toKotlin
 import kotlin.experimental.ExperimentalTypeInference
 
 internal typealias FD = Int
@@ -107,6 +107,12 @@ public actual object Syscall {
             ECONNREFUSED -> ConnectionRefusedException()
             ETIMEDOUT -> TimeoutException()
             ENETUNREACH -> NetworkUnreachableException()
+
+            // unsupporteed
+            ENOPROTOOPT -> UnsupportedOperationException(
+                "The specified option is not supported by this protocol."
+            )
+            ENOTSOCK -> UnsupportedOperationException("The specified fd is not a socket")
 
             EINVAL -> IllegalArgumentException()
 
@@ -234,7 +240,7 @@ public actual object Syscall {
      * [offset].
      */
     @Unsafe
-    public fun read(fd: FD, buf: ByteArray, count: Int, offset: Int = 0): Long {
+    public fun read(fd: FD, buf: ByteArray, count: Int, offset: Int = 0): BlockingResult {
         assert(count <= IO_MAX) { "Count is too high!" }
         assert(buf.size >= count) { "Buffer is too small!" }
 
@@ -243,13 +249,13 @@ public actual object Syscall {
         }
 
         if (readCount.isError) {
-            when (errno) {
-                EAGAIN -> TODO("EAGAIN")
+            return when (errno) {
+                EAGAIN -> BlockingResult.WOULD_BLOCK
                 else -> throwErrno(errno)
             }
         }
 
-        return readCount
+        return BlockingResult(readCount)
     }
 
     /**
@@ -259,12 +265,14 @@ public actual object Syscall {
      * This handles EINTR transparently, continuing a write if interrupted.
      */
     @Unsafe
-    public fun write(fd: FD, from: ByteArray, size: Int = from.size, offset: Int = 0): Long {
+    public fun write(
+        fd: FD, from: ByteArray, size: Int = from.size, offset: Int = 0
+    ): BlockingResult {
         assert(size <= IO_MAX) { "Count is too high!" }
         assert(from.size >= size) { "Buffer is too small!" }
 
-        // next of
         var nextOffset = offset
+        var hitAgain = false
 
         // head spinny logic
         from.usePinned {
@@ -275,8 +283,15 @@ public actual object Syscall {
                 )
 
                 // eintr means it didn't write anything, so we can transparently retry
-                if (written.isError && errno != EINTR) {
-                    throwErrno(errno)
+                if (written.isError) {
+                    when (errno) {
+                        EINTR -> continue
+                        EAGAIN -> {
+                            hitAgain = true
+                            break
+                        }
+                        else -> throwErrno(errno)
+                    }
                 }
 
                 // make sure we actually write all of the bytes we want to write
@@ -288,7 +303,12 @@ public actual object Syscall {
             }
         }
 
-        return nextOffset.toLong()
+        // if we hit EAGAIN, and nextOffset is 0, we didn't write anything
+        return if (hitAgain && nextOffset == 0) {
+            BlockingResult.WOULD_BLOCK
+        } else {
+            BlockingResult(nextOffset.toLong())
+        }
     }
 
     /**
@@ -325,7 +345,7 @@ public actual object Syscall {
      */
     @Unsafe
     public fun lseek(fd: FD, position: Long, whence: SeekWhence): Long {
-        val res = platform.posix.lseek(fd, position, whence.number)
+        val res = lseek(fd, position, whence.number)
         if (res.isError) {
             throwErrno(errno)
         }
@@ -617,6 +637,38 @@ public actual object Syscall {
 
     /**
      * Connects a socket to an address.
+     */
+    @Unsafe
+    public fun connect(sock: FD, info: InetConnectionInfo): BlockingResult = memScoped {
+        val struct: sockaddr
+        val size: UInt
+
+        when (info.family) {
+            AddressFamily.AF_INET6 -> {
+                struct = __ipv6_to_sockaddr(this, info.ip as IPv6Address, info.port)
+                size = sizeOf<sockaddr_in6>().toUInt()
+            }
+            AddressFamily.AF_INET -> {
+                struct = __ipv4_to_sockaddr(this, info.ip as IPv4Address, info.port)
+                size = sizeOf<sockaddr_in>().toUInt()
+            }
+            else -> throw UnsupportedOperationException("Don't know how to use $info")
+        }
+
+        return when (val res = connect(sock, struct.ptr, size)) {
+            0 -> BlockingResult.DIDNT_BLOCK
+            ERROR -> {
+                when (errno) {
+                    EINTR, EINPROGRESS, EWOULDBLOCK -> BlockingResult.WOULD_BLOCK
+                    else -> throwErrno(errno)
+                }
+            }
+            else -> error("Unknown return value: $res")
+        }
+    }
+
+    /**
+     * Connects a socket to an address.
      *
      * The [timeout] param defines how long to wait when connecting, in milliseconds. A
      * reasonable default of 30 seconds is set.
@@ -624,57 +676,29 @@ public actual object Syscall {
     @Unsafe
     public fun __connect_blocking(sock: FD, info: InetConnectionInfo, timeout: Int = 30_000) {
         memScoped {
-            val struct: sockaddr
-            val size: UInt
-
-            when (info.family) {
-                AddressFamily.AF_INET6 -> {
-                    struct = __ipv6_to_sockaddr(this, info.ip as IPv6Address, info.port)
-                    size = sizeOf<sockaddr_in6>().toUInt()
-                }
-                AddressFamily.AF_INET -> {
-                    struct = __ipv4_to_sockaddr(this, info.ip as IPv4Address, info.port)
-                    size = sizeOf<sockaddr_in>().toUInt()
-                }
-                else -> throw UnsupportedOperationException("Don't know how to use $info")
-            }
-
             // less than zero timeouts go on the fast path, which is a standard blocking connect
             if (timeout < 0) {
-                val res = connect(sock, struct.ptr, size)
-                if (res.isError) {
-                throwErrno(errno)
+                val res = connect(sock, info)
+                if (!res.isSuccess) {
+                    throw UnsupportedOperationException(
+                        "Attempted to do a blocking connect on a non-blocking socket"
+                    )
                 }
+
                 return
             }
 
             // actual timeout, so we go onto the complicated path
             // set non-blocking so we can do timeouts
-            val origin = fcntl(sock, F_GETFL)
-            if (origin.isError) {
-                throwErrno(errno)
-            }
-
-            // inside a run {} block to prevent polluting my local variables...
-            run {
-                val fcres = fcntl(sock, F_SETFL, origin.or(O_NONBLOCK))
-                if (fcres.isError) {
-                    throwErrno(errno)
-                }
-            }
+            val origin = fcntl(sock, FcntlParam.F_GETFL)
+            fcntl(sock, FcntlParam.F_SETFL, origin.or(O_NONBLOCK))
 
             // actually run the connect
-            val res = connect(sock, struct.ptr, size)
-            if (res == 0) {
+            val res = connect(sock, info)
+            if (res.isSuccess) {
                 // immediately succeeded, set blocking and return
-                val r = fcntl(sock, F_SETFL, origin)
-                if (r.isError) {
-                    throwErrno(errno)
-                }
-
+                fcntl(sock, FcntlParam.F_SETFL, origin)
                 return
-            } else if (res.isError && (errno != EINTR && errno != EINPROGRESS)) {
-                throwErrno(errno)
             }
 
             // need to poll() until the socket is writeable
@@ -695,12 +719,46 @@ public actual object Syscall {
             // don't bother checking pollfd because we only used one socket anyway so we know
             // which one succeeded
             // and we also gotta set the socket to blocking mode again
-            val r = fcntl(sock, F_SETFL, origin)
-            if (r.isError) {
-                throwErrno(errno)
-            }
+            fcntl(sock, FcntlParam.F_SETFL, origin)
         }
     }
+
+    /**
+     * File CoNTroL. Manipulates a file
+     */
+    @Unsafe
+    public fun fcntl(fd: FD, option: FcntlParam<*>): Int {
+        val res = platform.posix.fcntl(fd, option.number)
+        if (res.isError) {
+            throwErrno(errno)
+        }
+        return res
+    }
+
+    /**
+     * Overloaded fcntl with one int parameter.
+     */
+    @Unsafe
+    public fun fcntl(fd: FD, option: FcntlParam<Int>, p1: Int): Int {
+        val res = platform.posix.fcntl(fd, option.number, p1)
+        if (res.isError) {
+            throwErrno(errno)
+        }
+        return res
+    }
+
+    /**
+     * Overloaded fcntl with one pointer parameter.
+     */
+    @Unsafe
+    public fun fcntl(fd: FD, option: FcntlParam<CPointer<*>>, p1: CPointer<*>): Int {
+        val res = platform.posix.fcntl(fd, option.number, p1)
+        if (res.isError) {
+            throwErrno(errno)
+        }
+        return res
+    }
+
 
     // this easily has the ability to be one of the grossest APIs in the entire library.
     /**
@@ -717,34 +775,14 @@ public actual object Syscall {
 
         val accepted = retry { accept(sock, addr.ptr.reinterpret(), sizePtr.ptr) }
         if (accepted.isError) {
+            // TODO: EAGAIN/EWOULDBLOCK
             throwErrno(errno)
         }
 
-        // nb: this is duplicated partially from getaddrinfo()
-        // TODO: don't duplicate this
-
         // read out the IP address and put it in our own high-level object
         // for remoteAddress
-        val address = when (addr.ss_family) {
-            AF_INET.toUShort() -> {
-                val inet4 = addr.reinterpret<sockaddr_in>()
-                val ba = inet4.sin_addr.s_addr.toByteArray()
-                val ip = IPv4Address(ba)
-                val port = ntohs(inet4.sin_port).toInt()
-                creator.from(ip, port)
-            }
-            AF_INET6.toUShort() -> {
-                val inet6 = addr.reinterpret<sockaddr_in6>()
-                // XX: Kotlin in6_addr has no fields!
-                val addrPtr = inet6.sin6_addr.arrayMemberAt<ByteVar>(0L)
-                val ba = addrPtr.readBytesFast(16)
-                val ip = IPv6Address(ba)
-                val port = ntohs(inet6.sin6_port).toInt()
-                creator.from(ip, port)
-            }
-            else -> null
-        }
-
+        val pair = addr.toKotlin() ?: return Accepted(accepted, null)
+        val address = creator.from(pair.first, pair.second)
         return Accepted(accepted, address)
     }
 
@@ -798,19 +836,21 @@ public actual object Syscall {
         buffer: ByteArray,
         size: Int = buffer.size, offset: Int = 0,
         flags: Int = 0
-    ): Int {
+    ): BlockingResult {
         assert(size <= IO_MAX) { "Count is too high!" }
         assert(buffer.size >= size) { "Buffer is too small!" }
+        assert(offset + size <= buffer.size) { "offset + size > buffer.size" }
 
         val read = buffer.usePinned {
             retry { recv(sock, it.addressOf(offset), size.toULong(), flags) }
         }
 
         if (read.isError) {
+            if (errno == EAGAIN) return BlockingResult.WOULD_BLOCK
             throwErrno(errno)
         }
 
-        return read.toInt()
+        return BlockingResult(read)
     }
 
 
@@ -818,7 +858,9 @@ public actual object Syscall {
      * Writes bytes to a socket from the specified buffer.
      */
     @Unsafe
-    public fun send(sock: FD, buffer: ByteArray, size: Int = buffer.size, offset: Int = 0): Long {
+    public fun send(
+        sock: FD, buffer: ByteArray, size: Int = buffer.size, offset: Int = 0
+    ): BlockingResult {
         assert(size <= IO_MAX) { "Count is too high!" }
         assert(buffer.size >= size) { "Buffer is too small!" }
 

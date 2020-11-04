@@ -19,19 +19,21 @@ import tf.lotte.tinlok.system.Syscall
  * Implements Linux TCP server socket that produces new [LinuxTcpSocket] children.
  */
 internal class LinuxTcpServerSocket(
-    override val fd: FD,
+    fd: FD,
     private val address: TcpConnectionInfo
-) : LinuxTcpParent(), TcpServerSocket {
+) : LinuxTcpParent(fd), TcpServerSocket {
     @OptIn(Unsafe::class)
     override fun bind(backlog: Int) {
+        if (!wrapper.isOpen) throw ClosedException("This socket is closed")
+
         Syscall.bind(fd, address)
         Syscall.listen(fd, backlog)
-        isOpen.value = true
     }
 
     @Unsafe
     override fun unsafeAccept(): TcpClientSocket {
-        if (!isOpen.value) throw ClosedException("This socket is closed")
+        if (!wrapper.isOpen) throw ClosedException("This socket is closed")
+
         val accepted = Syscall.accept(fd, ConnectionInfoCreator.Tcp)
         return LinuxTcpSocket(accepted.fd, accepted.info!!)
     }

@@ -17,5 +17,5 @@ public interface Readable {
      * Reads no more than [size] amount of bytes into [buf], starting at [offset], returning the
      * number of bytes actually written.
      */
-    public fun readInto(buf: ByteArray, offset: Int = 0, size: Int = buf.size): Int
+    public fun readInto(buf: ByteArray, size: Int = buf.size, offset: Int = 0): Int
 }
