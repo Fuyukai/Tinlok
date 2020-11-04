@@ -16,11 +16,11 @@ import platform.posix.*
 import tf.lotte.cc.Unsafe
 import tf.lotte.cc.exc.*
 import tf.lotte.cc.types.ByteString
-import tf.lotte.cc.util.toByteArray
 import tf.lotte.cc.util.toUInt
 import tf.lotte.tinlok.net.*
 import tf.lotte.tinlok.net.dns.GAIException
 import tf.lotte.tinlok.net.socket.LinuxSocketOption
+import tf.lotte.tinlok.util.toKotlin
 import kotlin.experimental.ExperimentalTypeInference
 
 internal typealias FD = Int
@@ -775,34 +775,14 @@ public actual object Syscall {
 
         val accepted = retry { accept(sock, addr.ptr.reinterpret(), sizePtr.ptr) }
         if (accepted.isError) {
+            // TODO: EAGAIN/EWOULDBLOCK
             throwErrno(errno)
         }
 
-        // nb: this is duplicated partially from getaddrinfo()
-        // TODO: don't duplicate this
-
         // read out the IP address and put it in our own high-level object
         // for remoteAddress
-        val address = when (addr.ss_family) {
-            AF_INET.toUShort() -> {
-                val inet4 = addr.reinterpret<sockaddr_in>()
-                val ba = inet4.sin_addr.s_addr.toByteArray()
-                val ip = IPv4Address(ba)
-                val port = ntohs(inet4.sin_port).toInt()
-                creator.from(ip, port)
-            }
-            AF_INET6.toUShort() -> {
-                val inet6 = addr.reinterpret<sockaddr_in6>()
-                // XX: Kotlin in6_addr has no fields!
-                val addrPtr = inet6.sin6_addr.arrayMemberAt<ByteVar>(0L)
-                val ba = addrPtr.readBytesFast(16)
-                val ip = IPv6Address(ba)
-                val port = ntohs(inet6.sin6_port).toInt()
-                creator.from(ip, port)
-            }
-            else -> null
-        }
-
+        val pair = addr.toKotlin() ?: return Accepted(accepted, null)
+        val address = creator.from(pair.first, pair.second)
         return Accepted(accepted, address)
     }
 

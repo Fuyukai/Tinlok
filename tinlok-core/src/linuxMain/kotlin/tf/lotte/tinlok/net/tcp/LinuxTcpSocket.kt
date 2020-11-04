@@ -32,6 +32,7 @@ internal class LinuxTcpSocket(
         if (!result.isSuccess) {
             error("The underlying socket is in non-blocking mode, but we are a blocking socket")
         }
+
         return result.count.toInt()
     }
 
@@ -41,6 +42,7 @@ internal class LinuxTcpSocket(
         if (!result.isSuccess) {
             error("The underlying socket is in non-blocking mode, but we are a blocking socket")
         }
+
         return result.count.toInt()
     }
 }
