@@ -27,28 +27,19 @@ Tinlok includes some statically linked external libraries to perform certain fun
 are statically included into the relevant klibs for maximum ease of use, and are distributed
 under their original licences on Maven for anyone to use.
 
-* `ipv6-parser <https://github.com/jrepp/ipv6-parse>`_, licenced under the MIT licence. Used for
-  handling IPv6 addresses.
-
 * `Monocypher <https://monocypher.org/>`_, licenced under the 2-clause BSD licence. Used for core
   cryptography operations.
 
-OpenSSL
--------
+The Tinlok source code also directly includes the header files of several external dependencies in
+c-interop code.
 
-The current TLS support in Tinlok uses the ``libtls`` library, which was written by the LibreSSL
-devs.
+* `libuuid <https://git.kernel.org/pub/scm/utils/util-linux/util-linux.git>`_, licenced under the
+  3-clause (New) BSD licence.
 
-* ``libtls`` from `LibreSSL`_ contains code from the OpenSSL project pre-relicence, which is
-  under the OpenSSL/SSLeay licence which is normally incompatible with the LGPL. However, under
-  the GPL Section 7 (Additional Terms), we give permission for any code in Tinlok to be linked
-  with OpenSSL code. It is recommended that you do the same.
+* A copy of a structure used for symbolic links, taken from the MinGW source code (which was
+  itself taken from the ReactOS source code). Licenced under the public domain.
 
-* The `LibreTLS`_ project, however, exists as a port of ``libtls`` (ISC) to modern OpenSSL
-  (Apache 2.0) which avoids these licencing concerns. ``tinlok-tls-libtls`` is fully compatible
-  with this library.
 
 .. _GNU Lesser General Public License version 3.0 or later: https://www.gnu.org/licenses/lgpl-3.0.en.html
 .. _Mozilla Public License Version 2.0 or later: https://www.mozilla.org/en-US/MPL/2.0/
-.. _LibreTLS: https://git.causal.agency/libretls/about/
-.. _LibreSSL: https://www.libressl.org/
+
