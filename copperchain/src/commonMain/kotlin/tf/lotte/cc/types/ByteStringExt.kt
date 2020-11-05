@@ -102,7 +102,7 @@ public fun Collection<ByteString>.join(delim: ByteString): ByteString {
 /**
  * An array corresponding to the hex alphabet.
  */
-public val HEX_ALPHABET =
+public val HEX_ALPHABET: Array<Char> =
     arrayOf(
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
         'a', 'b', 'c', 'd', 'e', 'f'
@@ -127,16 +127,21 @@ public fun ByteString.hexlify(): String {
     return buf.toString()
 }
 
-internal fun Char.toInt16(): Int {
-    return when (this) {
-        'a', 'A' -> 10
-        'b', 'B' -> 11
-        'c', 'C' -> 12
-        'd', 'D' -> 13
-        'e', 'E' -> 14
-        'f', 'F' -> 15
-        else -> this.toString().toInt()  // real numbers
+/**
+ * Converts a hexadecimal char into an [Int].
+ */
+@Suppress("ConvertTwoComparisonsToRangeCheck")
+public fun Char.toIntHex(): Int {
+    return if (this >= 'a' && this <= 'f') {
+        this.toInt() - 87  // 'a' is ordinal 97
+    } else if (this >= 'A' && this <= 'F') {
+        toInt() - 55  // 'f' is ordinal 65
+    } else if (this >= '0' && this <= '9') {
+        toInt() - 48  // '0' is ordinal 48
+    } else {
+        throw IllegalArgumentException("Not a hexadecimal digit: $this")
     }
+
 }
 
 /**
@@ -146,13 +151,13 @@ internal fun Char.toInt16(): Int {
 public fun String.unhexlify(): ByteString {
     require((length.rem(2)) == 0) { "Hex string length was not a multiple of two!" }
     val buf = ByteArray(length / 2)
-    var cursor: Int = 0
+    var cursor = 0
 
     val iterator = this.iterator()
     while (true) {
         if (!iterator.hasNext()) break
-        val first = iterator.next().toInt16().shl(4)
-        val second = iterator.next().toInt16()
+        val first = iterator.next().toIntHex().shl(4)
+        val second = iterator.next().toIntHex()
 
         val byte = (first or second).toByte()
         buf[cursor] = byte
@@ -290,6 +295,12 @@ public fun ByteArray.toByteString(): ByteString = ByteString.fromByteArray(this)
  */
 @OptIn(Unsafe::class, ExperimentalUnsignedTypes::class)
 public fun UByteArray.toByteString(): ByteString = ByteString.fromUncopied(toByteArray())
+
+/**
+ * Creates a new [ByteString] from this collection of bytes.
+ */
+@OptIn(Unsafe::class)
+public fun Collection<Byte>.toByteString(): ByteString = ByteString.fromUncopied(toByteArray())
 
 /**
  * Creates a [ByteString] filled with zeroes.
