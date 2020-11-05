@@ -10,6 +10,8 @@
 package tf.lotte.tinlok.net
 
 import tf.lotte.cc.Unsafe
+import tf.lotte.cc.net.IPv6Stringifier
+import tf.lotte.cc.net.IPv6TextParser
 import tf.lotte.cc.util.toByteArray
 
 // see: https://docs.python.org/3/library/ipaddress.html
@@ -101,7 +103,7 @@ internal constructor(internal val rawRepresentation: ByteArray) : IPAddress() {
          */
         @OptIn(Unsafe::class)
         public fun of(ip: String): IPv6Address {
-            val bytes = parseIPv6(ip)
+            val bytes = IPv6TextParser.parse(ip)
             return IPv6Address(bytes)
         }
     }
@@ -129,6 +131,6 @@ internal constructor(internal val rawRepresentation: ByteArray) : IPAddress() {
 
     @OptIn(Unsafe::class)
     override fun toString(): String {
-        return IPv6toString(rawRepresentation)
+        return IPv6Stringifier(rawRepresentation).correct()
     }
 }

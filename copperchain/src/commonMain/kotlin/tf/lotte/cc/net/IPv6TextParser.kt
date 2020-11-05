@@ -93,7 +93,7 @@ public class IPv6TextParser(public val incoming: String) {
     }
 
     private fun parseError(cause: String): Nothing {
-        error("$cause when parsing address $incoming")
+        throw IPv6ParseException(cause, incoming)
     }
 
     /**

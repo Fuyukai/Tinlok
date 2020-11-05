@@ -15,16 +15,13 @@ import tf.lotte.cc.types.toByteString
 import tf.lotte.cc.util.baOf
 import kotlin.test.*
 
-private typealias ParseException = IllegalStateException
-
-
 
 /**
  * Tests the IPv6 parser object.
  */
 public class `Test_IPv6Parser` {
     private inline fun assertBadParse(address: String): Unit {
-        assertFailsWith<ParseException> { IPv6TextParser.parse(address) }
+        assertFailsWith<IPv6ParseException> { IPv6TextParser.parse(address) }
     }
 
     val yert = baOf(42, 3, 176, 192, 0, 3, 0, 208, 0, 0, 0, 0, 94, 184, 192, 1)

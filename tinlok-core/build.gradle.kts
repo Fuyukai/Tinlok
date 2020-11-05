@@ -67,7 +67,6 @@ kotlin {
     val x64 = linuxX64() {
         val linuxX64Main by sourceSets.getting {
             dependencies {
-                implementation(project(":tinlok-static-ipv6"))
                 implementation(project(":tinlok-static-monocypher"))
             }
         }
@@ -82,7 +81,6 @@ kotlin {
         val linuxMain by sourceSets.getting
         val linuxArm64Main by sourceSets.getting {
             dependencies {
-                implementation(project(":tinlok-static-ipv6"))
                 implementation(project(":tinlok-static-monocypher"))
             }
         }
@@ -96,7 +94,6 @@ kotlin {
     mingwX64() {
         val mingwX64Main by sourceSets.getting {
             dependencies {
-                implementation(project(":tinlok-static-ipv6"))
                 implementation(project(":tinlok-static-monocypher"))
             }
         }
@@ -133,21 +130,6 @@ tasks.register("copyCommonCBindings") {
             "src/linuxX64Main/kotlin/tf/lotte/tinlok/crypto/CryptoLLA.kt"
         )
         into("src/mingwX64Main/kotlin/tf/lotte/tinlok/crypto")
-    }
-
-    copy {
-        from("src/linuxX64Main/kotlin/tf/lotte/tinlok/net/IPAddressUtil.kt")
-        into("src/linuxArm64Main/kotlin/tf/lotte/tinlok/net/")
-    }
-
-    copy {
-        from("src/linuxX64Main/kotlin/tf/lotte/tinlok/net/IPAddressUtil.kt")
-        into("src/mingwX64Main/kotlin/tf/lotte/tinlok/net/")
-    }
-
-    copy {
-        from("src/linuxX64Main/kotlin/tf/lotte/tinlok/types/UuidPlatform.kt")
-        into("src/linuxArm64Main/kotlin/tf/lotte/tinlok/types/")
     }
 }
 
