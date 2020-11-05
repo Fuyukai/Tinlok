@@ -15,6 +15,8 @@ plugins {
 group = "tf.lotte.copperchain"
 
 kotlin {
+    explicitApi = org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode.Strict
+
     // == JVM targets == //
     jvm()
 
