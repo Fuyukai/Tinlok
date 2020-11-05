@@ -11,20 +11,18 @@
 
 package tf.lotte.cc.net
 
-import tf.lotte.cc.types.ByteString
 import tf.lotte.cc.types.toByteString
+import tf.lotte.cc.util.baOf
 import kotlin.test.*
 
 private typealias ParseException = IllegalStateException
+
+
 
 /**
  * Tests the IPv6 parser object.
  */
 public class `Test_IPv6Parser` {
-    private fun baOf(vararg i: Int): ByteString {
-        return intArrayOf(*i).map { it.toByte() }.toByteString()
-    }
-
     private inline fun assertBadParse(address: String): Unit {
         assertFailsWith<ParseException> { IPv6TextParser.parse(address) }
     }
