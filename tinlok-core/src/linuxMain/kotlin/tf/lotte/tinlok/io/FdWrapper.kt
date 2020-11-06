@@ -17,8 +17,7 @@ import tf.lotte.cc.exc.OSException
 import tf.lotte.cc.io.async.Selectable
 import tf.lotte.cc.io.async.SelectionKey
 import tf.lotte.cc.util.flagged
-import tf.lotte.tinlok.net.socket.LinuxSocketOption
-import tf.lotte.tinlok.net.socket.StandardSocketOption
+import tf.lotte.tinlok.net.socket.BsdSocketOption
 import tf.lotte.tinlok.system.*
 import tf.lotte.tinlok.util.AtomicBoolean
 
@@ -88,7 +87,7 @@ public open class FdWrapper(
      */
     @OptIn(Unsafe::class)
     @Throws(UnsupportedOperationException::class)
-    public fun <T> getSocketOption(option: LinuxSocketOption<T>): T {
+    public fun <T> getSocketOption(option: BsdSocketOption<T>): T {
         if (!isOpen) throw ClosedException("underlying fd is closed")
 
         return Syscall.getsockopt(fd, option)
@@ -96,7 +95,7 @@ public open class FdWrapper(
 
     @OptIn(Unsafe::class)
     @Throws(ClosedException::class, OSException::class)
-    public fun <T> setSocketOption(option: StandardSocketOption<T>, value: T) {
+    public fun <T> setSocketOption(option: BsdSocketOption<T>, value: T) {
         if (!isOpen) throw ClosedException("underlying fd is closed")
 
         Syscall.setsockopt(fd, option, value)

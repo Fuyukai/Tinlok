@@ -14,11 +14,12 @@ import kotlinx.cinterop.NativePlacement
 import tf.lotte.cc.Unsafe
 
 /**
- * Sub-interface for linux socket options.
+ * Sub-interface for BSD Socket API socket options. This is supported by both the BSD socket
+ * interface on POSIX systems, and WinSock.
  */
-public interface LinuxSocketOption<T> : SocketOption<T> {
-    /** The Linux option name, in int form. */
-    public val linuxOptionName: Int
+public actual interface BsdSocketOption<T> : SocketOption<T> {
+    /** The BSD option value, in int form. */
+    public actual val bsdOptionValue: Int
 
     /**
      * Allocates an empty (zero-value) native structure.
@@ -38,6 +39,9 @@ public interface LinuxSocketOption<T> : SocketOption<T> {
     @Unsafe
     public fun fromNativeStructure(allocator: NativePlacement, structure: CPointer<*>): T
 
+    /**
+     * Gets the native size of this option (i.e. sizeof(allocateNativeStructure(...))).
+     */
     @Unsafe
     public fun nativeSize(): Long
 }

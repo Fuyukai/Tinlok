@@ -20,7 +20,7 @@ import tf.lotte.cc.types.ByteString
 import tf.lotte.cc.util.toUInt
 import tf.lotte.tinlok.net.ConnectionInfoCreator
 import tf.lotte.tinlok.net.dns.GAIException
-import tf.lotte.tinlok.net.socket.LinuxSocketOption
+import tf.lotte.tinlok.net.socket.BsdSocketOption
 import tf.lotte.tinlok.util.toKotlin
 import kotlin.experimental.ExperimentalTypeInference
 
@@ -557,11 +557,7 @@ public actual object Syscall {
     ): addrinfo {
         val hints = alloc.alloc<addrinfo>()
         val res = alloc.allocPointerTo<addrinfo>()
-        hints.usePinned {
-            memset(hints.ptr, 0, sizeOf<addrinfo>().convert())
-        }
-
-        println("family: $family, type: $type, protocol: $protocol")
+        memset(hints.ptr, 0, sizeOf<addrinfo>().convert())
 
         hints.ai_flags = flags
         if (node == null) {
@@ -878,10 +874,10 @@ public actual object Syscall {
      * Sets the socket [option] to the [value] provided.
      */
     @Unsafe
-    public fun <T> setsockopt(sock: FD, option: LinuxSocketOption<T>, value: T): Unit = memScoped {
+    public fun <T> setsockopt(sock: FD, option: BsdSocketOption<T>, value: T): Unit = memScoped {
         val native = option.toNativeStructure(this, value)
         val size = option.nativeSize()
-        val err = setsockopt(sock, option.level, option.linuxOptionName, native, size.toUInt())
+        val err = setsockopt(sock, option.level, option.bsdOptionValue, native, size.toUInt())
         if (err.isError) {
             throwErrno(errno)
         }
@@ -891,11 +887,11 @@ public actual object Syscall {
      * Gets a socket option.
      */
     @Unsafe
-    public fun <T> getsockopt(sock: FD, option: LinuxSocketOption<T>): T = memScoped {
+    public fun <T> getsockopt(sock: FD, option: BsdSocketOption<T>): T = memScoped {
         val storage = option.allocateNativeStructure(this)
         val size = cValuesOf(option.nativeSize().toUInt())
         val res = getsockopt(
-            sock, option.level, option.linuxOptionName,
+            sock, option.level, option.bsdOptionValue,
             storage, size
         )
         if (res.isError) {

@@ -244,7 +244,6 @@ public actual object Syscall {
 
         if (res != TRUE) {
             val err = GetLastError().toInt()
-            println("deviceiocontrol failed")
             throwErrnoPath(err, path)
         }
         // this is the only thing we care about

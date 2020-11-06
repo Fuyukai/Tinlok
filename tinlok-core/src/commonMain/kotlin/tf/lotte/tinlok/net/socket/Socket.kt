@@ -20,10 +20,10 @@ public interface Socket : Closeable {
      *
      * Subinterfaces may add extra overloaded methods for this function.
      */
-    public fun <T> setSocketOption(option: StandardSocketOption<T>, value: T)
+    public fun <T> setSocketOption(option: BsdSocketOption<T>, value: T)
 
     /**
      * Gets a standard socket [option] on this socket.
      */
-    public fun <T> getSocketOption(option: StandardSocketOption<T>): T
+    public fun <T> getSocketOption(option: BsdSocketOption<T>): T
 }

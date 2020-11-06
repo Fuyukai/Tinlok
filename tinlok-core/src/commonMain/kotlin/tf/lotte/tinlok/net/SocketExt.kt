@@ -19,7 +19,7 @@ import tf.lotte.cc.use
 import tf.lotte.tinlok.Sys
 import tf.lotte.tinlok.net.socket.AcceptingSeverSocket
 import tf.lotte.tinlok.net.socket.ClientSocket
-import tf.lotte.tinlok.net.socket.StandardSocketOption
+import tf.lotte.tinlok.net.socket.StandardSocketOptions
 import tf.lotte.tinlok.net.tcp.TcpClientSocket
 import tf.lotte.tinlok.net.tcp.TcpServerSocket
 import kotlin.contracts.ExperimentalContracts
@@ -45,7 +45,6 @@ public inline fun <R> TcpClientSocket.Companion.connect(
     }
 
     val sock = unsafeOpen(address, timeout)
-    // TODO: TCP_NODELAY and TCP_NOTSENT_LOWAT if needed
 
     return sock.use(block)
 }
@@ -96,7 +95,7 @@ public inline fun <R> TcpServerSocket.Companion.bind(
     return TcpServerSocket.open(address) {
         // Always set REUSEADDR on non-Windows
         if (!Sys.osInfo.isWindows) {
-            it.setSocketOption(StandardSocketOption.SO_REUSEADDR, true)
+            it.setSocketOption(StandardSocketOptions.SO_REUSEADDR, true)
         }
 
         it.bind(backlog)

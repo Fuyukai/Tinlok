@@ -11,7 +11,7 @@ package tf.lotte.tinlok.net.tcp
 
 import tf.lotte.cc.Unsafe
 import tf.lotte.tinlok.io.FdWrapper
-import tf.lotte.tinlok.net.socket.StandardSocketOption
+import tf.lotte.tinlok.net.socket.BsdSocketOption
 import tf.lotte.tinlok.system.FD
 
 /**
@@ -24,12 +24,12 @@ public abstract class LinuxTcpParent(
     protected val wrapper: FdWrapper = FdWrapper(fd)
 
     @OptIn(Unsafe::class)
-    override fun <T> getSocketOption(option: StandardSocketOption<T>): T {
+    override fun <T> getSocketOption(option: BsdSocketOption<T>): T {
         return wrapper.getSocketOption(option)
     }
 
     @OptIn(Unsafe::class)
-    override fun <T> setSocketOption(option: StandardSocketOption<T>, value: T) {
+    override fun <T> setSocketOption(option: BsdSocketOption<T>, value: T) {
         return wrapper.setSocketOption(option, value)
     }
 
