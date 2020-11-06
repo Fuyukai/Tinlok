@@ -11,6 +11,8 @@ package tf.lotte.tinlok.net.tcp
 
 import tf.lotte.cc.Unsafe
 import tf.lotte.cc.io.HalfCloseableStream
+import tf.lotte.cc.net.tcp.TcpConnectionInfo
+import tf.lotte.cc.net.tcp.TcpSocketAddress
 import tf.lotte.tinlok.net.socket.PlatformSockets
 import tf.lotte.tinlok.net.socket.Socket
 import tf.lotte.tinlok.net.socket.StreamingClientSocket

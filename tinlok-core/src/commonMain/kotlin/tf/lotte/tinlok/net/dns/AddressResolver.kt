@@ -11,7 +11,6 @@ package tf.lotte.tinlok.net.dns
 
 import tf.lotte.cc.Unsafe
 import tf.lotte.cc.net.*
-import tf.lotte.tinlok.net.ConnectionInfo
 
 /**
  * Interface for address resolvers. This defines a portable getaddrinfo()-like high level function.

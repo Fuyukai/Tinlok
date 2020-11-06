@@ -15,9 +15,8 @@ import kotlinx.cinterop.ptr
 import platform.posix.addrinfo
 import tf.lotte.cc.Unsafe
 import tf.lotte.cc.net.*
-import tf.lotte.tinlok.net.ConnectionInfo
-import tf.lotte.tinlok.net.tcp.TcpConnectionInfo
-import tf.lotte.tinlok.net.udp.UdpConnectionInfo
+import tf.lotte.cc.net.tcp.TcpConnectionInfo
+import tf.lotte.cc.net.udp.UdpConnectionInfo
 import tf.lotte.tinlok.system.Syscall
 import tf.lotte.tinlok.util.toKotlin
 

@@ -10,7 +10,7 @@
 package tf.lotte.tinlok.net.socket
 
 import tf.lotte.cc.Unsafe
-import tf.lotte.tinlok.net.ConnectionInfo
+import tf.lotte.cc.net.ConnectionInfo
 
 /**
  * Defines a server-side socket that accepts new connections.

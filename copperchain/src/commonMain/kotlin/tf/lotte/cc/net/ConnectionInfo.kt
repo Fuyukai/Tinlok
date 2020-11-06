@@ -7,11 +7,7 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
-package tf.lotte.tinlok.net
-
-import tf.lotte.cc.net.AddressFamily
-import tf.lotte.cc.net.IPProtocol
-import tf.lotte.cc.net.SocketType
+package tf.lotte.cc.net
 
 /**
  * Base class for connection information objects.

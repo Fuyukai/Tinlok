@@ -9,7 +9,7 @@
 
 package tf.lotte.tinlok.net.socket
 
-import tf.lotte.tinlok.net.ConnectionInfo
+import tf.lotte.cc.net.ConnectionInfo
 
 /**
  * A client socket that performs I/O synchronously.

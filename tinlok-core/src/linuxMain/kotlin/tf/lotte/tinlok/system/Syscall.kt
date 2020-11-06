@@ -18,9 +18,7 @@ import tf.lotte.cc.exc.*
 import tf.lotte.cc.net.*
 import tf.lotte.cc.types.ByteString
 import tf.lotte.cc.util.toUInt
-import tf.lotte.tinlok.net.ConnectionInfo
 import tf.lotte.tinlok.net.ConnectionInfoCreator
-import tf.lotte.tinlok.net.InetConnectionInfo
 import tf.lotte.tinlok.net.dns.GAIException
 import tf.lotte.tinlok.net.socket.LinuxSocketOption
 import tf.lotte.tinlok.util.toKotlin

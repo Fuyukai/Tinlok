@@ -11,11 +11,12 @@ package tf.lotte.tinlok._workarounds
 
 import tf.lotte.cc.io.readUpTo
 import tf.lotte.cc.io.writeAll
+import tf.lotte.cc.net.tcp.TcpConnectionInfo
+import tf.lotte.cc.net.tcp.TcpSocketAddress
 import tf.lotte.cc.types.b
-import tf.lotte.tinlok.net.accept
-import tf.lotte.tinlok.net.bind
-import tf.lotte.tinlok.net.connect
-import tf.lotte.tinlok.net.tcp.*
+import tf.lotte.tinlok.net.*
+import tf.lotte.tinlok.net.tcp.TcpClientSocket
+import tf.lotte.tinlok.net.tcp.TcpServerSocket
 import kotlin.native.concurrent.TransferMode
 import kotlin.native.concurrent.Worker
 import kotlin.test.assertEquals

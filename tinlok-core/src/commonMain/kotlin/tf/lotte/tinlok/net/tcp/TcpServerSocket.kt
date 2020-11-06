@@ -10,6 +10,7 @@
 package tf.lotte.tinlok.net.tcp
 
 import tf.lotte.cc.Unsafe
+import tf.lotte.cc.net.tcp.TcpConnectionInfo
 import tf.lotte.tinlok.net.socket.AcceptingSeverSocket
 import tf.lotte.tinlok.net.socket.PlatformSockets
 

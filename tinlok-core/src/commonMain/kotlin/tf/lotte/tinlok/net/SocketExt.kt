@@ -12,12 +12,16 @@ package tf.lotte.tinlok.net
 import tf.lotte.cc.ClosingScope
 import tf.lotte.cc.Unsafe
 import tf.lotte.cc.exc.OSException
+import tf.lotte.cc.net.ConnectionInfo
+import tf.lotte.cc.net.tcp.TcpConnectionInfo
+import tf.lotte.cc.net.tcp.TcpSocketAddress
 import tf.lotte.cc.use
 import tf.lotte.tinlok.Sys
 import tf.lotte.tinlok.net.socket.AcceptingSeverSocket
 import tf.lotte.tinlok.net.socket.ClientSocket
 import tf.lotte.tinlok.net.socket.StandardSocketOption
-import tf.lotte.tinlok.net.tcp.*
+import tf.lotte.tinlok.net.tcp.TcpClientSocket
+import tf.lotte.tinlok.net.tcp.TcpServerSocket
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract

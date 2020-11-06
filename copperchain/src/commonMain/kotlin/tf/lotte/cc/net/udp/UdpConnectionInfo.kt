@@ -7,10 +7,9 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
-package tf.lotte.tinlok.net.udp
+package tf.lotte.cc.net.udp
 
 import tf.lotte.cc.net.*
-import tf.lotte.tinlok.net.InetConnectionInfo
 
 /**
  * Connection information for UDP sockets.

@@ -7,9 +7,7 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
-package tf.lotte.tinlok.net
-
-import tf.lotte.cc.net.IPAddress
+package tf.lotte.cc.net
 
 /**
  * Abstract base class for all connection info classes that operate over the Internet Protocol (IP).

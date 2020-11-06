@@ -13,6 +13,8 @@ import tf.lotte.cc.Unsafe
 import tf.lotte.cc.exc.NetworkUnreachableException
 import tf.lotte.cc.exc.OSException
 import tf.lotte.cc.net.StandardAddressFamilies
+import tf.lotte.cc.net.tcp.TcpConnectionInfo
+import tf.lotte.cc.net.tcp.TcpSocketAddress
 import tf.lotte.tinlok.net.AllConnectionsFailedException
 import tf.lotte.tinlok.net.tcp.*
 import tf.lotte.tinlok.system.FD
