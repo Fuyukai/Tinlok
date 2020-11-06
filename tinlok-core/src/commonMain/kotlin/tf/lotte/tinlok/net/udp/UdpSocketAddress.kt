@@ -10,9 +10,7 @@
 package tf.lotte.tinlok.net.udp
 
 import tf.lotte.cc.Unsafe
-import tf.lotte.tinlok.net.AddressFamily
-import tf.lotte.tinlok.net.IPProtocol
-import tf.lotte.tinlok.net.SocketType
+import tf.lotte.cc.net.*
 import tf.lotte.tinlok.net.dns.AddressResolver
 import tf.lotte.tinlok.net.dns.GlobalResolver
 import tf.lotte.tinlok.net.socket.SocketAddress
@@ -35,14 +33,16 @@ public class UdpSocketAddress private constructor(
             host: String, port: Int, resolver: AddressResolver = GlobalResolver,
         ): UdpSocketAddress {
             val connections = resolver.getaddrinfo(
-                host = host, service = port, family = AddressFamily.AF_UNSPEC,
-                type = SocketType.SOCK_DGRAM, protocol = IPProtocol.IPPROTO_UDP
+                host = host, service = port,
+                family = StandardAddressFamilies.AF_UNSPEC,
+                type = StandardSocketTypes.SOCK_DGRAM,
+                protocol = StandardIPProtocols.IPPROTO_UDP
             ).filterIsInstance<UdpConnectionInfo>()
             return UdpSocketAddress(host, connections.toSet())
         }
     }
 
-    override val protocol: IPProtocol = IPProtocol.IPPROTO_UDP
+    override val protocol: IPProtocol = StandardIPProtocols.IPPROTO_UDP
 
     override fun hashCode(): Int {
         return connections.hashCode()

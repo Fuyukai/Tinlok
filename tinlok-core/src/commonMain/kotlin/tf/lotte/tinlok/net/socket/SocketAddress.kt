@@ -9,8 +9,8 @@
 
 package tf.lotte.tinlok.net.socket
 
+import tf.lotte.cc.net.IPProtocol
 import tf.lotte.tinlok.net.ConnectionInfo
-import tf.lotte.tinlok.net.IPProtocol
 
 /**
  * Base abstract class for all socket addresses.

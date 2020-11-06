@@ -7,6 +7,7 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
+@file:Suppress("NOTHING_TO_INLINE")
 package tf.lotte.cc.types
 
 import tf.lotte.cc.Unsafe

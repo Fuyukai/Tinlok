@@ -9,6 +9,8 @@
 
 package tf.lotte.tinlok.net
 
+import tf.lotte.cc.net.IPAddress
+
 /**
  * Abstract base class for all connection info classes that operate over the Internet Protocol (IP).
  */

@@ -15,9 +15,12 @@ import kotlinx.cinterop.*
 import platform.posix.*
 import tf.lotte.cc.Unsafe
 import tf.lotte.cc.exc.*
+import tf.lotte.cc.net.*
 import tf.lotte.cc.types.ByteString
 import tf.lotte.cc.util.toUInt
-import tf.lotte.tinlok.net.*
+import tf.lotte.tinlok.net.ConnectionInfo
+import tf.lotte.tinlok.net.ConnectionInfoCreator
+import tf.lotte.tinlok.net.InetConnectionInfo
 import tf.lotte.tinlok.net.dns.GAIException
 import tf.lotte.tinlok.net.socket.LinuxSocketOption
 import tf.lotte.tinlok.util.toKotlin
@@ -560,6 +563,8 @@ public actual object Syscall {
             memset(hints.ptr, 0, sizeOf<addrinfo>().convert())
         }
 
+        println("family: $family, type: $type, protocol: $protocol")
+
         hints.ai_flags = flags
         if (node == null) {
             hints.ai_flags = hints.ai_flags or AI_PASSIVE
@@ -603,7 +608,7 @@ public actual object Syscall {
      */
     @Unsafe
     public fun __ipv6_to_sockaddr(alloc: NativePlacement, ip: IPv6Address, port: Int): sockaddr {
-        val ipRepresentation = ip.rawRepresentation
+        val ipRepresentation = ip.bytes
         // runtime safety check!!
         val size = ipRepresentation.size
         require(size == 16) {
@@ -625,7 +630,7 @@ public actual object Syscall {
      */
     @Unsafe
     public fun __ipv4_to_sockaddr(alloc: NativePlacement, ip: IPv4Address, port: Int): sockaddr {
-        val ipRepresentation = ip.rawRepresentation.toUByteArray()
+        val ipRepresentation = ip.bytes.toUByteArray()
         val struct = alloc.alloc<sockaddr_in> {
             sin_family = AF_INET.toUShort()
             sin_addr.s_addr = ipRepresentation.toUInt()
@@ -644,11 +649,11 @@ public actual object Syscall {
         val size: UInt
 
         when (info.family) {
-            AddressFamily.AF_INET6 -> {
+            StandardAddressFamilies.AF_INET6 -> {
                 struct = __ipv6_to_sockaddr(this, info.ip as IPv6Address, info.port)
                 size = sizeOf<sockaddr_in6>().toUInt()
             }
-            AddressFamily.AF_INET -> {
+            StandardAddressFamilies.AF_INET -> {
                 struct = __ipv4_to_sockaddr(this, info.ip as IPv4Address, info.port)
                 size = sizeOf<sockaddr_in>().toUInt()
             }
@@ -796,11 +801,11 @@ public actual object Syscall {
             val size: UInt
 
             when (address.family) {
-                AddressFamily.AF_INET6 -> {
+                StandardAddressFamilies.AF_INET6 -> {
                     struct = __ipv6_to_sockaddr(this, address.ip as IPv6Address, address.port)
                     size = sizeOf<sockaddr_in6>().toUInt()
                 }
-                AddressFamily.AF_INET -> {
+                StandardAddressFamilies.AF_INET -> {
                     struct = __ipv4_to_sockaddr(this, address.ip as IPv4Address, address.port)
                     size = sizeOf<sockaddr_in>().toUInt()
                 }

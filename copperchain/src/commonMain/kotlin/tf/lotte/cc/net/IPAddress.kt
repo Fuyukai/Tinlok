@@ -7,11 +7,9 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
-package tf.lotte.tinlok.net
+package tf.lotte.cc.net
 
 import tf.lotte.cc.Unsafe
-import tf.lotte.cc.net.IPv6Stringifier
-import tf.lotte.cc.net.IPv6TextParser
 import tf.lotte.cc.util.toByteArray
 
 // see: https://docs.python.org/3/library/ipaddress.html
@@ -41,8 +39,7 @@ public sealed class IPAddress {
  * An IP address using version 4.
  */
 @OptIn(ExperimentalUnsignedTypes::class)
-public class IPv4Address
-internal constructor(internal val rawRepresentation: ByteArray) : IPAddress() {
+public class IPv4Address(public val bytes: ByteArray) : IPAddress() {
     public companion object {
         /**
          * Parses an IPv4 address from a String.
@@ -67,7 +64,7 @@ internal constructor(internal val rawRepresentation: ByteArray) : IPAddress() {
     }
 
     override val version: Int = IP_VERSION_4
-    override val family: AddressFamily get() = AddressFamily.AF_INET
+    override val family: AddressFamily get() = StandardAddressFamilies.AF_INET
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -75,33 +72,31 @@ internal constructor(internal val rawRepresentation: ByteArray) : IPAddress() {
 
         other as IPv4Address
 
-        if (!rawRepresentation.contentEquals(other.rawRepresentation)) return false
+        if (!bytes.contentEquals(other.bytes)) return false
         if (version != other.version) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        var result = rawRepresentation.contentHashCode()
+        var result = bytes.contentHashCode()
         result = 31 * result + version
         return result
     }
 
     override fun toString(): String {
-        return rawRepresentation.joinToString(".") { it.toUByte().toString() }
+        return bytes.joinToString(".") { it.toUByte().toString() }
     }
 }
 
 /**
  * An IP address using version 6.
  */
-public class IPv6Address
-internal constructor(internal val rawRepresentation: ByteArray) : IPAddress() {
+public class IPv6Address(public val bytes: ByteArray) : IPAddress() {
     public companion object {
         /**
          * Parses an IPv6 address from a String.
          */
-        @OptIn(Unsafe::class)
         public fun of(ip: String): IPv6Address {
             val bytes = IPv6TextParser.parse(ip)
             return IPv6Address(bytes)
@@ -109,7 +104,7 @@ internal constructor(internal val rawRepresentation: ByteArray) : IPAddress() {
     }
 
     override val version: Int = IP_VERSION_6
-    override val family: AddressFamily get() = AddressFamily.AF_INET6
+    override val family: AddressFamily get() = StandardAddressFamilies.AF_INET6
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -117,20 +112,20 @@ internal constructor(internal val rawRepresentation: ByteArray) : IPAddress() {
 
         other as IPv6Address
 
-        if (!rawRepresentation.contentEquals(other.rawRepresentation)) return false
+        if (!bytes.contentEquals(other.bytes)) return false
         if (version != other.version) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        var result = rawRepresentation.contentHashCode()
+        var result = bytes.contentHashCode()
         result = 31 * result + version
         return result
     }
 
     @OptIn(Unsafe::class)
     override fun toString(): String {
-        return IPv6Stringifier(rawRepresentation).correct()
+        return IPv6Stringifier(bytes).correct()
     }
 }

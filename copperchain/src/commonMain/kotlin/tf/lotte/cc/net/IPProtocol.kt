@@ -7,24 +7,29 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
-package tf.lotte.tinlok.net
+package tf.lotte.cc.net
+
+/**
+ * Defines a single IP protocol for usage in socket creation.
+ */
+public interface IPProtocol {
+    /** The socket number for the IP protocol. */
+    public val number: Int
+}
 
 /**
  * Enumerations of valid IP protocols.
  */
-public expect enum class IPProtocol {
+public enum class StandardIPProtocols(override val number: Int) : IPProtocol {
     /** Kernel's choice */
-    IPPROTO_IP,
+    IPPROTO_IP(0),
 
     /** ICMP protocol */
-    IPPROTO_ICMP,
+    IPPROTO_ICMP(1),
 
     /** TCP protocol */
-    IPPROTO_TCP,
+    IPPROTO_TCP(6),
 
     /** UDP protocol */
-    IPPROTO_UDP;
-
-    /** The actual number for this IP protocol. */
-    public actual val number: Int
+    IPPROTO_UDP(17);
 }

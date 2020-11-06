@@ -10,7 +10,8 @@
 package tf.lotte.tinlok.net.dns
 
 import tf.lotte.cc.Unsafe
-import tf.lotte.tinlok.net.*
+import tf.lotte.cc.net.*
+import tf.lotte.tinlok.net.ConnectionInfo
 
 /**
  * Interface for address resolvers. This defines a portable getaddrinfo()-like high level function.
@@ -35,9 +36,9 @@ public interface AddressResolver {
     @Unsafe
     public fun getaddrinfo(
         host: String?, service: Int = 0,
-        family: AddressFamily = AddressFamily.AF_UNSPEC,
-        type: SocketType = SocketType.SOCK_STREAM,
-        protocol: IPProtocol = IPProtocol.IPPROTO_IP,
+        family: AddressFamily = StandardAddressFamilies.AF_UNSPEC,
+        type: SocketType = StandardSocketTypes.SOCK_STREAM,
+        protocol: IPProtocol = StandardIPProtocols.IPPROTO_IP,
         flags: Int = 0
     ): List<ConnectionInfo>
 }

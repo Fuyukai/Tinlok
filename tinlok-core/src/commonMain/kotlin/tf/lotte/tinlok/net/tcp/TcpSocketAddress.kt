@@ -10,9 +10,7 @@
 package tf.lotte.tinlok.net.tcp
 
 import tf.lotte.cc.Unsafe
-import tf.lotte.tinlok.net.AddressFamily
-import tf.lotte.tinlok.net.IPProtocol
-import tf.lotte.tinlok.net.SocketType
+import tf.lotte.cc.net.*
 import tf.lotte.tinlok.net.dns.AddressResolver
 import tf.lotte.tinlok.net.dns.GlobalResolver
 import tf.lotte.tinlok.net.socket.SocketAddress
@@ -35,8 +33,10 @@ public class TcpSocketAddress private constructor(
             host: String, port: Int, resolver: AddressResolver = GlobalResolver,
         ): TcpSocketAddress {
             val connections = resolver.getaddrinfo(
-                host = host, service = port, family = AddressFamily.AF_UNSPEC,
-                type = SocketType.SOCK_STREAM, protocol = IPProtocol.IPPROTO_TCP
+                host = host, service = port,
+                family = StandardAddressFamilies.AF_UNSPEC,
+                type = StandardSocketTypes.SOCK_STREAM,
+                protocol = StandardIPProtocols.IPPROTO_TCP
             ).filterIsInstance<TcpConnectionInfo>()
             return TcpSocketAddress(host, connections.toSet())
         }
@@ -49,8 +49,7 @@ public class TcpSocketAddress private constructor(
         }
     }
 
-
-    override val protocol: IPProtocol get() = IPProtocol.IPPROTO_TCP
+    override val protocol: IPProtocol get() = StandardIPProtocols.IPPROTO_TCP
 
     override fun hashCode(): Int {
         return connections.hashCode()

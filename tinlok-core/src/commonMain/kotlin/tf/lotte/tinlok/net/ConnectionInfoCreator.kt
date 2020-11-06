@@ -9,6 +9,7 @@
 
 package tf.lotte.tinlok.net
 
+import tf.lotte.cc.net.IPAddress
 import tf.lotte.tinlok.net.tcp.TcpConnectionInfo
 
 /**

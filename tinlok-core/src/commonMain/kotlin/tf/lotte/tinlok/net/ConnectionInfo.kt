@@ -9,6 +9,10 @@
 
 package tf.lotte.tinlok.net
 
+import tf.lotte.cc.net.AddressFamily
+import tf.lotte.cc.net.IPProtocol
+import tf.lotte.cc.net.SocketType
+
 /**
  * Base class for connection information objects.
  */

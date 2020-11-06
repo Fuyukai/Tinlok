@@ -7,26 +7,32 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
-package tf.lotte.tinlok.net
+package tf.lotte.cc.net
+
+/**
+ * Defines a single address family for usage in socket creation.
+ */
+public interface AddressFamily {
+    /** The socket number for the address family. */
+    public val number: Int
+}
 
 /**
  * An enumeration of the available address families.
  */
-public expect enum class AddressFamily {
+public enum class StandardAddressFamilies(override val number: Int) : AddressFamily {
     // main IP
     /** Unspecified address family. */
-    AF_UNSPEC,
+    AF_UNSPEC(0),
 
     /** IPv4 */
-    AF_INET,
+    AF_INET(2),
 
     /** IPv6 */
-    AF_INET6,
+    AF_INET6(10),
     // AF_UNIX is available on newer versions of Windows 10 so it's available on all platforms
     /** Unix pipes */
-    AF_UNIX,
+    AF_UNIX(1),
     ;
 
-    /** The socket number of this address family. */
-    public val number: Int
 }

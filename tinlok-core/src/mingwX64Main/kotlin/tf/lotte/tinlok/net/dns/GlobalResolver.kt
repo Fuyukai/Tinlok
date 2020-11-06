@@ -10,7 +10,7 @@
 package tf.lotte.tinlok.net.dns
 
 import tf.lotte.cc.Unsafe
-import tf.lotte.tinlok.net.*
+import tf.lotte.tinlok.net.ConnectionInfo
 
 /**
  * The global address resolver. This is used by default for all resolution requests without an

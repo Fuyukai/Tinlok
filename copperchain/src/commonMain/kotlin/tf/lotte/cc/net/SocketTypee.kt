@@ -7,22 +7,27 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
-package tf.lotte.tinlok.net
+package tf.lotte.cc.net
+
+/**
+ * Defines a single socket type for usage in socket creation.
+ */
+public interface SocketType {
+    /** The socket number for the socket type. */
+    public val number: Int
+}
 
 /**
  * An enumeration of the available socket kinds.
  */
-public expect enum class SocketType {
+public enum class StandardSocketTypes(override val number: Int) : SocketType {
     /** Stream sockets (TCP) */
-    SOCK_STREAM,
+    SOCK_STREAM(1),
 
     /** Datagram sockets (UDP) */
-    SOCK_DGRAM,
+    SOCK_DGRAM(2),
 
     /** Raw sockets (SCARY) */
-    SOCK_RAW,
+    SOCK_RAW(3),
     ;
-
-    /** The number of this socket kind. */
-    public val number: Int
 }

@@ -12,7 +12,7 @@ package tf.lotte.tinlok.net.socket
 import tf.lotte.cc.Unsafe
 import tf.lotte.cc.exc.NetworkUnreachableException
 import tf.lotte.cc.exc.OSException
-import tf.lotte.tinlok.net.AddressFamily
+import tf.lotte.cc.net.StandardAddressFamilies
 import tf.lotte.tinlok.net.AllConnectionsFailedException
 import tf.lotte.tinlok.net.tcp.*
 import tf.lotte.tinlok.system.FD
@@ -44,7 +44,7 @@ public actual object PlatformSockets {
             } catch (e: NetworkUnreachableException) {
                 // ENETUNREACH is raised when ipv6 is requested but the network doesn't support ipv6
                 // so silently eat the error
-                if (info.family == AddressFamily.AF_INET6) continue
+                if (info.family == StandardAddressFamilies.AF_INET6) continue
                 else throw e
             } catch (e: Throwable) {
                 // always close if connect() fails for other reasons
