@@ -3,18 +3,22 @@
 Networking - Enums
 ==================
 
-Tinlok provides several enumerations that map to networking constants. This page provides a brief
-description and the available constants for all platforms.
+.. versionchanged:: 1.3.0
 
-.. note::
+    Moved from Tinlok-Core to Copperchain.
 
-    Specific platforms may have more than these constants exposed, but these are guaranteed to
-    exist on all supported platforms.
+.. versionchanged:: 1.3.0
+
+    An interface was extracted from each enumeration, making these more forwards-compatible.
+
+Copperchain provides several interfaces defining the socket creation constant, and enumerations
+containing a set of possible values that are known to be supported by all platforms.
 
 AddressFamily
 -----------------
 
-The ``AddressFamily`` enum corresponds to ``AF_`` constants on the BSD socket API.
+The ``AddressFamily`` interface corresponds to ``AF_`` constants on the BSD socket API. The
+``StandardAddressFamilies`` enumeration has the following members:
 
 +---------------+-----------------------------------------------------------------------+
 | Name          | Description                                                           |
@@ -31,7 +35,8 @@ The ``AddressFamily`` enum corresponds to ``AF_`` constants on the BSD socket AP
 SocketType
 --------------
 
-The ``SocketType`` enum corresponds to SOCK\_ constants on the BSD socket API.
+The ``SocketType`` interface corresponds to SOCK\_ constants on the BSD socket API. The
+``StandardSocketTypes`` enumeration has the following members:
 
 +-----------------+--------------------------------------------+
 | Name            | Description                                |
@@ -46,7 +51,8 @@ The ``SocketType`` enum corresponds to SOCK\_ constants on the BSD socket API.
 IPProtocol
 --------------
 
-The ``IPProtocol`` enum corresponds to ``IPROTO_`` constants on the BSD socket API.
+The ``IPProtocol`` interface corresponds to ``IPROTO_`` constants on the BSD socket API. The
+``StandardIPProtocols`` enumeration has the following members:
 
 +------------------+--------------------------------------------------+
 | Name             | Description                                      |

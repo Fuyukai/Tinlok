@@ -3,6 +3,15 @@
 Changelog
 =========
 
+1.3.0
+-----
+
+ - Add pure-Kotlin IPv6 parsing.
+
+   - The new parser is less featureful currently, but removes an external dependency.
+
+ - Move large amounts of IP-address based code to the Copperchain module.
+
 1.2.0 (Released 2020-11-04)
 ---------------------------
 

@@ -93,7 +93,7 @@ fun hasAmd64(): Boolean {
 
 subprojects {
     // ALL projects get the appropriately tracked version
-    version = "1.2.0"
+    version = "1.3.0"
 
     // ignore the non tinlok branded project
     if (!this.name.startsWith("tinlok-")) return@subprojects

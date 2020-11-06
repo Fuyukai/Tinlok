@@ -606,7 +606,7 @@ public actual object Syscall {
      */
     @Unsafe
     public fun __ipv6_to_sockaddr(alloc: NativePlacement, ip: IPv6Address, port: Int): sockaddr {
-        val ipRepresentation = ip.bytes
+        val ipRepresentation = ip.representation.unwrap()
         // runtime safety check!!
         val size = ipRepresentation.size
         require(size == 16) {
@@ -628,7 +628,7 @@ public actual object Syscall {
      */
     @Unsafe
     public fun __ipv4_to_sockaddr(alloc: NativePlacement, ip: IPv4Address, port: Int): sockaddr {
-        val ipRepresentation = ip.bytes.toUByteArray()
+        val ipRepresentation = ip.representation.toUByteArray()
         val struct = alloc.alloc<sockaddr_in> {
             sin_family = AF_INET.toUShort()
             sin_addr.s_addr = ipRepresentation.toUInt()

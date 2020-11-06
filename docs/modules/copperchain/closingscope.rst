@@ -3,6 +3,10 @@
 Closeable and ClosingScope
 ==========================
 
+.. versionchanged:: 1.2.0
+
+    Moved from Tinlok-Core to Copperchain.
+
 .. note::
 
     Parts of this applies to the version of Kotlin/Native with primitive ARC memory management

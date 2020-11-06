@@ -3,6 +3,14 @@
 I/O Interfaces
 ==============
 
+.. versionchanged:: 1.2.0
+
+    Moved from Tinlok-Core to Copperchain.
+
+.. versionadded:: 1.2.0
+
+    Added asynchronous variants.
+
 Copperchain provides several interfaces defining how I/O objects act. Both synchronous and
 asynchronous variants exist.
 

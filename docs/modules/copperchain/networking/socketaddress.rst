@@ -3,13 +3,21 @@
 Networking - Socket Addresses
 =============================
 
+.. versionchanged:: 1.3.0
+
+    Moved from Tinlok-Core to Copperchain.
+
+.. versionchanged:: 1.3.0
+
+    Added the ability to create addresses directly through the constructor.
+
 Under the BSD socket model, sockets are bound or connected to a specific single address, which
 is of a single address family, protocol and socket type. In the real world, this is not
 sufficient; with dual stack networks being common but not too common, you want to be able to
 connect to IPv6 if possible then fall back to IPv4.
 
-Tinlok builds socket abstractions around this model by separating out an address a socket will
-bind to with the actual networking address using two classes: ``SocketAddress`` and
+Copperchain and Tinlok builds socket abstractions around this model by separating out an address
+a socket will bind to with the actual networking address using two classes: ``SocketAddress`` and
 ``ConnectionInfo``.
 
 ConnectionInfo
@@ -55,6 +63,10 @@ being passed directly:
 
     val tcp = TcpSocketAddress.resolve("toaru-project.com")
     val udp = UdpSocketAddress.resolve("some-udp-service-i-couldnt-think-of-any.arpa")
+
+.. note::
+
+    These methods come from Tinlok-Core. DNS resolution is not provided in Copperchain.
 
 .. note::
 

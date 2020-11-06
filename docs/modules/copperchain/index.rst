@@ -45,3 +45,7 @@ Contents
    closingscope.rst
    bytestring.rst
    io-interfaces.rst
+
+   networking/network-enums.rst
+   networking/ipaddress.rst
+   networking/socketaddress.rst

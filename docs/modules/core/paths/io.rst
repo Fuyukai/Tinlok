@@ -110,14 +110,18 @@ The ``DirEntry`` data class contains a ``Path`` of the child directory and the `
 the file listed (only supported on certain filesystems). It also contains functions similar to
 the query operations which operate on the ``FileType`` to avoid excessive stat() calls.
 
-A ``Path`` can be fully resolved into an absolute path using ``toAbsolutePath``:
+A ``Path`` can be fully resolved into an absolute path using ``resolveFully``:
 
 .. code-block:: kotlin
 
     val path = Path.of("./abc/def")
-    val absolute = path.toAbsolutePath()
+    val absolute = path.resolveFully()
     assert(path.isAbsolute)
     assert(path == Path.of("/home/cs/abc/def"))
+
+.. versionchanged:: 1.2.0
+
+    This method was renamed from toAbsolutePath to reflect that it traverses symbolic links too.
 
 Temporary files
 ---------------

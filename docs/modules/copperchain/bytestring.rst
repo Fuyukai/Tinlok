@@ -3,8 +3,15 @@
 Types - Bytestrings
 ===================
 
+.. versionchanged:: 1.2.0
+
+    Moved from Tinlok-Core to Copperchain.
+
 A ``ByteString`` is an immutable sequence of singular bytes, or simply an immutable ``ByteArray``.
 It is used extensively whenever binary data is involved.
+
+Unlike ``ByteArray`` objects, ``ByteString`` objects provide sane equality and hashcode attributes
+(no ``contentEquals`` or ``contentHashCode``).
 
 Creation
 --------

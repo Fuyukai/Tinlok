@@ -53,9 +53,6 @@ Contents
    paths/pure.rst
    paths/io.rst
 
-   networking/network-enums.rst
-   networking/ipaddress.rst
-   networking/socketaddress.rst
    networking/socket.rst
    networking/tcp.rst
    networking/tls.rst

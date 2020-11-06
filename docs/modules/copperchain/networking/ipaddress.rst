@@ -3,11 +3,16 @@
 Networking - IP Addresses
 =========================
 
-Tinlok provides high-level immutable wrappers for IPv4 and IPv6 addresses, which are used
+.. versionchanged:: 1.3.0
+
+    Moved from Tinlok-Core to Copperchain.
+
+Copperchain provides high-level immutable wrappers for IPv4 and IPv6 addresses, which can be used
 everywhere an IP address is used.
 
 Al IP addresses inherit from the ``IPAddress`` class, which provides a ``version`` and a
-``family`` field (see :ref:`network-enums`).
+``family`` field (see :ref:`network-enums`), as well as the ``representation`` field which contains
+the raw ``ByteString`` representation.
 
 IPv4
 ----
@@ -31,10 +36,13 @@ To create a new ``IPv6Address``, you can use the helper companion object methods
     val ip = IPv6Address.of("2600:3c01::f03c:91ff:fedb:76b6")
     assert(ip.toString() == "2600:3c01::f03c:91ff:fedb:76b6")
 
+.. note::
+
+    IPv6 stringification uses the output format as specified by RFC 5952, not the canonical output.
+
 IPv6 address parsing supports all forms of valid IPv6 address textual representation.
 
-IPv6 parsing and stringification uses the ipv6-parse_ library, licenced under the MIT licence. It
-is statically linked into the Tinlok library, meaning neither a developer or an end-user needs it
-installed to use.
+.. versionchanged:: 1.3.0
 
-.. _ipv6-parse: https://github.com/jrepp/ipv6-parse
+    1.3.0 onwards uses a pure-Kotlin IPv6 parser, rather than a dependency provided one.
+
