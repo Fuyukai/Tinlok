@@ -32,8 +32,10 @@ public class UUID(
     public enum class Variant {
         /** Variant 10X, as specified by RFC 4122. */
         RFC_4122,
+
         /** Variant 110, for Microsoft GUIDs. */
         MICROSOFT,
+
         /** Variant 111, reserved for future usage. */
         RESERVED,
         ;
@@ -115,25 +117,27 @@ public class UUID(
 
     // depends on clockSeqHighAndVariant
     /** The variant of this UUID. */
-    public val variant: Variant get() {
-        // RFC 4122 defines this in the worst way possible!
-        // Bit 0 (Msb0) should always be 1.
-        if (!clockSeqHighAndVariant.bit(8)) {
-            throw UnsupportedOperationException("Legacy NCS UUIDs are not supported")
-        }
+    public val variant: Variant
+        get() {
+            // RFC 4122 defines this in the worst way possible!
+            // Bit 0 (Msb0) should always be 1.
+            if (!clockSeqHighAndVariant.bit(8)) {
+                throw UnsupportedOperationException("Legacy NCS UUIDs are not supported")
+            }
 
-        // MSB1
-        return when (clockSeqHighAndVariant.bit(7)) {
-            false -> Variant.RFC_4122
-            true -> Variant.MICROSOFT
+            // MSB1
+            return when (clockSeqHighAndVariant.bit(7)) {
+                false -> Variant.RFC_4122
+                true -> Variant.MICROSOFT
+            }
         }
-    }
 
     /** The version of this UUID. */
-    public val version: Version get() {
-        val value = (bytes[6]).toInt().ushr(4)
-        return Version.values()[value]
-    }
+    public val version: Version
+        get() {
+            val value = (bytes[6]).toInt().ushr(4)
+            return Version.values()[value]
+        }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

@@ -39,7 +39,6 @@ public open class FdWrapper(
             val flags = fcntl(FcntlParam.F_GETFL)
             return flagged(flags, O_NONBLOCK)
         }
-
         set(value: Boolean) {
             var flags = fcntl(FcntlParam.F_GETFL)
             flags = if (value) flags.or(O_NONBLOCK) else flags.and(O_NONBLOCK.inv())

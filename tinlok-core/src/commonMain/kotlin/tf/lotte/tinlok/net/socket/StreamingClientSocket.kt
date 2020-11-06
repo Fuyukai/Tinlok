@@ -16,4 +16,4 @@ import tf.lotte.cc.net.ConnectionInfo
  * Defines a client socket that is also a [HalfCloseableStream]. This is used for SOCK_STREAM
  * based sockets.
  */
-public interface StreamingClientSocket<I: ConnectionInfo?> : ClientSocket<I>, HalfCloseableStream
+public interface StreamingClientSocket<I : ConnectionInfo?> : ClientSocket<I>, HalfCloseableStream

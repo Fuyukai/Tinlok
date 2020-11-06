@@ -25,4 +25,4 @@ public expect interface Closeable {
  * Using the specified [Closeable], runs the lambda [block] and automatically closes the object
  * afterwards.
  */
-public expect inline fun <T: Closeable, R> T.use(block: (T) -> R): R
+public expect inline fun <T : Closeable, R> T.use(block: (T) -> R): R

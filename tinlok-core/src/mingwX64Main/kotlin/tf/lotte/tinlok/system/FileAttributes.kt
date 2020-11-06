@@ -47,7 +47,8 @@ public constructor(
     }
 
     /** If this file is just a regular file. */
-    public val isRegularFile: Boolean get() {
-        return !isDirectory
-    }
+    public val isRegularFile: Boolean
+        get() {
+            return !isDirectory
+        }
 }

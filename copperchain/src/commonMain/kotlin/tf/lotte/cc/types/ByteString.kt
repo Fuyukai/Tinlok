@@ -18,7 +18,7 @@ import tf.lotte.cc.Unsafe
 @OptIn(ExperimentalUnsignedTypes::class)
 public class ByteString
 private constructor(
-    private val backing: ByteStringHolder
+    private val backing: ByteStringHolder,
 ) : Iterable<Byte>, Collection<Byte> {
     public companion object {
         /**

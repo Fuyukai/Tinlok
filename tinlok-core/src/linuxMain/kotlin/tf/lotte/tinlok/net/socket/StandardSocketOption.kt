@@ -24,14 +24,14 @@ public actual sealed class StandardSocketOption<T>(override val name: String) :
 
     @Unsafe
     private class BooleanSocketOption(
-        name: String, override val linuxOptionName: Int
+        name: String, override val linuxOptionName: Int,
     ) : StandardSocketOption<Boolean>(name) {
         override fun allocateNativeStructure(allocator: NativePlacement): CPointer<*> {
             return allocator.alloc<IntVar>().ptr
         }
 
         override fun toNativeStructure(
-            allocator: NativePlacement, value: Boolean
+            allocator: NativePlacement, value: Boolean,
         ): CPointer<IntVar> {
             // we just allocate an int (lol)
             // somebody may be able to correct this in the future.
@@ -41,7 +41,9 @@ public actual sealed class StandardSocketOption<T>(override val name: String) :
             return int.ptr
         }
 
-        override fun fromNativeStructure(allocator: NativePlacement, structure: CPointer<*>): Boolean {
+        override fun fromNativeStructure(
+            allocator: NativePlacement, structure: CPointer<*>,
+        ): Boolean {
             // THIS CORRUPTS MEMORY IF THIS CAST FAILS
             // DO NOT PASS THIS FUNCTION THINGS IT DOESN'T EXPECT!
             val int = (structure as CPointer<IntVar>).pointed.value
@@ -55,7 +57,7 @@ public actual sealed class StandardSocketOption<T>(override val name: String) :
 
     @Unsafe
     private class ULongSocketOption(
-        name: String, override val linuxOptionName: Int
+        name: String, override val linuxOptionName: Int,
     ) : StandardSocketOption<ULong>(name) {
         override fun allocateNativeStructure(allocator: NativePlacement): CPointer<*> {
             return allocator.alloc<ULongVar>().ptr
@@ -63,7 +65,7 @@ public actual sealed class StandardSocketOption<T>(override val name: String) :
 
         @Unsafe
         override fun toNativeStructure(
-            allocator: NativePlacement, value: ULong
+            allocator: NativePlacement, value: ULong,
         ): CPointer<ULongVar> {
             val long = allocator.alloc<ULongVar>()
             long.value = value
@@ -71,7 +73,9 @@ public actual sealed class StandardSocketOption<T>(override val name: String) :
         }
 
         @Unsafe
-        override fun fromNativeStructure(allocator: NativePlacement, structure: CPointer<*>): ULong {
+        override fun fromNativeStructure(
+            allocator: NativePlacement, structure: CPointer<*>,
+        ): ULong {
             // THIS EQUALLY CORRUPTS MEMORY!!!!
             return (structure as CPointer<ULongVar>).pointed.value
         }

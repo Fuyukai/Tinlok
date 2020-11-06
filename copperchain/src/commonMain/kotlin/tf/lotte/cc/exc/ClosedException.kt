@@ -13,5 +13,5 @@ package tf.lotte.cc.exc
  * Thrown when something is attempted on a closed resource.
  */
 public class ClosedException(
-    message: String? = null, cause: Throwable? = null
+    message: String? = null, cause: Throwable? = null,
 ) : Exception(message, cause)

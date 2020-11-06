@@ -25,7 +25,7 @@ public const val HASH_SIZE: Int = 64
 @OptIn(ExperimentalUnsignedTypes::class)
 public fun crypto_argon2(
     password: UByteArray, blocks: Int, iterations: Int,
-    salt: UByteArray
+    salt: UByteArray,
 ): UByteArray = memScoped {
     val size = blocks * 1024
 
@@ -56,7 +56,7 @@ public fun crypto_argon2(
 @OptIn(ExperimentalUnsignedTypes::class, Unsafe::class)
 public actual fun passwordHash(
     password: String, salt: UByteArray?,
-    blocks: Int, iterations: Int
+    blocks: Int, iterations: Int,
 ): Argon2iHash = memScoped {
     require(password.isNotEmpty()) { "Password cannot be empty!" }
     require(blocks >= 8) { "Must use at least 8 memory blocks!" }

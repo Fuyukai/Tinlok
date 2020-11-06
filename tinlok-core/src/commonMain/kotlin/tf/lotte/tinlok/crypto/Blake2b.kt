@@ -8,6 +8,7 @@
  */
 
 @file:OptIn(ExperimentalUnsignedTypes::class)
+
 package tf.lotte.tinlok.crypto
 
 import tf.lotte.cc.Closeable
@@ -39,8 +40,8 @@ public expect class Blake2b internal constructor(key: UByteArray) : Closeable {
 @OptIn(ExperimentalUnsignedTypes::class)
 public operator fun <R> Blake2b.Companion.invoke(
     key: UByteArray = ubyteArrayOf(),
-    block: (Blake2b) -> R): R
-{
+    block: (Blake2b) -> R,
+): R {
     val hasher = Blake2b(key)
     return hasher.use(block)
 }
@@ -51,7 +52,7 @@ public operator fun <R> Blake2b.Companion.invoke(
  */
 @OptIn(ExperimentalUnsignedTypes::class)
 public operator fun Blake2b.Companion.invoke(
-    scope: ClosingScope, key: UByteArray = ubyteArrayOf()
+    scope: ClosingScope, key: UByteArray = ubyteArrayOf(),
 ): Blake2b {
     val hasher = Blake2b(key)
     scope.add(hasher)

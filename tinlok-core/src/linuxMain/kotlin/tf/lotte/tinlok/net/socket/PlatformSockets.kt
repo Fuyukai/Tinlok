@@ -29,7 +29,7 @@ public actual object PlatformSockets {
     @Unsafe
     @Throws(AllConnectionsFailedException::class, OSException::class)
     public fun tryTcpConnect(
-        address: TcpSocketAddress, timeout: Int
+        address: TcpSocketAddress, timeout: Int,
     ): Pair<FD, TcpConnectionInfo> {
         // try every address in sequence
         // when kotlin's concurrency (memory) model gets better, i will implement happy eyeballs.
@@ -64,7 +64,7 @@ public actual object PlatformSockets {
     @Unsafe
     @Throws(AllConnectionsFailedException::class, OSException::class)
     public actual fun newTcpSynchronousSocket(
-        address: TcpSocketAddress, timeout: Int
+        address: TcpSocketAddress, timeout: Int,
     ): TcpClientSocket {
         val (fd, info) = tryTcpConnect(address, timeout)
         return LinuxTcpSocket(fd, info)

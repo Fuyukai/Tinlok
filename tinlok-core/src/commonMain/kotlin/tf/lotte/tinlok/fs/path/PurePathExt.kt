@@ -27,7 +27,8 @@ public fun PurePath.Companion.posix(path: String): PosixPurePath = posix(path.to
 /**
  * Joins this pure path to another [ByteString], returning the combined path.
  */
-public fun PurePath.resolveChild(other: ByteString): PurePath = resolveChild(PlatformPaths.purePath(other))
+public fun PurePath.resolveChild(other: ByteString): PurePath =
+    resolveChild(PlatformPaths.purePath(other))
 
 /**
  * Joins this path to another String, returning the combined path.

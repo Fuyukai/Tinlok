@@ -18,7 +18,7 @@ import tf.lotte.cc.types.*
 public open class WindowsPurePath protected constructor(
     internal val driveLetter: ByteString?,
     internal val volume: ByteString?,
-    internal val rest: List<ByteString>
+    internal val rest: List<ByteString>,
 ) : PurePath {
     public companion object {
         protected const val SEP: Byte = '\\'.toByte()
@@ -139,7 +139,7 @@ public open class WindowsPurePath protected constructor(
          */
         @OptIn(Unsafe::class)
         protected fun parsePath(
-            bs: ByteString
+            bs: ByteString,
         ): Triple<ByteString?, ByteString?, List<ByteString>> {
             // strip \\?\ returned by various W functions
             val realPath = if (bs.startsWith(LONGPATH)) {
@@ -197,16 +197,17 @@ public open class WindowsPurePath protected constructor(
     override val isAbsolute: Boolean
         get() = rawAnchor != null
 
-    override val rawName: ByteString? get() {
-        return if (isAbsolute) {
-            // first part of component may be the anchorr
-            if (rawComponents.size <= 1) null
-            else rawComponents.last()
-        } else {
-            // always exists on relative paths
-            rawComponents.last()
+    override val rawName: ByteString?
+        get() {
+            return if (isAbsolute) {
+                // first part of component may be the anchorr
+                if (rawComponents.size <= 1) null
+                else rawComponents.last()
+            } else {
+                // always exists on relative paths
+                rawComponents.last()
+            }
         }
-    }
 
     override val parent: WindowsPurePath by lazy {
         if (rest.isEmpty()) this

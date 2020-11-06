@@ -21,5 +21,5 @@ package tf.lotte.tinlok.crypto
  */
 public expect fun passwordHash(
     password: String, salt: UByteArray? = null,
-    blocks: Int = 100_000, iterations: Int = 3
+    blocks: Int = 100_000, iterations: Int = 3,
 ): Argon2iHash

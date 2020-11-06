@@ -32,7 +32,7 @@ public data class Stat(
     val deviceId: ULong,
 
     // internal properties
-    private val st_mode: UInt
+    private val st_mode: UInt,
 ) {
     private companion object {
         const val S_IFMT = 61440U

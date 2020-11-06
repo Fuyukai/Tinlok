@@ -21,7 +21,9 @@ public actual class AtomicBoolean(value: Boolean) {
     /** The actual value of this boolean. */
     public actual var value: Boolean
         get() = _value.value == 1
-        set(value) { _value.value = if (value) 1 else 0 }
+        set(value) {
+            _value.value = if (value) 1 else 0
+        }
 
     public override fun toString(): String = value.toString()
 

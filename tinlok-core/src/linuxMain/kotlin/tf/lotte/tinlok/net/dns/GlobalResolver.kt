@@ -74,7 +74,7 @@ public actual object GlobalResolver : AddressResolver {
         host: String?, service: Int,
         family: AddressFamily,
         type: SocketType, protocol: IPProtocol,
-        flags: Int
+        flags: Int,
     ): List<ConnectionInfo> {
         val strService = if (service == 0) null else service.toString()
         return memScoped {

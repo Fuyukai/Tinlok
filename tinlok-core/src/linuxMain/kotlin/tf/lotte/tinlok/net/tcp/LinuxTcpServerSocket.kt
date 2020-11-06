@@ -21,7 +21,7 @@ import tf.lotte.tinlok.system.Syscall
  */
 internal class LinuxTcpServerSocket(
     fd: FD,
-    private val address: TcpConnectionInfo
+    private val address: TcpConnectionInfo,
 ) : LinuxTcpParent(fd), TcpServerSocket {
     @OptIn(Unsafe::class)
     override fun bind(backlog: Int) {

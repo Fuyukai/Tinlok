@@ -16,7 +16,7 @@ package tf.lotte.cc.exc
  * Thrown when a platform call returns an unhandleable error.
  */
 public open class OSException(
-    message: String? = null, cause: Throwable? = null
+    message: String? = null, cause: Throwable? = null,
 ) : Exception(message, cause)
 
 // See: https://www.python.org/dev/peps/pep-3151/
@@ -29,7 +29,7 @@ public open class OSException(
 public open class FileAlreadyExistsException
 public constructor(
     public val path: String,
-    cause: Throwable?
+    cause: Throwable?,
 ) : OSException(message = "File exists: $path", cause = cause) {
     public constructor(path: String) : this(path, null)
 }
@@ -40,7 +40,7 @@ public constructor(
 public open class FileNotFoundException
 constructor(
     public val path: String,
-    cause: Throwable?
+    cause: Throwable?,
 ) : OSException(message = "File not found: $path", cause = cause) {
     public constructor(path: String) : this(path, null)
 }
@@ -52,7 +52,7 @@ constructor(
 public open class IsADirectoryException
 constructor(
     public val path: String,
-    cause: Throwable?
+    cause: Throwable?,
 ) : OSException(message = "Is a directory: $path", cause = cause) {
     public constructor(path: String) : this(path, null)
 }
@@ -63,7 +63,7 @@ constructor(
 public open class DirectoryNotEmptyException
 constructor(
     public val path: String,
-    cause: Throwable?
+    cause: Throwable?,
 ) : OSException(message = "Directory not empty: $path", cause = cause) {
     public constructor(path: String) : this(path, null)
 }
@@ -74,7 +74,7 @@ constructor(
  */
 public open class AccessDeniedException
 constructor(
-    cause: Throwable?
+    cause: Throwable?,
 ) : OSException(message = "Access denied", cause = cause) {
     public constructor() : this(null)
 }
@@ -84,7 +84,7 @@ constructor(
  */
 public open class PermissionDeniedException
 constructor(
-    cause: Throwable?
+    cause: Throwable?,
 ) : OSException(message = "Permission denied", cause = cause) {
     public constructor() : this(null)
 }
@@ -94,7 +94,7 @@ constructor(
  */
 public open class ConnectionException
 constructor(
-    message: String?, cause: Throwable?
+    message: String?, cause: Throwable?,
 ) : OSException(message, cause)
 
 /**
@@ -103,7 +103,7 @@ constructor(
  */
 public open class BrokenPipeException
 constructor(
-    cause: Throwable?
+    cause: Throwable?,
 ) : ConnectionException(message = "Broken pipe", cause = cause) {
     public constructor() : this(null)
 }
@@ -114,7 +114,7 @@ constructor(
  */
 public open class SocketShutdownException
 constructor(
-    cause: Throwable?
+    cause: Throwable?,
 ) : ConnectionException(message = "Cannot send after transport endpoint shutdown", cause = cause) {
     public constructor() : this(null)
 }
@@ -124,7 +124,7 @@ constructor(
  */
 public open class ConnectionAbortedException
 constructor(
-    cause: Throwable?
+    cause: Throwable?,
 ) : ConnectionException(
     message = "Connection aborted", cause = cause
 ) {

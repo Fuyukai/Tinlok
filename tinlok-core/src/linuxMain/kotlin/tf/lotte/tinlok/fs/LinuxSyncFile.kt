@@ -28,7 +28,7 @@ import tf.lotte.tinlok.util.AtomicBoolean
 internal class LinuxSyncFile(
     override val path: LinuxPath,
     openModes: Set<FileOpenMode>,
-    permission: PosixFilePermission = PosixFilePermission.DEFAULT_FILE
+    permission: PosixFilePermission = PosixFilePermission.DEFAULT_FILE,
 ) : FilesystemFile {
     /** The underlying file descriptor for this file. */
     private val wrapper: FdWrapper

@@ -42,9 +42,11 @@ internal class LinuxPath(rawParts: List<ByteString>) : Path, PosixPurePath(rawPa
     override fun resolveChild(other: PurePath): LinuxPath {
         return LinuxPath(super.resolveChild(other).rawComponents)
     }
+
     override fun withName(name: ByteString): LinuxPath {
         return LinuxPath(super.withName(name).rawComponents)
     }
+
     override fun reparent(from: PurePath, to: PurePath): LinuxPath {
         return LinuxPath(super.reparent(from, to).rawComponents)
     }
@@ -135,7 +137,7 @@ internal class LinuxPath(rawParts: List<ByteString>) : Path, PosixPurePath(rawPa
     override fun createDirectory(
         parents: Boolean,
         existOk: Boolean,
-        vararg permissions: FilePermission
+        vararg permissions: FilePermission,
     ) {
         val path = unsafeToString()
         val permMask = if (permissions.isEmpty()) {

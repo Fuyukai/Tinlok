@@ -15,7 +15,7 @@ import tf.lotte.cc.net.ConnectionInfo
 /**
  * Defines a server-side socket that accepts new connections.
  */
-public interface AcceptingSeverSocket<I: ConnectionInfo, T: ClientSocket<I>> : ServerSocket {
+public interface AcceptingSeverSocket<I : ConnectionInfo, T : ClientSocket<I>> : ServerSocket {
     /**
      * Accepts a new connection, returning a synchronous client socket for the incoming connection.
      *

@@ -38,7 +38,7 @@ private typealias CI = ConnectionInfo
 @OptIn(Unsafe::class, ExperimentalContracts::class)
 @Throws(OSException::class)
 public inline fun <R> TcpClientSocket.Companion.connect(
-    address: TcpSocketAddress, timeout: Int = 30_000, block: (TcpClientSocket) -> R
+    address: TcpSocketAddress, timeout: Int = 30_000, block: (TcpClientSocket) -> R,
 ): R {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
@@ -57,7 +57,7 @@ public inline fun <R> TcpClientSocket.Companion.connect(
  */
 @OptIn(Unsafe::class)
 public fun TcpClientSocket.Companion.connect(
-    scope: ClosingScope, address: TcpSocketAddress, timeout: Int = 30_000
+    scope: ClosingScope, address: TcpSocketAddress, timeout: Int = 30_000,
 ): TcpClientSocket {
     val sock = unsafeOpen(address, timeout)
     scope.add(sock)
@@ -70,7 +70,7 @@ public fun TcpClientSocket.Companion.connect(
 @OptIn(Unsafe::class, ExperimentalContracts::class)
 public inline fun <R> TcpServerSocket.Companion.open(
     address: TcpConnectionInfo,
-    block: (TcpServerSocket) -> R
+    block: (TcpServerSocket) -> R,
 ): R {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
@@ -87,7 +87,7 @@ public inline fun <R> TcpServerSocket.Companion.open(
  */
 @OptIn(Unsafe::class, ExperimentalContracts::class)
 public inline fun <R> TcpServerSocket.Companion.bind(
-    address: TcpConnectionInfo, backlog: Int = 128, block: (TcpServerSocket) -> R
+    address: TcpConnectionInfo, backlog: Int = 128, block: (TcpServerSocket) -> R,
 ): R {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
@@ -112,7 +112,7 @@ public inline fun <R> TcpServerSocket.Companion.bind(
  */
 @OptIn(Unsafe::class, ExperimentalContracts::class)
 public inline fun <R, I : CI, T : ClientSocket<I>> AcceptingSeverSocket<I, T>.accept(
-    block: (T) -> R
+    block: (T) -> R,
 ): R {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
@@ -126,7 +126,7 @@ public inline fun <R, I : CI, T : ClientSocket<I>> AcceptingSeverSocket<I, T>.ac
  * specified [scope] for automatic closing.
  */
 @OptIn(Unsafe::class)
-public fun <I: CI, T: ClientSocket<I>> AcceptingSeverSocket<I, T>.accept(scope: ClosingScope): T {
+public fun <I : CI, T : ClientSocket<I>> AcceptingSeverSocket<I, T>.accept(scope: ClosingScope): T {
     val sock = unsafeAccept()
     scope.add(sock)
     return sock

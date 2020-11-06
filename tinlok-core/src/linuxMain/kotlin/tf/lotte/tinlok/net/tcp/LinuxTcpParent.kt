@@ -18,7 +18,7 @@ import tf.lotte.tinlok.system.FD
  * Parent class for the two TCP socket classes.
  */
 public abstract class LinuxTcpParent(
-    protected val fd: FD
+    protected val fd: FD,
 ) : TcpSocket {
     /* wrapper object around the file descriptor */
     protected val wrapper: FdWrapper = FdWrapper(fd)

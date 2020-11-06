@@ -16,5 +16,5 @@ import tf.lotte.cc.exc.OSException
  */
 public class WindowsException
 public constructor(
-    public val winerror: Int, message: String, cause: Throwable? = null
+    public val winerror: Int, message: String, cause: Throwable? = null,
 ) : OSException(message, cause)

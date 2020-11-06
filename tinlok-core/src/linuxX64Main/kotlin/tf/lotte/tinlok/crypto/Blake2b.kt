@@ -41,7 +41,8 @@ public actual class Blake2b internal actual constructor(key: UByteArray) : Close
                 crypto_blake2b_general_init(
                     context.ptr, HASH_SIZE.toULong(),
                     it.addressOf(0), key.size.toULong()
-                ) }
+                )
+            }
         } else {
             crypto_blake2b_general_init(context.ptr, HASH_SIZE.toULong(), null, 0UL)
         }

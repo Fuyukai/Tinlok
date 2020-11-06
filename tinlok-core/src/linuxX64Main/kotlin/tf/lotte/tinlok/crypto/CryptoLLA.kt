@@ -22,7 +22,7 @@ public actual fun crypto_verify64(first: UByteArray, second: UByteArray): Boolea
     require(second.size == 64) { "Second array is not 64 bytes long!" }
 
     first.usePinned { a ->
-        second.usePinned { b->
+        second.usePinned { b ->
             return (crypto_verify64(a.addressOf(0), b.addressOf(0))) == 0
         }
     }

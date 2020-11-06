@@ -267,7 +267,7 @@ public actual object Syscall {
      */
     @Unsafe
     public fun write(
-        fd: FD, from: ByteArray, size: Int = from.size, offset: Int = 0
+        fd: FD, from: ByteArray, size: Int = from.size, offset: Int = 0,
     ): BlockingResult {
         assert(size <= IO_MAX) { "Count is too high!" }
         assert(from.size >= size) { "Buffer is too small!" }
@@ -496,7 +496,7 @@ public actual object Syscall {
      */
     @Suppress("FoldInitializerAndIfToElvis")
     @Unsafe
-    public fun realpath( path: String): ByteString = memScoped {
+    public fun realpath(path: String): ByteString = memScoped {
         val buffer = allocArray<ByteVar>(PATH_MAX)
         val res = realpath(path, buffer)
         if (res == null) {
@@ -553,7 +553,7 @@ public actual object Syscall {
     public fun getaddrinfo(
         alloc: NativePlacement,
         node: String?, service: String?,
-        family: Int, type: Int, protocol: Int, flags: Int
+        family: Int, type: Int, protocol: Int, flags: Int,
     ): addrinfo {
         val hints = alloc.alloc<addrinfo>()
         val res = alloc.allocPointerTo<addrinfo>()
@@ -769,7 +769,7 @@ public actual object Syscall {
      */
     @Unsafe
     public fun <T : ConnectionInfo> accept(
-        sock: FD, creator: ConnectionInfoCreator<T>
+        sock: FD, creator: ConnectionInfoCreator<T>,
     ): Accepted<T> = memScoped {
         val addr = alloc<sockaddr_storage>()
         val sizePtr = alloc<UIntVar>()
@@ -838,7 +838,7 @@ public actual object Syscall {
         sock: FD,
         buffer: ByteArray,
         size: Int = buffer.size, offset: Int = 0,
-        flags: Int = 0
+        flags: Int = 0,
     ): BlockingResult {
         assert(size <= IO_MAX) { "Count is too high!" }
         assert(buffer.size >= size) { "Buffer is too small!" }
@@ -862,7 +862,7 @@ public actual object Syscall {
      */
     @Unsafe
     public fun send(
-        sock: FD, buffer: ByteArray, size: Int = buffer.size, offset: Int = 0
+        sock: FD, buffer: ByteArray, size: Int = buffer.size, offset: Int = 0,
     ): BlockingResult {
         assert(size <= IO_MAX) { "Count is too high!" }
         assert(buffer.size >= size) { "Buffer is too small!" }

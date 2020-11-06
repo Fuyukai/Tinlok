@@ -19,7 +19,7 @@ import tf.lotte.tinlok.system.Syscall
  * Implements a TCP socket on Linux.
  */
 internal class LinuxTcpSocket(
-    fd: FD, override val remoteAddress: TcpConnectionInfo
+    fd: FD, override val remoteAddress: TcpConnectionInfo,
 ) : LinuxTcpParent(fd), TcpClientSocket {
 
     @OptIn(Unsafe::class)

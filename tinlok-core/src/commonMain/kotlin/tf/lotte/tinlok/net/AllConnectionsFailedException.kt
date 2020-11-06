@@ -15,5 +15,5 @@ import tf.lotte.cc.net.SocketAddress
  * Thrown when an attempt to connect a socket fails with all possible connections.
  */
 public class AllConnectionsFailedException(
-    public val addr: SocketAddress<*>, cause: Throwable? = null
+    public val addr: SocketAddress<*>, cause: Throwable? = null,
 ) : Exception("Connecting to $addr failed on all attempts", cause)

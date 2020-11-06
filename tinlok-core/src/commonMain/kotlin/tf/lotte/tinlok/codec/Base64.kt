@@ -44,7 +44,7 @@ private const val PADDING = '='
  */
 @OptIn(ExperimentalUnsignedTypes::class)
 private fun encodeBase64ThreeChunk(
-    table: CharArray, bs: ByteString, baset: Int, output: CharArray, outset: Int
+    table: CharArray, bs: ByteString, baset: Int, output: CharArray, outset: Int,
 ) {
     var baseOffset = baset
     // gross increment hacks
@@ -65,7 +65,7 @@ private fun encodeBase64ThreeChunk(
  */
 @OptIn(ExperimentalUnsignedTypes::class)
 private fun encodeBase64TwoChunk(
-    table: CharArray, bs: ByteString, baset: Int, output: CharArray, outset: Int
+    table: CharArray, bs: ByteString, baset: Int, output: CharArray, outset: Int,
 ) {
     var baseOffset = baset
 
@@ -88,7 +88,7 @@ private fun encodeBase64TwoChunk(
  */
 @OptIn(ExperimentalUnsignedTypes::class)
 private fun encodeBase64OneChunk(
-    table: CharArray, b: Byte, output: CharArray, outset: Int
+    table: CharArray, b: Byte, output: CharArray, outset: Int,
 ) {
     val i = b.toUInt().shl(16)
     var outOffset = outset

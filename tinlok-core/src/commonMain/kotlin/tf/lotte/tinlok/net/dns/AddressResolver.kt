@@ -38,6 +38,6 @@ public interface AddressResolver {
         family: AddressFamily = StandardAddressFamilies.AF_UNSPEC,
         type: SocketType = StandardSocketTypes.SOCK_STREAM,
         protocol: IPProtocol = StandardIPProtocols.IPPROTO_IP,
-        flags: Int = 0
+        flags: Int = 0,
     ): List<ConnectionInfo>
 }

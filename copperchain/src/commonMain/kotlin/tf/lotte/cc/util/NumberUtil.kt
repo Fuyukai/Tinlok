@@ -86,7 +86,6 @@ public inline val Long.lowerByte: Long
     get() = (this and 0x00000000000000FF)
 
 
-
 // Number --> ByteArray
 /**
  * Decodes this int into a [ByteArray] in big endian mode.
@@ -133,8 +132,8 @@ public inline fun Long.toByteArray(): ByteArray {
         ((this ushr 32) and 0xffL).toByte(),
         ((this ushr 24) and 0xffL).toByte(),
         ((this ushr 16) and 0xffL).toByte(),
-        ((this ushr  8) and 0xffL).toByte(),
-        ((this        ) and 0xffL).toByte()
+        ((this ushr 8) and 0xffL).toByte(),
+        ((this) and 0xffL).toByte()
     )
 }
 
@@ -144,8 +143,8 @@ public inline fun Long.toByteArray(): ByteArray {
 /* @InlineOnly */
 public inline fun Long.toByteArrayLE(): ByteArray {
     return byteArrayOf(
-        ((this        ) and 0xffL).toByte(),
-        ((this ushr  8) and 0xffL).toByte(),
+        ((this) and 0xffL).toByte(),
+        ((this ushr 8) and 0xffL).toByte(),
         ((this ushr 16) and 0xffL).toByte(),
         ((this ushr 24) and 0xffL).toByte(),
         ((this ushr 32) and 0xffL).toByte(),
@@ -166,8 +165,8 @@ public inline fun ULong.toByteArray(): ByteArray {
         ((this shr 32) and 0xffUL).toByte(),
         ((this shr 24) and 0xffUL).toByte(),
         ((this shr 16) and 0xffUL).toByte(),
-        ((this shr  8) and 0xffUL).toByte(),
-        ((this       ) and 0xffUL).toByte()
+        ((this shr 8) and 0xffUL).toByte(),
+        ((this) and 0xffUL).toByte()
     )
 }
 
@@ -177,8 +176,8 @@ public inline fun ULong.toByteArray(): ByteArray {
 /* @InlineOnly */
 public inline fun ULong.toByteArrayLE(): ByteArray {
     return byteArrayOf(
-        ((this       ) and 0xffUL).toByte(),
-        ((this shr  8) and 0xffUL).toByte(),
+        ((this) and 0xffUL).toByte(),
+        ((this shr 8) and 0xffUL).toByte(),
         ((this shr 16) and 0xffUL).toByte(),
         ((this shr 24) and 0xffUL).toByte(),
         ((this shr 32) and 0xffUL).toByte(),

@@ -16,7 +16,7 @@ public abstract class InetConnectionInfo(
     /** The IP address of this socket address. */
     public val ip: IPAddress,
     /** The port of this info, or 0 if this doesn't have a port. */
-    public val port: Int
+    public val port: Int,
 ) : ConnectionInfo() {
 
     override fun equals(other: Any?): Boolean {

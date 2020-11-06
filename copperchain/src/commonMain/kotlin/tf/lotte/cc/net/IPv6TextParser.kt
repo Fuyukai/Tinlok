@@ -31,16 +31,22 @@ public class IPv6TextParser(public val incoming: String) {
     private enum class State {
         /** Initial (empty) state. */
         STATE_INITIAL,
+
         /** Last character was a left-bracket '[' */
         STATE_LBRACKET,
+
         /** Last character was a hex digit. */
         STATE_HEXDIGIT,
+
         /** Last character was a colon that immediately starts the address */
         STATE_FIRST_COLON,
+
         /** Last character was a regular colon. */
         STATE_REGULAR_COLON,
+
         /** Last character was the second colon. */
         STATE_DOUBLE_COLON,
+
         /** Last character was a right-bracket ']' */
         STATE_RBRACKET,
         ;
@@ -63,11 +69,13 @@ public class IPv6TextParser(public val incoming: String) {
 
     /** The final buffer of bytes. */
     private val buf = ByteArray(16)
+
     /** Cursor into the final array. */
     private var cursor = 0
 
     /** Secondary buffer, used for bytes after a double colon. */
     private val secondaryBuf = ByteArray(16)
+
     /** Secondary cursor, used for the secondary buffer. */
     private var secondaryCursor = 0
 

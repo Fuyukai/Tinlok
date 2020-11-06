@@ -23,7 +23,7 @@ import tf.lotte.tinlok.system.Syscall
 internal class WindowsPath(
     driveLetter: ByteString?,
     volume: ByteString?,
-    rest: List<ByteString>
+    rest: List<ByteString>,
 ) : Path, WindowsPurePath(driveLetter, volume, rest) {
     companion object {
         /**
@@ -58,10 +58,11 @@ internal class WindowsPath(
         return WindowsPath(pure.driveLetter, pure.volume, pure.rest)
     }
 
-    override val parent: WindowsPath get() {
-        val parent = super.parent
-        return WindowsPath(driveLetter, volume, parent.rest)
-    }
+    override val parent: WindowsPath
+        get() {
+            val parent = super.parent
+            return WindowsPath(driveLetter, volume, parent.rest)
+        }
 
     @OptIn(Unsafe::class)
     override fun exists(): Boolean {

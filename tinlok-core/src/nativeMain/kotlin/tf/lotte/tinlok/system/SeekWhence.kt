@@ -15,8 +15,10 @@ package tf.lotte.tinlok.system
 public expect enum class SeekWhence {
     /** Seek from the start of the file (absolute seek). */
     START,
+
     /** Seek from the current position of the file (relative seek). */
     CURRENT,
+
     /** Seek from the end of the file (absolute seek). */
     END,
     ;

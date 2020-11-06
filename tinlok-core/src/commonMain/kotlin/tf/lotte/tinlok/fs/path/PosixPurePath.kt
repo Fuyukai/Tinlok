@@ -93,17 +93,18 @@ public open class PosixPurePath(rawParts: List<ByteString>) : PurePath {
         }
     }
 
-    override val rawName: ByteString? get() {
-        return if (isAbsolute) {
-            // only get the name if it exists
-            // because we may only have /
-            if (rawComponents.size <= 1) null
-            else rawComponents.last()
-        } else {
-            // always exists on relative paths
-            rawComponents.last()
+    override val rawName: ByteString?
+        get() {
+            return if (isAbsolute) {
+                // only get the name if it exists
+                // because we may only have /
+                if (rawComponents.size <= 1) null
+                else rawComponents.last()
+            } else {
+                // always exists on relative paths
+                rawComponents.last()
+            }
         }
-    }
     override val name: String? get() = rawName?.decode()
 
 

@@ -15,5 +15,5 @@ import tf.lotte.cc.exc.OSException
  * Thrown when an error occurs with the getaddrinfo() system call.
  */
 public class GAIException(
-    public val errno: Int, message: String? = null, cause: Throwable? = null
+    public val errno: Int, message: String? = null, cause: Throwable? = null,
 ) : OSException(message, cause)

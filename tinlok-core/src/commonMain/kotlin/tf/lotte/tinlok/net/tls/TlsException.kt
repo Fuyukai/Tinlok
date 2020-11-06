@@ -16,7 +16,7 @@ import tf.lotte.cc.exc.OSException
  */
 public class TlsException
 public constructor(
-    message: String, cause: Throwable?
+    message: String, cause: Throwable?,
 ) : OSException(message, cause) {
     public constructor(message: String) : this(message, null)
 }
