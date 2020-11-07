@@ -45,7 +45,6 @@ public inline fun <R> TcpClientSocket.Companion.connect(
     }
 
     val sock = unsafeOpen(address, timeout)
-
     return sock.use(block)
 }
 
