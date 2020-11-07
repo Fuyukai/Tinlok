@@ -20,7 +20,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 /**
- * Tests the [FilesystemFile] class.
+ * Tests the [SynchronousFile] class.
  */
 class `Test FilesystemFile` {
     /**

@@ -16,9 +16,9 @@ import tf.lotte.tinlok.fs.path.Path
 import tf.lotte.tinlok.util.AtomicBoolean
 
 /**
- * Represents a file on the filesystem.
+ * A synchronous file on a filesystem.
  */
-public interface FilesystemFile : BidirectionalStream, Seekable {
+public interface SynchronousFile : BidirectionalStream, Seekable {
     /** If this file is still open. */
     public val isOpen: AtomicBoolean
 

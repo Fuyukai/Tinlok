@@ -13,9 +13,9 @@ import platform.windows.*
 import tf.lotte.cc.Unsafe
 import tf.lotte.cc.types.ByteString
 import tf.lotte.tinlok.fs.FileOpenMode
-import tf.lotte.tinlok.fs.FilesystemFile
 import tf.lotte.tinlok.fs.StandardOpenModes.*
 import tf.lotte.tinlok.fs.StandardOpenModes.CREATE_NEW
+import tf.lotte.tinlok.fs.SynchronousFile
 import tf.lotte.tinlok.system.SeekWhence
 import tf.lotte.tinlok.system.Syscall
 import tf.lotte.tinlok.util.AtomicBoolean
@@ -27,7 +27,7 @@ import tf.lotte.tinlok.util.AtomicBoolean
 public class WindowsSyncFile(
     override val path: Path,
     modes: Array<out FileOpenMode>,
-) : FilesystemFile {
+) : SynchronousFile {
     private val handle: HANDLE
 
     init {

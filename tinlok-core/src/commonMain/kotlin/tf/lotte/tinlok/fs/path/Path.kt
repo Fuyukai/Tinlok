@@ -179,5 +179,5 @@ public interface Path : PurePath {
      * [tf.lotte.tinlok.fs.path.open] instead.
      */
     @Unsafe
-    public fun unsafeOpen(vararg modes: FileOpenMode): FilesystemFile
+    public fun unsafeOpen(vararg modes: FileOpenMode): SynchronousFile
 }

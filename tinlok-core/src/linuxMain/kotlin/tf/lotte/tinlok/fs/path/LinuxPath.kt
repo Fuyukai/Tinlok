@@ -276,7 +276,7 @@ internal class LinuxPath(rawParts: List<ByteString>) : Path, PosixPurePath(rawPa
     }
 
     @Unsafe
-    override fun unsafeOpen(vararg modes: FileOpenMode): FilesystemFile {
+    override fun unsafeOpen(vararg modes: FileOpenMode): SynchronousFile {
         if (this.isDirectory(followSymlinks = false)) {
             throw IsADirectoryException(unsafeToString())
         }

@@ -199,7 +199,7 @@ internal class WindowsPath(
     }
 
     @Unsafe
-    override fun unsafeOpen(vararg modes: FileOpenMode): FilesystemFile {
+    override fun unsafeOpen(vararg modes: FileOpenMode): SynchronousFile {
         if (isDirectory(followSymlinks = true)) {
             throw IsADirectoryException(unsafeToString())
         }

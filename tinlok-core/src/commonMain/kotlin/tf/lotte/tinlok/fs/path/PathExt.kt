@@ -20,8 +20,8 @@ import tf.lotte.cc.types.b
 import tf.lotte.cc.types.toByteString
 import tf.lotte.cc.use
 import tf.lotte.tinlok.fs.DirEntry
-import tf.lotte.tinlok.fs.FilesystemFile
 import tf.lotte.tinlok.fs.StandardOpenModes
+import tf.lotte.tinlok.fs.SynchronousFile
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -219,7 +219,7 @@ public fun Path.delete() {
  * automatically closed when the lambda exits.
  */
 @OptIn(Unsafe::class, ExperimentalContracts::class)
-public inline fun <R> Path.open(vararg modes: StandardOpenModes, block: (FilesystemFile) -> R): R {
+public inline fun <R> Path.open(vararg modes: StandardOpenModes, block: (SynchronousFile) -> R): R {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
@@ -231,7 +231,7 @@ public inline fun <R> Path.open(vararg modes: StandardOpenModes, block: (Filesys
  * Opens a path for file I/O, adding it to the specified [scope] for automatic closing.
  */
 @OptIn(Unsafe::class)
-public fun Path.open(scope: ClosingScope, vararg modes: StandardOpenModes): FilesystemFile {
+public fun Path.open(scope: ClosingScope, vararg modes: StandardOpenModes): SynchronousFile {
     val file = unsafeOpen(*modes)
     scope.add(file)
     return file
