@@ -15,17 +15,18 @@ import tf.lotte.cc.Unsafe
 /**
  * A socket option for a boolean.
  */
-@Unsafe
 public actual class BooleanSocketOption actual constructor(
     actual override val bsdOptionValue: Int,
     override val level: Int,
     override val name: String
 ) : BsdSocketOption<Boolean> {
 
+    @Unsafe
     override fun allocateNativeStructure(allocator: NativePlacement): CPointer<*> {
         return allocator.alloc<IntVar>().ptr
     }
 
+    @Unsafe
     override fun toNativeStructure(
         allocator: NativePlacement, value: Boolean,
     ): CPointer<IntVar> {
@@ -37,6 +38,7 @@ public actual class BooleanSocketOption actual constructor(
         return int.ptr
     }
 
+    @Unsafe
     override fun fromNativeStructure(
         allocator: NativePlacement, structure: CPointer<*>,
     ): Boolean {
@@ -54,13 +56,13 @@ public actual class BooleanSocketOption actual constructor(
 /**
  * A socket option for an unsigned long.
  */
-@Unsafe
 @OptIn(ExperimentalUnsignedTypes::class)
 public actual class ULongSocketOption actual constructor(
     actual override val bsdOptionValue: Int,
     override val level: Int,
     override val name: String
 ) : BsdSocketOption<ULong> {
+    @Unsafe
     override fun allocateNativeStructure(allocator: NativePlacement): CPointer<*> {
         return allocator.alloc<ULongVar>().ptr
     }

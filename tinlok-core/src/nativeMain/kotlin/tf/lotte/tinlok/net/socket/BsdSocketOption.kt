@@ -42,6 +42,5 @@ public actual interface BsdSocketOption<T> : SocketOption<T> {
     /**
      * Gets the native size of this option (i.e. sizeof(allocateNativeStructure(...))).
      */
-    @Unsafe
     public fun nativeSize(): Long
 }

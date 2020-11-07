@@ -9,12 +9,9 @@
 
 package tf.lotte.tinlok.net.socket
 
-import tf.lotte.cc.Unsafe
-
 /**
  * A socket option that has a boolean parameter.
  */
-@Unsafe
 public expect class BooleanSocketOption(
     bsdOptionValue: Int,
     level: Int,
@@ -26,7 +23,6 @@ public expect class BooleanSocketOption(
 /**
  * A socket option that has an unsigned long parameter.
  */
-@Unsafe
 @OptIn(ExperimentalUnsignedTypes::class)
 public expect class ULongSocketOption(
     bsdOptionValue: Int,
