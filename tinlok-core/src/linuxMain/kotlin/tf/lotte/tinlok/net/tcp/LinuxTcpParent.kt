@@ -9,7 +9,7 @@
 
 package tf.lotte.tinlok.net.tcp
 
-import tf.lotte.cc.Unsafe
+import tf.lotte.tinlok.Unsafe
 import tf.lotte.tinlok.io.FdWrapper
 import tf.lotte.tinlok.net.socket.BsdSocketOption
 import tf.lotte.tinlok.system.FD

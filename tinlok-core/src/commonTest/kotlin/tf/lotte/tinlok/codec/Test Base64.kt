@@ -9,7 +9,7 @@
 
 package tf.lotte.tinlok.codec
 
-import tf.lotte.cc.types.b
+import tf.lotte.tinlok.util.b
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

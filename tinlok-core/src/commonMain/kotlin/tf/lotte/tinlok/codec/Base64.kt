@@ -11,8 +11,8 @@
 
 package tf.lotte.tinlok.codec
 
-import tf.lotte.cc.Unsafe
-import tf.lotte.cc.types.ByteString
+import tf.lotte.tinlok.Unsafe
+import tf.lotte.tinlok.util.ByteString
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 

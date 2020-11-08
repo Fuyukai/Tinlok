@@ -11,7 +11,7 @@ package tf.lotte.tinlok.net.socket
 
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.NativePlacement
-import tf.lotte.cc.Unsafe
+import tf.lotte.tinlok.Unsafe
 
 /**
  * Sub-interface for BSD Socket API socket options. This is supported by both the BSD socket

@@ -11,7 +11,7 @@ package tf.lotte.tinlok.system
 
 import platform.windows.FILE_ATTRIBUTE_DIRECTORY
 import platform.windows.FILE_ATTRIBUTE_REPARSE_POINT
-import tf.lotte.cc.Unsafe
+import tf.lotte.tinlok.Unsafe
 import tf.lotte.tinlok.util.flagged
 
 /**

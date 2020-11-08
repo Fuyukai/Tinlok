@@ -9,7 +9,6 @@
 
 package tf.lotte.tinlok.net
 
-import tf.lotte.cc.net.IPv4Address
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith

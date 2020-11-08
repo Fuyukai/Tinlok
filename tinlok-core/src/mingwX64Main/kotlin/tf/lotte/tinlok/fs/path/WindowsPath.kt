@@ -9,16 +9,16 @@
 
 package tf.lotte.tinlok.fs.path
 
-import tf.lotte.cc.Unsafe
-import tf.lotte.cc.exc.FileNotFoundException
-import tf.lotte.cc.exc.IsADirectoryException
-import tf.lotte.cc.types.ByteString
-import tf.lotte.cc.types.toByteString
-import tf.lotte.cc.use
+import tf.lotte.tinlok.Unsafe
 import tf.lotte.tinlok.fs.*
+import tf.lotte.tinlok.io.FileNotFoundException
+import tf.lotte.tinlok.io.IsADirectoryException
 import tf.lotte.tinlok.system.DirectoryScanContext
 import tf.lotte.tinlok.system.FileAttributes
 import tf.lotte.tinlok.system.Syscall
+import tf.lotte.tinlok.util.ByteString
+import tf.lotte.tinlok.util.toByteString
+import tf.lotte.tinlok.util.use
 
 internal class WindowsPath(
     driveLetter: ByteString?,

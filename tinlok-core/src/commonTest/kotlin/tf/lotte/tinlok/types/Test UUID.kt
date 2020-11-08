@@ -9,7 +9,8 @@
 
 package tf.lotte.tinlok.types
 
-import tf.lotte.cc.types.toByteString
+import tf.lotte.tinlok.util.UUID
+import tf.lotte.tinlok.util.toByteString
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

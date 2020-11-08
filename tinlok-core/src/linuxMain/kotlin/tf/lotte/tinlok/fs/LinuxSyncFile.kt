@@ -10,9 +10,7 @@
 package tf.lotte.tinlok.fs
 
 import platform.posix.*
-import tf.lotte.cc.Unsafe
-import tf.lotte.cc.exc.ClosedException
-import tf.lotte.cc.types.ByteString
+import tf.lotte.tinlok.Unsafe
 import tf.lotte.tinlok.fs.StandardOpenModes.*
 import tf.lotte.tinlok.fs.path.LinuxPath
 import tf.lotte.tinlok.io.FdWrapper
@@ -20,6 +18,8 @@ import tf.lotte.tinlok.system.SeekWhence
 import tf.lotte.tinlok.system.Syscall
 import tf.lotte.tinlok.system.ensureNonBlock
 import tf.lotte.tinlok.util.AtomicBoolean
+import tf.lotte.tinlok.util.ByteString
+import tf.lotte.tinlok.util.ClosedException
 
 /**
  * Linux implementation of a synchronous filesystem file.

@@ -13,9 +13,8 @@ import kotlinx.cinterop.ByteVar
 import kotlinx.cinterop.arrayMemberAt
 import kotlinx.cinterop.reinterpret
 import platform.posix.*
-import tf.lotte.cc.Unsafe
-import tf.lotte.cc.net.*
-import tf.lotte.cc.util.toByteArray
+import tf.lotte.tinlok.Unsafe
+import tf.lotte.tinlok.net.*
 import tf.lotte.tinlok.system.readBytesFast
 
 /**

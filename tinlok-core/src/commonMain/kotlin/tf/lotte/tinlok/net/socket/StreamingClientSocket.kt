@@ -9,8 +9,8 @@
 
 package tf.lotte.tinlok.net.socket
 
-import tf.lotte.cc.io.HalfCloseableStream
-import tf.lotte.cc.net.ConnectionInfo
+import tf.lotte.tinlok.io.HalfCloseableStream
+import tf.lotte.tinlok.net.ConnectionInfo
 
 /**
  * Defines a client socket that is also a [HalfCloseableStream]. This is used for SOCK_STREAM

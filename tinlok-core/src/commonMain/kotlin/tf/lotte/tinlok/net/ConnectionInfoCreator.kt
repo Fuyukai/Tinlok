@@ -9,9 +9,7 @@
 
 package tf.lotte.tinlok.net
 
-import tf.lotte.cc.net.ConnectionInfo
-import tf.lotte.cc.net.IPAddress
-import tf.lotte.cc.net.tcp.TcpConnectionInfo
+import tf.lotte.tinlok.net.tcp.TcpConnectionInfo
 
 /**
  * Defines a connection information creator, to turn an IP address into a ConnectionInfo.

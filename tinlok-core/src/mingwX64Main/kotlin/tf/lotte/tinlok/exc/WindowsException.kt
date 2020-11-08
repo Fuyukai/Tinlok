@@ -9,7 +9,7 @@
 
 package tf.lotte.tinlok.exc
 
-import tf.lotte.cc.exc.OSException
+import tf.lotte.tinlok.io.OSException
 
 /**
  * Thrown when an exception happens that is not otherwise turned into a

@@ -13,15 +13,14 @@ package tf.lotte.tinlok.system
 
 import kotlinx.cinterop.*
 import platform.posix.*
-import tf.lotte.cc.Unsafe
-import tf.lotte.cc.exc.*
-import tf.lotte.cc.net.*
-import tf.lotte.cc.types.ByteString
-import tf.lotte.cc.util.toUInt
-import tf.lotte.tinlok.net.ConnectionInfoCreator
+import tf.lotte.tinlok.Unsafe
+import tf.lotte.tinlok.io.*
+import tf.lotte.tinlok.net.*
 import tf.lotte.tinlok.net.dns.GAIException
 import tf.lotte.tinlok.net.socket.BsdSocketOption
+import tf.lotte.tinlok.util.ByteString
 import tf.lotte.tinlok.util.toKotlin
+import tf.lotte.tinlok.util.toUInt
 import kotlin.experimental.ExperimentalTypeInference
 
 internal typealias FD = Int

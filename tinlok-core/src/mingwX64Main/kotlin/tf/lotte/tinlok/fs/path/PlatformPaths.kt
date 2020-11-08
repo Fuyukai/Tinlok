@@ -11,14 +11,11 @@
 
 package tf.lotte.tinlok.fs.path
 
-import tf.lotte.cc.Unsafe
-import tf.lotte.cc.exc.FileAlreadyExistsException
-import tf.lotte.cc.types.ByteString
-import tf.lotte.cc.types.b
-import tf.lotte.cc.types.toByteString
+import tf.lotte.tinlok.Unsafe
 import tf.lotte.tinlok.crypto.SecureRandom
+import tf.lotte.tinlok.io.FileAlreadyExistsException
 import tf.lotte.tinlok.system.Syscall
-import tf.lotte.tinlok.util.randomAsciiString
+import tf.lotte.tinlok.util.*
 
 /**
  * Defines the [PurePath] that for the current platform.

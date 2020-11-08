@@ -10,7 +10,7 @@
 package tf.lotte.tinlok.crypto
 
 import platform.posix.O_RDONLY
-import tf.lotte.cc.Unsafe
+import tf.lotte.tinlok.Unsafe
 import tf.lotte.tinlok.system.Syscall
 
 /**

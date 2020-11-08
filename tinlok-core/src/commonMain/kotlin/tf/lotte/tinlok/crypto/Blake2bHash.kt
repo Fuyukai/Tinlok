@@ -9,9 +9,9 @@
 
 package tf.lotte.tinlok.crypto
 
-import tf.lotte.cc.Unsafe
-import tf.lotte.cc.types.ByteString
-import tf.lotte.cc.types.hexlify
+import tf.lotte.tinlok.Unsafe
+import tf.lotte.tinlok.util.ByteString
+import tf.lotte.tinlok.util.hexlify
 
 /**
  * Wraps the raw bytes of an outgoing Blake2b hash. This is a 64-byte hash (i.e. a BLAKE2-512 hash).

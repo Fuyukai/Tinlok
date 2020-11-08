@@ -10,16 +10,12 @@
 package tf.lotte.tinlok.io
 
 import platform.posix.O_NONBLOCK
-import tf.lotte.cc.Closeable
-import tf.lotte.cc.Unsafe
-import tf.lotte.cc.exc.ClosedException
-import tf.lotte.cc.exc.OSException
-import tf.lotte.cc.io.async.Selectable
-import tf.lotte.cc.io.async.SelectionKey
-import tf.lotte.cc.util.flagged
+import tf.lotte.tinlok.Unsafe
+import tf.lotte.tinlok.io.async.Selectable
+import tf.lotte.tinlok.io.async.SelectionKey
 import tf.lotte.tinlok.net.socket.BsdSocketOption
 import tf.lotte.tinlok.system.*
-import tf.lotte.tinlok.util.AtomicBoolean
+import tf.lotte.tinlok.util.*
 
 /**
  * A wrapper class around a file descriptor. Wraps various platform calls into an OO API.

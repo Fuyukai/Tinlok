@@ -9,7 +9,7 @@
 
 package tf.lotte.tinlok.net.socket
 
-import tf.lotte.cc.Unsafe
+import tf.lotte.tinlok.Unsafe
 
 // For SO_REUSEADDR, see: https://github.com/python-trio/trio/issues/928
 // See also: https://github.com/python-trio/trio/issues/72

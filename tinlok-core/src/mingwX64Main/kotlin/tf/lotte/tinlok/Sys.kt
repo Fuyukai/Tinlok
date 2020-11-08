@@ -10,7 +10,6 @@
 package tf.lotte.tinlok
 
 import platform.windows.GetCurrentProcessId
-import tf.lotte.cc.Unsafe
 import tf.lotte.tinlok.system.Syscall
 
 /**

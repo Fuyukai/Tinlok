@@ -9,12 +9,10 @@
 
 package tf.lotte.tinlok.net.tcp
 
-import tf.lotte.cc.exc.TimeoutException
-import tf.lotte.cc.io.readUpTo
-import tf.lotte.cc.net.IPv4Address
-import tf.lotte.cc.net.tcp.TcpConnectionInfo
-import tf.lotte.cc.net.tcp.TcpSocketAddress
 import tf.lotte.tinlok._workarounds.__Workaround_TcpSocketTests
+import tf.lotte.tinlok.io.TimeoutException
+import tf.lotte.tinlok.io.readUpTo
+import tf.lotte.tinlok.net.IPv4Address
 import tf.lotte.tinlok.net.connect
 import tf.lotte.tinlok.net.resolve
 import kotlin.test.*

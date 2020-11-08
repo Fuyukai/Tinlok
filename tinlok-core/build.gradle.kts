@@ -104,16 +104,12 @@ kotlin {
             defFile(path)
         }
     }
-
-    sourceSets.commonMain {
-        dependencies {
-            api(project(":copperchain"))
-        }
-    }
 }
 
 // commonizer hack
 tasks.register("copyCommonCBindings") {
+    group = "interop"
+
     copy {
         from(
             "src/linuxX64Main/kotlin/tf/lotte/tinlok/crypto/Blake2b.kt",
@@ -130,6 +126,11 @@ tasks.register("copyCommonCBindings") {
             "src/linuxX64Main/kotlin/tf/lotte/tinlok/crypto/CryptoLLA.kt"
         )
         into("src/mingwX64Main/kotlin/tf/lotte/tinlok/crypto")
+    }
+
+    copy {
+        from("src/linuxX64Main/kotlin/tf/lotte/tinlok/util/UuidPlatform.kt")
+        into("src/linuxArm64Main/kotlin/tf/lotte/tinlok/util")
     }
 }
 

@@ -13,11 +13,11 @@ import kotlinx.cinterop.Arena
 import kotlinx.cinterop.alloc
 import platform.windows.HANDLE
 import platform.windows.WIN32_FIND_DATAW
-import tf.lotte.cc.Closeable
-import tf.lotte.cc.Unsafe
-import tf.lotte.cc.exc.ClosedException
+import tf.lotte.tinlok.Unsafe
 import tf.lotte.tinlok.fs.DirEntry
 import tf.lotte.tinlok.fs.path.Path
+import tf.lotte.tinlok.util.Closeable
+import tf.lotte.tinlok.util.ClosedException
 import kotlin.native.concurrent.ensureNeverFrozen
 
 /**

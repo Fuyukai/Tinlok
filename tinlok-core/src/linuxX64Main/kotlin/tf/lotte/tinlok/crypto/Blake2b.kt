@@ -12,11 +12,11 @@
 package tf.lotte.tinlok.crypto
 
 import kotlinx.cinterop.*
-import tf.lotte.cc.Closeable
-import tf.lotte.cc.Unsafe
-import tf.lotte.cc.exc.ClosedException
-import tf.lotte.cc.types.ByteString
+import tf.lotte.tinlok.Unsafe
 import tf.lotte.tinlok.interop.libmonocypher.*
+import tf.lotte.tinlok.util.ByteString
+import tf.lotte.tinlok.util.Closeable
+import tf.lotte.tinlok.util.ClosedException
 
 /**
  * A class that takes in data and will eventually produce a hash using the Blake2b algorithm.

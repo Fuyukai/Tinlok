@@ -9,7 +9,7 @@
 
 package tf.lotte.tinlok.net.tls
 
-import tf.lotte.cc.exc.OSException
+import tf.lotte.tinlok.io.OSException
 
 /**
  * Thrown when a exception happpens relating to TLS code.

@@ -9,16 +9,13 @@
 
 package tf.lotte.tinlok.net
 
-import tf.lotte.cc.Unsafe
-import tf.lotte.cc.net.StandardAddressFamilies
-import tf.lotte.cc.net.StandardIPProtocols
-import tf.lotte.cc.net.StandardSocketTypes
-import tf.lotte.cc.net.tcp.TcpConnectionInfo
-import tf.lotte.cc.net.tcp.TcpSocketAddress
-import tf.lotte.cc.net.udp.UdpConnectionInfo
-import tf.lotte.cc.net.udp.UdpSocketAddress
+import tf.lotte.tinlok.Unsafe
 import tf.lotte.tinlok.net.dns.AddressResolver
 import tf.lotte.tinlok.net.dns.GlobalResolver
+import tf.lotte.tinlok.net.tcp.TcpConnectionInfo
+import tf.lotte.tinlok.net.tcp.TcpSocketAddress
+import tf.lotte.tinlok.net.udp.UdpConnectionInfo
+import tf.lotte.tinlok.net.udp.UdpSocketAddress
 
 /**
  * Resolves a [host] and [port] combination into a [TcpSocketAddress].

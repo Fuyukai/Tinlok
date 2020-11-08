@@ -26,7 +26,7 @@ public fun ShortArray.utf16ToString(count: Int = this.size): String {
 /**
  * Converts this UShortArray into a string (assumiing it is UTF-16).
  */
-@ExperimentalUnsignedTypes
+@OptIn(ExperimentalUnsignedTypes::class)
 public fun UShortArray.utf16ToString(count: Int = this.size): String {
     val ca = CharArray(count)
     for (idx in 0 until count) {

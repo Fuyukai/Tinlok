@@ -13,14 +13,14 @@ import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.pointed
 import kotlinx.cinterop.toKString
 import platform.posix.*
-import tf.lotte.cc.Unsafe
-import tf.lotte.cc.exc.FileNotFoundException
-import tf.lotte.cc.exc.IsADirectoryException
-import tf.lotte.cc.types.ByteString
-import tf.lotte.cc.types.b
+import tf.lotte.tinlok.Unsafe
 import tf.lotte.tinlok.fs.*
+import tf.lotte.tinlok.io.FileNotFoundException
+import tf.lotte.tinlok.io.IsADirectoryException
 import tf.lotte.tinlok.system.Syscall
 import tf.lotte.tinlok.system.readZeroTerminated
+import tf.lotte.tinlok.util.ByteString
+import tf.lotte.tinlok.util.b
 
 /**
  * Linux-based implementation of a [Path]. Is also a [PosixPurePath].

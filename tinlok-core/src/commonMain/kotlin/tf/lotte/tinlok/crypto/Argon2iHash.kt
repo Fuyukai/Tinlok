@@ -9,8 +9,8 @@
 
 package tf.lotte.tinlok.crypto
 
-import tf.lotte.cc.Unsafe
-import tf.lotte.cc.types.ByteString
+import tf.lotte.tinlok.Unsafe
+import tf.lotte.tinlok.util.ByteString
 
 /**
  * Represents a password hash that was created using the Argon2i hashing algorithm.

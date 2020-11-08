@@ -9,8 +9,8 @@
 
 package tf.lotte.tinlok.net.tcp
 
-import tf.lotte.cc.Unsafe
-import tf.lotte.cc.net.StandardIPProtocols
+import tf.lotte.tinlok.Unsafe
+import tf.lotte.tinlok.net.StandardIPProtocols
 import tf.lotte.tinlok.net.socket.BooleanSocketOption
 import tf.lotte.tinlok.net.socket.BsdSocketOption
 

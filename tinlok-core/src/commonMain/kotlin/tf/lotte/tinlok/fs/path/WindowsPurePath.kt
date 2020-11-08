@@ -9,8 +9,8 @@
 
 package tf.lotte.tinlok.fs.path
 
-import tf.lotte.cc.Unsafe
-import tf.lotte.cc.types.*
+import tf.lotte.tinlok.Unsafe
+import tf.lotte.tinlok.util.*
 
 /**
  * Implements a pure path with Windows filesystem semantics.

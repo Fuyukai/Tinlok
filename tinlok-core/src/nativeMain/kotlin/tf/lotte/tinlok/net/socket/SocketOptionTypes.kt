@@ -10,7 +10,7 @@
 package tf.lotte.tinlok.net.socket
 
 import kotlinx.cinterop.*
-import tf.lotte.cc.Unsafe
+import tf.lotte.tinlok.Unsafe
 
 /**
  * A socket option for a boolean.

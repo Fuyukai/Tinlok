@@ -9,8 +9,6 @@
 
 package tf.lotte.tinlok.net
 
-import tf.lotte.cc.net.SocketAddress
-
 /**
  * Thrown when an attempt to connect a socket fails with all possible connections.
  */

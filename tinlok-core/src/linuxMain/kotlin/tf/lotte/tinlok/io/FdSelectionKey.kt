@@ -9,7 +9,7 @@
 
 package tf.lotte.tinlok.io
 
-import tf.lotte.cc.io.async.SelectionKey
+import tf.lotte.tinlok.io.async.SelectionKey
 import tf.lotte.tinlok.system.FD
 
 /**

@@ -9,7 +9,7 @@
 
 package tf.lotte.tinlok.fs
 
-import tf.lotte.cc.Unsafe
+import tf.lotte.tinlok.Unsafe
 
 /**
  * Represents the result of an ``(l)stat()`` call.

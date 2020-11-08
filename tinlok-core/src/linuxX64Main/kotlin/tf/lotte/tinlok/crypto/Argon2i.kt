@@ -12,9 +12,9 @@
 package tf.lotte.tinlok.crypto
 
 import kotlinx.cinterop.*
-import tf.lotte.cc.Unsafe
-import tf.lotte.cc.types.ByteString
+import tf.lotte.tinlok.Unsafe
 import tf.lotte.tinlok.interop.libmonocypher.crypto_argon2i
+import tf.lotte.tinlok.util.ByteString
 import kotlin.random.nextUBytes
 
 public const val HASH_SIZE: Int = 64
