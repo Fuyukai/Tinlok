@@ -15,4 +15,7 @@ package tf.lotte.tinlok.net.socket
 public expect interface BsdSocketOption<T> : SocketOption<T> {
     /** The BSD option value, in int form. */
     public val bsdOptionValue: Int
+
+    /** The level of this socket option. */
+    public val level: Int
 }

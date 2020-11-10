@@ -23,15 +23,15 @@ import tf.lotte.tinlok.system.readBytesFast
  */
 @OptIn(ExperimentalUnsignedTypes::class)
 @Unsafe
-public fun sockaddr.toKotlin(family: AddressFamily): Pair<IPAddress, Int>? {
-    return when (family) {
-        StandardAddressFamilies.AF_INET -> {
+public fun sockaddr.toKotlin(): Pair<IPAddress, Int>? {
+    return when (sa_family.toInt()) {
+        StandardAddressFamilies.AF_INET.number -> {
             val real = reinterpret<sockaddr_in>()
             val ipBytes = real.sin_addr.s_addr.toByteArray()
             val ip = IPv4Address(ipBytes)
             return ip to ntohs(real.sin_port).toInt()
         }
-        StandardAddressFamilies.AF_INET6 -> {
+        StandardAddressFamilies.AF_INET6.number -> {
             val real = reinterpret<sockaddr_in6>()
             // XX: Kotlin in6_addr has no fields!
             val addrPtr = real.sin6_addr.arrayMemberAt<ByteVar>(0L)
@@ -49,8 +49,5 @@ public fun sockaddr.toKotlin(family: AddressFamily): Pair<IPAddress, Int>? {
  */
 @Unsafe
 public fun sockaddr_storage.toKotlin(): Pair<IPAddress, Int>? {
-    val familyInt = ss_family.toInt()
-    val family =
-        StandardAddressFamilies.values().find { it.number == familyInt } ?: return null
-    return reinterpret<sockaddr>().toKotlin(family)
+    return reinterpret<sockaddr>().toKotlin()
 }

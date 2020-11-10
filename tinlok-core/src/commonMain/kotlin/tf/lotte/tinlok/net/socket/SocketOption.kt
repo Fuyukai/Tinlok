@@ -17,7 +17,4 @@ package tf.lotte.tinlok.net.socket
 public interface SocketOption<T> {
     /** The name of this socket option. */
     public val name: String
-
-    /** The level of this socket option. */
-    public val level: Int
 }

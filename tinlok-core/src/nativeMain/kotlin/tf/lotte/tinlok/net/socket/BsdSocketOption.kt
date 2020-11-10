@@ -21,6 +21,9 @@ public actual interface BsdSocketOption<T> : SocketOption<T> {
     /** The BSD option value, in int form. */
     public actual val bsdOptionValue: Int
 
+    /** The level of this socket option. */
+    public actual val level: Int
+
     /**
      * Allocates an empty (zero-value) native structure.
      */

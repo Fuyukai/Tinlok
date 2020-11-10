@@ -18,6 +18,7 @@ public expect class BooleanSocketOption(
     name: String
 ) : BsdSocketOption<Boolean> {
     override val bsdOptionValue: Int
+    override val level: Int
 }
 
 /**
@@ -30,4 +31,5 @@ public expect class ULongSocketOption(
     name: String
 ) : BsdSocketOption<ULong> {
     override val bsdOptionValue: Int
+    override val level: Int
 }

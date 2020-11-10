@@ -18,6 +18,8 @@ import tf.lotte.tinlok.io.*
 import tf.lotte.tinlok.net.*
 import tf.lotte.tinlok.net.dns.GAIException
 import tf.lotte.tinlok.net.socket.BsdSocketOption
+import tf.lotte.tinlok.net.socket.RecvFrom
+import tf.lotte.tinlok.net.socket.ShutdownOption
 import tf.lotte.tinlok.util.ByteString
 import tf.lotte.tinlok.util.toKotlin
 import tf.lotte.tinlok.util.toUInt
@@ -38,11 +40,6 @@ internal typealias FD = Int
 @OptIn(ExperimentalTypeInference::class, ExperimentalUnsignedTypes::class)
 public actual object Syscall {
     // wrapper types, for e.g. accept
-
-    /**
-     * Wraps an accepted socket and a [ConnectionInfo] for the accepted socket.
-     */
-    public class Accepted<T : ConnectionInfo>(public val fd: FD, public val info: T?)
 
     public const val ERROR: Int = -1
     public const val LONG_ERROR: Long = -1L
@@ -108,7 +105,6 @@ public actual object Syscall {
             ETIMEDOUT -> TimeoutException()
             ENETUNREACH -> NetworkUnreachableException()
 
-            // unsupporteed
             ENOPROTOOPT -> UnsupportedOperationException(
                 "The specified option is not supported by this protocol."
             )
@@ -236,16 +232,18 @@ public actual object Syscall {
     public const val IO_MAX: Int = 0x7ffff000
 
     /**
-     * Reads up to [count] bytes from file descriptor [fd] into the buffer [buf], at the offset
+     * Reads up to [size] bytes from file descriptor [fd] into the buffer [buffer], at the offset
      * [offset].
      */
     @Unsafe
-    public fun read(fd: FD, buf: ByteArray, count: Int, offset: Int = 0): BlockingResult {
-        assert(count <= IO_MAX) { "Count is too high!" }
-        assert(buf.size >= count) { "Buffer is too small!" }
-
-        val readCount = buf.usePinned {
-            retry { read(fd, it.addressOf(offset), count.toULong()) }
+    public fun read(fd: FD, buffer: ByteArray, size: Int, offset: Int = 0): BlockingResult {
+        require(size <= IO_MAX) { "$size is more than IO_MAX" }
+        require(buffer.size >= size) { "$size is more than buffer size (${buffer.size})" }
+        require(offset + size <= buffer.size) {
+            "offset ($offset) + size ($size) > buffer.size (${buffer.size})"
+        }
+        val readCount = buffer.usePinned {
+            retry { read(fd, it.addressOf(offset), size.toULong()) }
         }
 
         if (readCount.isError) {
@@ -266,16 +264,19 @@ public actual object Syscall {
      */
     @Unsafe
     public fun write(
-        fd: FD, from: ByteArray, size: Int = from.size, offset: Int = 0,
+        fd: FD, buffer: ByteArray, size: Int = buffer.size, offset: Int = 0,
     ): BlockingResult {
-        assert(size <= IO_MAX) { "Count is too high!" }
-        assert(from.size >= size) { "Buffer is too small!" }
+        require(size <= IO_MAX) { "$size is more than IO_MAX" }
+        require(buffer.size >= size) { "$size is more than buffer size (${buffer.size})" }
+        require(offset + size <= buffer.size) {
+            "offset ($offset) + size ($size) > buffer.size (${buffer.size})"
+        }
 
         var nextOffset = offset
         var hitAgain = false
 
         // head spinny logic
-        from.usePinned {
+        buffer.usePinned {
             while (true) {
                 val written = write(
                     fd, it.addressOf(nextOffset),
@@ -637,20 +638,22 @@ public actual object Syscall {
      * Connects a socket to an address.
      */
     @Unsafe
-    public fun connect(sock: FD, info: InetConnectionInfo): BlockingResult = memScoped {
+    public fun connect(sock: FD, address: ConnectionInfo): BlockingResult = memScoped {
         val struct: sockaddr
         val size: UInt
 
-        when (info.family) {
+        when (address.family) {
             StandardAddressFamilies.AF_INET6 -> {
+                val info = (address as InetConnectionInfo)
                 struct = __ipv6_to_sockaddr(this, info.ip as IPv6Address, info.port)
                 size = sizeOf<sockaddr_in6>().toUInt()
             }
             StandardAddressFamilies.AF_INET -> {
+                val info = (address as InetConnectionInfo)
                 struct = __ipv4_to_sockaddr(this, info.ip as IPv4Address, info.port)
                 size = sizeOf<sockaddr_in>().toUInt()
             }
-            else -> throw UnsupportedOperationException("Don't know how to use $info")
+            else -> throw UnsupportedOperationException("Don't know how to use $address")
         }
 
         return when (val res = connect(sock, struct.ptr, size)) {
@@ -672,11 +675,11 @@ public actual object Syscall {
      * reasonable default of 30 seconds is set.
      */
     @Unsafe
-    public fun __connect_blocking(sock: FD, info: InetConnectionInfo, timeout: Int = 30_000) {
+    public fun __connect_blocking(sock: FD, address: ConnectionInfo, timeout: Int = 30_000) {
         memScoped {
             // less than zero timeouts go on the fast path, which is a standard blocking connect
             if (timeout < 0) {
-                val res = connect(sock, info)
+                val res = connect(sock, address)
                 if (!res.isSuccess) {
                     throw UnsupportedOperationException(
                         "Attempted to do a blocking connect on a non-blocking socket"
@@ -692,7 +695,7 @@ public actual object Syscall {
             fcntl(sock, FcntlParam.F_SETFL, origin.or(O_NONBLOCK))
 
             // actually run the connect
-            val res = connect(sock, info)
+            val res = connect(sock, address)
             if (res.isSuccess) {
                 // immediately succeeded, set blocking and return
                 fcntl(sock, FcntlParam.F_SETFL, origin)
@@ -726,7 +729,7 @@ public actual object Syscall {
      */
     @Unsafe
     public fun fcntl(fd: FD, option: FcntlParam<*>): Int {
-        val res = platform.posix.fcntl(fd, option.number)
+        val res = fcntl(fd, option.number)
         if (res.isError) {
             throwErrno(errno)
         }
@@ -738,7 +741,7 @@ public actual object Syscall {
      */
     @Unsafe
     public fun fcntl(fd: FD, option: FcntlParam<Int>, p1: Int): Int {
-        val res = platform.posix.fcntl(fd, option.number, p1)
+        val res = fcntl(fd, option.number, p1)
         if (res.isError) {
             throwErrno(errno)
         }
@@ -750,7 +753,7 @@ public actual object Syscall {
      */
     @Unsafe
     public fun fcntl(fd: FD, option: FcntlParam<CPointer<*>>, p1: CPointer<*>): Int {
-        val res = platform.posix.fcntl(fd, option.number, p1)
+        val res = fcntl(fd, option.number, p1)
         if (res.isError) {
             throwErrno(errno)
         }
@@ -758,48 +761,41 @@ public actual object Syscall {
     }
 
 
-    // this easily has the ability to be one of the grossest APIs in the entire library.
     /**
-     * Accepts a new connection from the specified socket.
+     * Accepts a new connection from the specified socket. The [BlockingResult] returned will
+     * contain the file descriptor.
      */
     @Unsafe
-    public fun <T : ConnectionInfo> accept(
-        sock: FD, creator: ConnectionInfoCreator<T>,
-    ): Accepted<T> = memScoped {
-        val addr = alloc<sockaddr_storage>()
-        val sizePtr = alloc<UIntVar>()
-        val size = sizeOf<sockaddr_storage>().toUInt()
-        sizePtr.value = size
-
-        val accepted = retry { accept(sock, addr.ptr.reinterpret(), sizePtr.ptr) }
+    public fun accept(sock: FD): BlockingResult {
+        val accepted = retry { accept(sock, null, null) }
         if (accepted.isError) {
-            // TODO: EAGAIN/EWOULDBLOCK
-            throwErrno(errno)
+            when (errno) {
+                EAGAIN -> Unit
+                else -> throwErrno(errno)
+            }
         }
 
-        // read out the IP address and put it in our own high-level object
-        // for remoteAddress
-        val pair = addr.toKotlin() ?: return Accepted(accepted, null)
-        val address = creator.from(pair.first, pair.second)
-        return Accepted(accepted, address)
+        return BlockingResult(accepted.toLong())
     }
 
     /**
      * Binds a socket to an address.
      */
     @Unsafe
-    public fun bind(sock: FD, address: InetConnectionInfo) {
+    public fun bind(sock: FD, address: ConnectionInfo) {
         val res = memScoped {
             val struct: sockaddr
             val size: UInt
 
             when (address.family) {
                 StandardAddressFamilies.AF_INET6 -> {
-                    struct = __ipv6_to_sockaddr(this, address.ip as IPv6Address, address.port)
+                    val info = (address as InetConnectionInfo)
+                    struct = __ipv6_to_sockaddr(this, info.ip as IPv6Address, info.port)
                     size = sizeOf<sockaddr_in6>().toUInt()
                 }
                 StandardAddressFamilies.AF_INET -> {
-                    struct = __ipv4_to_sockaddr(this, address.ip as IPv4Address, address.port)
+                    val info = (address as InetConnectionInfo)
+                    struct = __ipv4_to_sockaddr(this, info.ip as IPv4Address, info.port)
                     size = sizeOf<sockaddr_in>().toUInt()
                 }
                 else -> error("Unknown or unsupported address family: ${address.family}")
@@ -830,17 +826,19 @@ public actual object Syscall {
      */
     @Unsafe
     public fun recv(
-        sock: FD,
+        fd: FD,
         buffer: ByteArray,
         size: Int = buffer.size, offset: Int = 0,
         flags: Int = 0,
     ): BlockingResult {
-        assert(size <= IO_MAX) { "Count is too high!" }
-        assert(buffer.size >= size) { "Buffer is too small!" }
-        assert(offset + size <= buffer.size) { "offset + size > buffer.size" }
+        require(size <= IO_MAX) { "$size is more than IO_MAX" }
+        require(buffer.size >= size) { "$size is more than buffer size (${buffer.size})" }
+        require(offset + size <= buffer.size) {
+            "offset ($offset) + size ($size) > buffer.size (${buffer.size})"
+        }
 
         val read = buffer.usePinned {
-            retry { recv(sock, it.addressOf(offset), size.toULong(), flags) }
+            retry { recv(fd, it.addressOf(offset), size.toULong(), flags) }
         }
 
         if (read.isError) {
@@ -851,20 +849,145 @@ public actual object Syscall {
         return BlockingResult(read)
     }
 
+    // Eww!
+    /**
+     * Receives bytes from a socket into the specified buffer, returning the number of bytes read as
+     * well as the
+     */
+    @Unsafe
+    public fun <I: ConnectionInfo> recvfrom(
+        fd: FD,
+        buffer: ByteArray,
+        size: Int = buffer.size, offset: Int = 0,
+        flags: Int = 0,
+
+        /* extra flags for address creation */
+        creator: ConnectionInfoCreator<I>
+    ): RecvFrom<I>? = memScoped {
+        require(size <= IO_MAX) { "$size is more than IO_MAX" }
+        require(buffer.size >= size) { "$size is more than buffer size (${buffer.size})" }
+        require(offset + size <= buffer.size) {
+            "offset ($offset) + size ($size) > buffer.size (${buffer.size})"
+        }
+
+        val addr = alloc<sockaddr_storage>().reinterpret<sockaddr>()
+        val sizePtr = alloc<UIntVar>()
+        sizePtr.value = sizeOf<sockaddr_storage>().toUInt()
+
+        val read = buffer.usePinned {
+            retry {
+                recvfrom(fd, it.addressOf(offset), size.toULong(), flags, addr.ptr, sizePtr.ptr)
+            }
+        }
+
+        if (read.isError) {
+            if (errno != EAGAIN) throwErrno(errno)
+            else return null
+        }
+
+        val kAddr = addr.toKotlin()
+            ?: error("null addr")
+
+        return RecvFrom(BlockingResult(read), creator.from(kAddr.first, kAddr.second))
+    }
 
     /**
      * Writes bytes to a socket from the specified buffer.
      */
     @Unsafe
     public fun send(
-        sock: FD, buffer: ByteArray, size: Int = buffer.size, offset: Int = 0,
+        fd: FD, buffer: ByteArray, size: Int = buffer.size, offset: Int = 0,
+        flags: Int
     ): BlockingResult {
-        assert(size <= IO_MAX) { "Count is too high!" }
-        assert(buffer.size >= size) { "Buffer is too small!" }
+        require(size <= IO_MAX) { "$size is more than IO_MAX" }
+        require(buffer.size >= size) { "$size is more than buffer size (${buffer.size})" }
+        require(offset + size <= buffer.size) {
+            "offset ($offset) + size ($size) > buffer.size (${buffer.size})"
+        }
 
-        // our retry logic is already implemented in write
-        // and write() on a socket works fine.
-        return write(sock, buffer, size, offset)
+        // copied directly from write()
+
+        var nextOffset = offset
+        var hitAgain = false
+
+        // head spinny logic
+        buffer.usePinned {
+            while (true) {
+                val written = send(
+                    fd, it.addressOf(nextOffset),
+                    (size - nextOffset).toULong(),
+                    flags
+                )
+
+                // eintr means it didn't write anything, so we can transparently retry
+                if (written.isError) {
+                    when (errno) {
+                        EINTR -> continue
+                        EAGAIN -> {
+                            hitAgain = true
+                            break
+                        }
+                        else -> throwErrno(errno)
+                    }
+                }
+
+                // make sure we actually write all of the bytes we want to write
+                // this will never be more than INT_MAX, so we're fine
+                nextOffset += written.toInt()
+                if (nextOffset >= size) {
+                    break
+                }
+            }
+        }
+
+        // if we hit EAGAIN, and nextOffset is 0, we didn't write anything
+        return if (hitAgain && nextOffset == 0) {
+            BlockingResult.WOULD_BLOCK
+        } else {
+            BlockingResult(nextOffset.toLong())
+        }
+    }
+
+    /**
+     * Writes bytes to a socket from the specified buffer.
+     */
+    @Unsafe
+    public fun <I> sendto(
+        fd: FD, buffer: ByteArray, size: Int, offset: Int, flags: Int,
+        address: I,
+    ): BlockingResult = memScoped {
+        val struct: sockaddr
+        val addrSize: UInt
+
+        when (address) {
+            is InetConnectionInfo -> {
+                when (val ip = address.ip) {
+                    is IPv6Address -> {
+                        struct = __ipv6_to_sockaddr(this, ip, address.port)
+                        addrSize = sizeOf<sockaddr_in6>().toUInt()
+                    }
+                    is IPv4Address -> {
+                        struct = __ipv4_to_sockaddr(this, ip, address.port)
+                        addrSize = sizeOf<sockaddr_in>().toUInt()
+                    }
+                }
+            }
+            else -> throw IllegalArgumentException(
+                "Don't know how to translatee $address into a sockaddr"
+            )
+        }
+
+        val result = buffer.usePinned {
+            retry {
+                sendto(fd, it.addressOf(offset), size.toULong(), flags, struct.ptr, addrSize)
+            }
+        }
+        if (result.isError) {
+            return if (errno == EAGAIN) BlockingResult.WOULD_BLOCK
+            else throwErrno(errno)
+        }
+
+        return BlockingResult(result)
     }
 
     // These are both really gross!
@@ -904,8 +1027,8 @@ public actual object Syscall {
      * Shuts down part of a fully duplex connection.
      */
     @Unsafe
-    public fun shutdown(sock: FD, how: Int) {
-        val res = platform.posix.shutdown(sock, how)
+    public fun shutdown(sock: FD, how: ShutdownOption) {
+        val res = shutdown(sock, how.number)
         if (res.isError) {
             throwErrno(errno)
         }

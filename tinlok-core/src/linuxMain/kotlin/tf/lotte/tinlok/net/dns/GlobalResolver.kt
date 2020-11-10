@@ -49,7 +49,7 @@ public actual object GlobalResolver : AddressResolver {
 
             // addresses with a nullptr IP are skipped because ???
             val sockaddr = info.ai_addr?.pointed ?: continue
-            val (ip, port) = sockaddr.toKotlin(family) ?: continue
+            val (ip, port) = sockaddr.toKotlin() ?: continue
 
             val finalAddr = when (type) {
                 StandardSocketTypes.SOCK_STREAM -> {

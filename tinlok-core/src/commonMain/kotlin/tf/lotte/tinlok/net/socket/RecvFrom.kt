@@ -9,11 +9,14 @@
 
 package tf.lotte.tinlok.net.socket
 
-import tf.lotte.tinlok.io.HalfCloseableStream
 import tf.lotte.tinlok.net.ConnectionInfo
+import tf.lotte.tinlok.system.BlockingResult
 
 /**
- * Defines a client socket that is also a [HalfCloseableStream]. This is used for SOCK_STREAM
- * based sockets.
+ * Wraps the result of a recvfrom() socket call. This is a data class to prevent boxing with
+ * [BlockingResult].
  */
-public interface StreamingClientSocket<I : ConnectionInfo?> : ClientSocket<I>, HalfCloseableStream
+public data class RecvFrom<I: ConnectionInfo>(
+    public val result: BlockingResult,
+    public val address: I
+)

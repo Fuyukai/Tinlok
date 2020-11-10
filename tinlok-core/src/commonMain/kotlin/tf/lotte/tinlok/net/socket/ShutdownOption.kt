@@ -7,11 +7,13 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
-package tf.lotte.tinlok._workarounds
+package tf.lotte.tinlok.net.socket
 
 /**
- * Provisional sleep
+ * An enumeration of possible socket shutdown options.
  */
-public actual fun provisional_sleep(millis: Long) {
-    platform.posix.usleep(millis.toUInt() * 1000U)
+public enum class ShutdownOption(public val number: Int) {
+    READ(0),
+    WRITE(1),
+    READWRITE(2)
 }

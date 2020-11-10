@@ -9,23 +9,12 @@
 
 package tf.lotte.tinlok.net
 
-import tf.lotte.tinlok.net.tcp.TcpConnectionInfo
-
 /**
  * Defines a connection information creator, to turn an IP address into a ConnectionInfo.
  */
-public interface ConnectionInfoCreator<T : ConnectionInfo> {
-    /**
-     * An information creator for [TcpConnectionInfo] instances.
-     */
-    public object Tcp : ConnectionInfoCreator<TcpConnectionInfo> {
-        override fun from(ip: IPAddress, port: Int): TcpConnectionInfo {
-            return TcpConnectionInfo(ip, port)
-        }
-    }
-
+public fun interface ConnectionInfoCreator<I : ConnectionInfo> {
     /**
      * Creates a new [T] from the IP address and port specified.
      */
-    public fun from(ip: IPAddress, port: Int = 0): T
+    public fun from(ip: IPAddress, port: Int): I
 }
