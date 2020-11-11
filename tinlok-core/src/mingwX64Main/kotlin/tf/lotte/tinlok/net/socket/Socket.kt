@@ -15,6 +15,7 @@ import tf.lotte.tinlok.net.*
 import tf.lotte.tinlok.net.tcp.TcpConnectionInfo
 import tf.lotte.tinlok.net.udp.UdpConnectionInfo
 import tf.lotte.tinlok.system.BlockingResult
+import tf.lotte.tinlok.system.Syscall
 import tf.lotte.tinlok.util.AtomicBoolean
 import tf.lotte.tinlok.util.Closeable
 
@@ -28,20 +29,28 @@ public actual interface Socket<I: ConnectionInfo> : Selectable, Closeable {
          * Creates a new unconnected TCP socket.
          */
         @Unsafe
-        actual fun tcp(
+        public actual fun tcp(
             family: AddressFamily,
         ): Socket<TcpConnectionInfo> {
-            TODO("Not yet implemented")
+            val type = StandardSocketTypes.SOCK_STREAM
+            val proto = StandardIPProtocols.IPPROTO_TCP
+            val sock = Syscall.socket(family, type, proto)
+
+            return WindowsSocket(family, type, proto, sock, ::TcpConnectionInfo)
         }
 
         /**
          * Creates a new unconnected UDP socket.
          */
         @Unsafe
-        actual fun udp(
+        public actual fun udp(
             family: AddressFamily,
         ): Socket<UdpConnectionInfo> {
-            TODO("Not yet implemented")
+            val type = StandardSocketTypes.SOCK_DGRAM
+            val proto = StandardIPProtocols.IPPROTO_UDP
+            val sock = Syscall.socket(family, type, proto)
+
+            return WindowsSocket(family, type, proto, sock, ::UdpConnectionInfo)
         }
 
     }
@@ -56,10 +65,10 @@ public actual interface Socket<I: ConnectionInfo> : Selectable, Closeable {
     public actual val protocol: IPProtocol
 
     /** If this socket is still open. */
-    actual val isOpen: AtomicBoolean
+    public actual val isOpen: AtomicBoolean
 
     /** If this socket is non-blocking. */
-    actual var nonBlocking: Boolean
+    public actual var nonBlocking: Boolean
 
     /**
      * Sets the [option] on this BSD socket to [value].

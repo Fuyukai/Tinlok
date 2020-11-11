@@ -139,21 +139,20 @@ subprojects {
             }
 
             // native main sourceset, allows us access to cinterop
-            val nativeMain by creating {
+            // and common posix stuff.
+            val posixMain by creating {
                 dependsOn(commonMain)
             }
 
             // linux sourcesets all share a sourceset
-            val linuxMain by creating { dependsOn(nativeMain) }
+            val linuxMain by creating { dependsOn(posixMain) }
             val linuxMainX64 = sourceSets.getByName("linuxX64Main")
             linuxMainX64.dependsOn(linuxMain)
 
             val linuxMainArm = sourceSets.getByName("linuxArm64Main")
             linuxMainArm.dependsOn(linuxMain)
 
-            val mingwX64Main by getting {
-                dependsOn(nativeMain)
-            }
+            val mingwX64Main by getting { dependsOn(posixMain) }
 
             all {
                 languageSettings.apply {

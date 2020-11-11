@@ -679,13 +679,7 @@ public actual object Syscall {
         memScoped {
             // less than zero timeouts go on the fast path, which is a standard blocking connect
             if (timeout < 0) {
-                val res = connect(sock, address)
-                if (!res.isSuccess) {
-                    throw UnsupportedOperationException(
-                        "Attempted to do a blocking connect on a non-blocking socket"
-                    )
-                }
-
+                connect(sock, address).ensureNonBlock()
                 return
             }
 
@@ -711,16 +705,17 @@ public actual object Syscall {
             val pres = retry { poll(pollfd, 1, timeout) }
             if (pres.isError) {
                 throwErrno(errno)
-            } else if (pres == 0) {
+            } else {
+                // always set back to non-blocking if it just fails to connect
+                fcntl(sock, FcntlParam.F_SETFL, origin)
+
                 // socket timed out
-                throw TimeoutException()
+                if (pres == 0) throw TimeoutException()
             }
 
             // success
             // don't bother checking pollfd because we only used one socket anyway so we know
             // which one succeeded
-            // and we also gotta set the socket to blocking mode again
-            fcntl(sock, FcntlParam.F_SETFL, origin)
         }
     }
 
@@ -852,7 +847,7 @@ public actual object Syscall {
     // Eww!
     /**
      * Receives bytes from a socket into the specified buffer, returning the number of bytes read as
-     * well as the
+     * well as the address of the sender.
      */
     @Unsafe
     public fun <I: ConnectionInfo> recvfrom(

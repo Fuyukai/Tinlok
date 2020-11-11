@@ -14,7 +14,7 @@ package tf.lotte.tinlok.net
  */
 public fun interface ConnectionInfoCreator<I : ConnectionInfo> {
     /**
-     * Creates a new [T] from the IP address and port specified.
+     * Creates a new [I] from the IP address and port specified.
      */
     public fun from(ip: IPAddress, port: Int): I
 }

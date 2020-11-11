@@ -11,27 +11,36 @@ package tf.lotte.tinlok.system
 
 import ddk._K_REPARSE_DATA_BUFFER
 import kotlinx.cinterop.*
-import platform.posix.WSAData
-import platform.posix.memcpy
+import platform.posix.*
 import platform.windows.*
+import platform.windows.WSAECONNABORTED
+import platform.windows.WSAECONNREFUSED
+import platform.windows.WSAECONNRESET
+import platform.windows.WSAENETUNREACH
+import platform.windows.WSAESHUTDOWN
+import platform.windows.WSAETIMEDOUT
+import platform.windows.WSAStartup
 import tf.lotte.tinlok.Unsafe
 import tf.lotte.tinlok.exc.WindowsException
 import tf.lotte.tinlok.fs.DirEntry
 import tf.lotte.tinlok.fs.FileType
 import tf.lotte.tinlok.fs.path.resolveChild
 import tf.lotte.tinlok.io.*
-import tf.lotte.tinlok.util.flagged
-import tf.lotte.tinlok.util.flags
-import tf.lotte.tinlok.util.utf16ToString
+import tf.lotte.tinlok.net.*
+import tf.lotte.tinlok.net.socket.RecvFrom
+import tf.lotte.tinlok.net.socket.ShutdownOption
+import tf.lotte.tinlok.util.*
 
 /**
  * Platform call container object for all Win32 calls.
  */
 @OptIn(ExperimentalUnsignedTypes::class)
 public actual object Syscall {
+    @Suppress("ObjectPropertyName")
     private val _WSADATA = nativeHeap.allocPointerTo<WSAData>()
 
     /** The winsock data information. */
+    @Suppress("unused")
     public val WSADATA: WSAData get() = _WSADATA.pointed!!
 
     init {
@@ -104,9 +113,6 @@ public actual object Syscall {
     @OptIn(ExperimentalUnsignedTypes::class)
     @Unsafe
     public fun FormatMessage(code: Int): String = memScoped {
-        // NB: we manually free because windows allocates it and I don't think K/N will
-        // deallocate it properly. I might be wrong about that, but this code is correct no
-        // matter what.
         val flags = FORMAT_MESSAGE_ALLOCATE_BUFFER
             .or(FORMAT_MESSAGE_FROM_SYSTEM)
             .or(FORMAT_MESSAGE_IGNORE_INSERTS).toUInt()
@@ -579,7 +585,7 @@ public actual object Syscall {
     @Unsafe
     public fun SetFilePointer(handle: HANDLE, count: Int, whence: SeekWhence): Long = memScoped {
         // ECH
-        val result = platform.windows.SetFilePointer(
+        val result = SetFilePointer(
             handle,
             count,
             null,
@@ -595,7 +601,7 @@ public actual object Syscall {
 
         // now get the current address
         val higher = alloc<IntVar>()
-        val result2 = platform.windows.SetFilePointer(
+        val result2 = SetFilePointer(
             handle, 0, higher.ptr,
             FILE_CURRENT.toUInt()
         )
@@ -620,7 +626,7 @@ public actual object Syscall {
         val readCnt = alloc<UIntVar>()
 
         val res = buf.usePinned {
-            platform.windows.ReadFile(
+            ReadFile(
                 handle,
                 it.addressOf(offset),
                 count.toUInt(),
@@ -648,7 +654,7 @@ public actual object Syscall {
 
         val writtenCnt = alloc<UIntVar>()
         val res = buf.usePinned {
-            platform.windows.WriteFile(
+            WriteFile(
                 handle,
                 it.addressOf(offset),
                 count.toUInt(),
@@ -733,6 +739,394 @@ public actual object Syscall {
             if (attrs.isDirectory) RemoveDirectory(path)
             else DeleteFile(path)
         }
+    }
+
+    // == Networking == //
+    /**
+     * Throws an appropriate WinSock error for the specified [code].
+     */
+    @Unsafe
+    public fun throwErrnoWSA(code: Int): Nothing {
+        throw when (code) {
+            WSAENETUNREACH -> NetworkUnreachableException()
+            WSAECONNRESET -> ConnectionResetException()
+            WSAECONNABORTED -> ConnectionAbortedException()
+            WSAECONNREFUSED -> ConnectionRefusedException()
+            WSAESHUTDOWN -> SocketShutdownException()
+            WSAETIMEDOUT -> TimeoutException()
+            in 0..999 -> throwErrno(code)
+            else -> WindowsException(code, message = FormatMessage(code))
+        }
+    }
+
+    @Unsafe
+    public fun throwErrnoWSA(): Nothing {
+        val code = platform.windows.WSAGetLastError()
+        throwErrnoWSA(code)
+    }
+
+    // copied from linuxMain...
+    /**
+     * Converts an [IPv6Address] to a [sockaddr].
+     */
+    @Unsafe
+    public fun __ipv6_to_sockaddr(alloc: NativePlacement, ip: IPv6Address, port: Int): sockaddr {
+        val ipRepresentation = ip.representation.unwrap()
+        // runtime safety check!!
+        val size = ipRepresentation.size
+        require(size == 16) {
+            "IPv6 address size was mismatched (expected 16, got $size), refusing to clobber memory"
+        }
+
+        val struct = alloc.alloc<sockaddr_in6> {
+            sin6_family = AF_INET6.toShort()  // ?
+            // have to manually write to the array contained within
+            sin6_addr.arrayMemberAt<ByteVar>(0L).unsafeClobber(ipRepresentation)
+            sin6_port = htons(port.toUShort())
+        }
+
+        return struct.reinterpret()
+    }
+
+    /**
+     * Converts an [IPv4Address] to a [sockaddr].
+     */
+    @Unsafe
+    public fun __ipv4_to_sockaddr(alloc: NativePlacement, ip: IPv4Address, port: Int): sockaddr {
+        val ipRepresentation = ip.representation.toUByteArray()
+        val struct = alloc.alloc<sockaddr_in> {
+            sin_family = platform.windows.AF_INET.toShort()
+            sin_addr.S_un.S_addr = ipRepresentation.toUInt()
+            sin_port = htons(port.toUShort())
+        }
+
+        return struct.reinterpret()
+    }
+
+    /**
+     * Opens a new socket, with the specified [family], [type], and [protocol].
+     */
+    @Unsafe
+    public fun socket(family: AddressFamily, type: SocketType, protocol: IPProtocol): SOCKET {
+        val sock = WSASocketW(
+            // socket numbers
+            family.number, type.number, protocol.number,
+            null,  // protocol info, we don't care
+            0,  // groups, we don't care yet
+            WSA_FLAG_OVERLAPPED  // sockets are always opened for IOCP
+        )
+
+        if (sock == INVALID_SOCKET) {
+            throwErrnoWSA()
+        }
+
+        return sock
+    }
+
+    /**
+     * Connects a socket to an address.
+     */
+    @Unsafe
+    public fun connect(sock: SOCKET, address: ConnectionInfo): BlockingResult = memScoped {
+        val struct: sockaddr
+        val size: UInt
+
+        when (address.family) {
+            StandardAddressFamilies.AF_INET6 -> {
+                val info = (address as InetConnectionInfo)
+                struct = __ipv6_to_sockaddr(this, info.ip as IPv6Address, info.port)
+                size = sizeOf<sockaddr_in6>().toUInt()
+            }
+            StandardAddressFamilies.AF_INET -> {
+                val info = (address as InetConnectionInfo)
+                struct = __ipv4_to_sockaddr(this, info.ip as IPv4Address, info.port)
+                size = sizeOf<sockaddr_in>().toUInt()
+            }
+            else -> throw UnsupportedOperationException("Don't know how to use $address")
+        }
+
+        return when (val res = platform.windows.connect(sock, struct.ptr, size.toInt())) {
+            0 -> BlockingResult.DIDNT_BLOCK
+            ERROR -> {
+                when (errno) {
+                    EINTR, EINPROGRESS, EWOULDBLOCK -> BlockingResult.WOULD_BLOCK
+                    else -> throwErrnoWSA(errno)
+                }
+            }
+            else -> error("Unknown return value: $res")
+        }
+    }
+
+    /**
+     * Performs an ioctl on a socket.
+     */
+    @Unsafe
+    public fun ioctlsocket(sock: SOCKET, cmd: Int, param: UInt): Unit = memScoped {
+        val ptr = alloc<UIntVar>()
+        ptr.value = param
+        val res = platform.windows.ioctlsocket(sock, cmd, ptr.ptr)
+        if (res == SOCKET_ERROR) {
+            throwErrnoWSA()
+        }
+    }
+
+    /**
+     * Connects a socket with a timeout.
+     */
+    @Unsafe
+    public fun __connect_timeout(sock: SOCKET, address: ConnectionInfo, timeout: Int = 30_000) {
+        // same fast path as on linux
+        if (timeout < 0) {
+            connect(sock, address).ensureNonBlock()
+            return
+        }
+
+        // slow path......
+        memScoped {
+            // similar slow path
+            ioctlsocket(sock, platform.windows.FIONBIO.toInt(), 1u)
+
+            val connRes = connect(sock, address)
+            if (connRes.isSuccess) {
+                // connected immediately, set back to blocking and return
+                ioctlsocket(sock, platform.windows.FIONBIO.toInt(), 0u)
+                return
+            }
+
+            // start a poll operation
+            val pollfd = allocArray<WSAPOLLFD>(1)
+            pollfd[0].fd = sock
+            pollfd[0].events = POLLOUT.toShort()
+
+            val res = WSAPoll(pollfd, 1u, timeout)
+            if (res == SOCKET_ERROR) {
+                throwErrnoWSA()
+            } else if (res == 0) {
+                // no sockets available
+                throw TimeoutException()
+            }
+
+            // succeeded... maybe?
+            val revent = pollfd[0].revents.toInt()
+            if (flagged(revent, POLLERR) || flagged(revent, POLLHUP) || flagged(revent, POLLNVAL)) {
+                error("WSAPoll() gave revent '$revent'")
+            }
+            // ok, we definitely succeeded if we're here
+            // set non-blocking and return
+            ioctlsocket(sock, platform.windows.FIONBIO.toInt(), 0u)
+        }
+    }
+
+    /**
+     * Binds a socket to an address.
+     */
+    @Unsafe
+    public fun bind(sock: SOCKET, address: ConnectionInfo) {
+        val res = memScoped {
+            val struct: sockaddr
+            val size: Long
+
+            when (address.family) {
+                StandardAddressFamilies.AF_INET6 -> {
+                    val info = (address as InetConnectionInfo)
+                    struct = __ipv6_to_sockaddr(this, info.ip as IPv6Address, info.port)
+                    size = sizeOf<sockaddr_in6>()
+                }
+                StandardAddressFamilies.AF_INET -> {
+                    val info = (address as InetConnectionInfo)
+                    struct = __ipv4_to_sockaddr(this, info.ip as IPv4Address, info.port)
+                    size = sizeOf<sockaddr_in>()
+                }
+                else -> error("Unknown or unsupported address family: ${address.family}")
+            }
+
+            platform.windows.bind(sock, struct.ptr, size.toInt())
+        }
+
+        if (res == SOCKET_ERROR) {
+            throwErrnoWSA()
+        }
+    }
+
+    /**
+     * Marks a socket as listening, with the specified [backlog].
+     */
+    @Unsafe
+    public fun listen(sock: SOCKET, backlog: Int) {
+        val res = platform.windows.listen(sock, backlog)
+        if (res == SOCKET_ERROR) {
+            throwErrnoWSA()
+        }
+    }
+
+    /**
+     * Accepts a new connection on a socket.
+     */
+    @OptIn(Unsafe::class)
+    public fun accept(sock: SOCKET): BlockingResult {
+        val res = WSAAccept(sock, null, null, null, 0UL)
+        if (res == INVALID_SOCKET) {
+            val error = platform.windows.WSAGetLastError()
+            return if (error == platform.windows.WSAEWOULDBLOCK) BlockingResult.WOULD_BLOCK
+            else throwErrnoWSA(error)
+        }
+
+        return BlockingResult(res.toLong())
+    }
+
+    /**
+     * Receives data from the specified socket.
+     */
+    @Unsafe
+    @Suppress("RemoveRedundantQualifierName")
+    public fun recv(
+        sock: SOCKET, buf: ByteArray, size: Int, offset: Int, flags: Int
+    ): BlockingResult {
+        // TODO: Use WSARecv always?
+        require(size + offset <= buf.size) {
+            "offset ($offset) + size ($size) > buf.size (${buf.size})"
+        }
+
+        val res = buf.usePinned {
+            platform.windows.recv(sock, it.addressOf(offset), size, flags)
+        }
+        if (res == SOCKET_ERROR) {
+            val error = platform.windows.WSAGetLastError()
+            return if (error == platform.windows.WSAEWOULDBLOCK) BlockingResult.WOULD_BLOCK
+            else throwErrnoWSA(error)
+        }
+
+        return BlockingResult(res.toLong())
+    }
+
+    /**
+     * Receives bytes from a socket into the specified buffer, returning the number of bytes read as
+     * well as the address of the sender.
+     */
+    @Unsafe
+    public fun <I: ConnectionInfo> recvfrom(
+        sock: SOCKET,
+        buf: ByteArray,
+        size: Int = buf.size, offset: Int = 0,
+        flags: Int = 0,
+
+        /* extra flags for address creation */
+        creator: ConnectionInfoCreator<I>
+    ): RecvFrom<I>? = memScoped {
+        require(offset + size <= buf.size) {
+            "offset ($offset) + size ($size) > buf.size (${buf.size})"
+        }
+
+        val addr = alloc<sockaddr_storage>().reinterpret<sockaddr>()
+        val sizePtr = alloc<IntVar>()
+        sizePtr.value = sizeOf<sockaddr_storage>().toInt()
+
+        val read = buf.usePinned {
+            platform.posix.recvfrom(
+                sock, it.addressOf(offset), size, flags, addr.ptr,
+                sizePtr.ptr
+            )
+        }
+
+        // closed...
+        if (read == 0) return null
+
+        // errored...
+        if (read == SOCKET_ERROR) {
+            val error = platform.windows.WSAGetLastError()
+            return if (error == platform.windows.WSAEWOULDBLOCK) null
+            else throwErrnoWSA(error)
+        }
+
+        val (ip, port) = addr.toKotlin() ?: error("null address")
+        val kAddr = creator.from(ip, port)
+        return RecvFrom(BlockingResult(read.toLong()), kAddr)
+    }
+
+    /**
+     * Sends data on the specified socket.
+     */
+    @Unsafe
+    public fun send(
+        sock: SOCKET, buf: ByteArray, size: Int, offset: Int, flags: Int
+    ): BlockingResult {
+        require(size + offset <= buf.size) {
+            "offset ($offset) + size ($size) > buf.size (${buf.size})"
+        }
+
+        val res = buf.usePinned {
+            // XXX: ``platform.windows.send`` has buf turned into a CString for some reason.
+            send(sock, it.addressOf(offset), size, flags)
+        }
+        if (res == SOCKET_ERROR) {
+            val error = platform.windows.WSAGetLastError()
+            return if (error == platform.windows.WSAEWOULDBLOCK) BlockingResult.WOULD_BLOCK
+            else throwErrnoWSA(error)
+        }
+
+        return BlockingResult(res.toLong())
+    }
+
+    /**
+     * Writes bytes to a socket from the specified buffer.
+     */
+    @Unsafe
+    public fun <I> sendto(
+        sock: SOCKET, buffer: ByteArray, size: Int, offset: Int, flags: Int,
+        address: I,
+    ): BlockingResult = memScoped {
+        val struct: sockaddr
+        val addrSize: Int
+
+        when (address) {
+            is InetConnectionInfo -> {
+                when (val ip = address.ip) {
+                    is IPv6Address -> {
+                        struct = __ipv6_to_sockaddr(this, ip, address.port)
+                        addrSize = sizeOf<sockaddr_in6>().toInt()
+                    }
+                    is IPv4Address -> {
+                        struct = __ipv4_to_sockaddr(this, ip, address.port)
+                        addrSize = sizeOf<sockaddr_in>().toInt()
+                    }
+                }
+            }
+            else -> throw IllegalArgumentException(
+                "Don't know how to translatee $address into a sockaddr"
+            )
+        }
+
+        val result = buffer.usePinned {
+            platform.posix.sendto(
+                sock, it.addressOf(offset), size, flags, struct.ptr, addrSize
+            )
+        }
+
+        if (result == SOCKET_ERROR) {
+            return if (errno == EAGAIN) BlockingResult.WOULD_BLOCK
+            else throwErrno(errno)
+        }
+
+        return BlockingResult(result.toLong())
+    }
+
+    /**
+     * Shuts down one or both sides of a socket.
+     */
+    @Unsafe
+    @Suppress("RemoveRedundantQualifierName")
+    public fun shutdown(sock: SOCKET, how: ShutdownOption) {
+        val res = platform.windows.shutdown(sock, how.number)
+        if (res == SOCKET_ERROR) throwErrnoWSA()
+    }
+
+    /**
+     * Closes the specified socket.
+     */
+    @Unsafe
+    public fun closesocket(sock: SOCKET) {
+        val res = platform.windows.closesocket(sock)
+        if (res == SOCKET_ERROR) throwErrnoWSA()
     }
 
     // == Generic stuff == //
