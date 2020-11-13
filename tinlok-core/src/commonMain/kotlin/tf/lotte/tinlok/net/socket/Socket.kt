@@ -142,6 +142,18 @@ public expect interface Socket<I: ConnectionInfo> : Selectable, Closeable {
     public fun send(buf: Buffer, size: Int, flags: Int): BlockingResult
 
     /**
+     * Attempts to send *all* [size] bytes from [buf] into this socket, starting at [offset], using
+     * the specified [flags], returning the actual number of bytes written. This will attempt retry
+     * logic.
+     */
+    public fun sendall(buf: ByteArray, size: Int, offset: Int, flags: Int): BlockingResult
+
+    /**
+     * Sends up to [size] bytes from [buf] into this socket. This will attempt retry logic.
+     */
+    public fun sendall(buf: Buffer, size: Int, flags: Int): BlockingResult
+
+    /**
      * Sends up to [size] bytes from [buf] into this socket, starting at [offset], using the
      * specified [flags], to the specified [addr].
      *

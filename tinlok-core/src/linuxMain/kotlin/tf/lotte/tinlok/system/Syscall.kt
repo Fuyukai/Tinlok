@@ -26,6 +26,10 @@ import tf.lotte.tinlok.util.toUInt
 import kotlin.experimental.ExperimentalTypeInference
 
 internal typealias FD = Int
+// file descriptors are ints
+public actual typealias FILE = Int
+// Sockets are also ints
+public actual typealias SOCKET = Int
 
 // TODO: Probably want to make some of these enums.
 
@@ -202,6 +206,14 @@ public actual object Syscall {
     }
 
     /**
+     * Closes a file.
+     */
+    @Unsafe
+    public actual fun __close_file(fd: FILE) {
+        this.close(fd)
+    }
+
+    /**
      * Closes all of the specified file descriptors. This is guaranteed to call close(2) on all,
      * but will only raise an error for the first failed fd.
      *
@@ -266,6 +278,17 @@ public actual object Syscall {
     }
 
     /**
+     * Reads [size] bytes from the file [fd] to [address], returning the number of bytes written.
+     *
+     * This method will NOT attempt to retry.
+     */
+    @Unsafe
+    public actual fun __read_file(fd: FILE, address: CPointer<ByteVar>, size: Int): BlockingResult {
+        return this.read(fd, address, size)
+    }
+
+
+    /**
      * Writes up to [size] bytes to the specified file descriptor, returning the number of bytes
      * actually written.
      *
@@ -304,6 +327,57 @@ public actual object Syscall {
         return buf.usePinned {
             write(fd, it.addressOf(offset), size)
         }
+    }
+
+    /**
+     * Writes [size] bytes from [address] to the file [fd], returning the number of bytes written.
+     *
+     * This method will NOT attempt to retry.
+     */
+    @Unsafe
+    public actual fun __write_file(
+        fd: FILE, address: CPointer<ByteVar>, size: Int
+    ): BlockingResult {
+        return this.write(fd, address, size)
+    }
+
+    /**
+     * Writes [size] bytes from [address] to the file [fd], returning the number of bytes written.
+     *
+     * This method will attempt to retry until the full [size] bytes are written. Use a
+     * platform-specific method if you wish to avoid that.
+     */
+    @Unsafe
+    public actual fun __write_file_with_retry(
+        fd: FILE, address: CPointer<ByteVar>, size: Int
+    ): BlockingResult {
+        var lastOffset = 0
+
+        while (true) {
+            // pointer arithmetic...
+            // not fun!
+            // address is always the base address, so we always add the last offset
+            // and last offset is always incremented from the amount we've actually written
+
+            val ptr = (address + lastOffset) ?: error("pointer arithmetic returned null?")
+
+            //
+            val amount = this.write(fd, ptr, size - lastOffset)
+            if (!amount.isSuccess) break
+
+            lastOffset += amount.count.toInt()
+
+            if (lastOffset >= size) break
+        }
+
+        return if (lastOffset <= 0) {
+            // lastOffset of zero means write() returned EAGAIN immediately
+            BlockingResult.WOULD_BLOCK
+        } else {
+            // lastOffset of greater means we hit EAGAIN or finished writing fully
+            BlockingResult(lastOffset.toLong())
+        }
+
     }
 
     /**
@@ -346,6 +420,22 @@ public actual object Syscall {
         }
 
         return res
+    }
+
+    /**
+     * Gets the current cursor for a file (the seek point).
+     */
+    @Unsafe
+    public actual fun __get_file_cursor(fd: FILE): Long {
+        return lseek(fd, 0L, SeekWhence.CURRENT)
+    }
+
+    /**
+     * Sets the current absolute cursor for a file.
+     */
+    @Unsafe
+    public actual fun __set_file_cursor(fd: FILE, point: Long) {
+        lseek(fd, point, SeekWhence.START)
     }
 
     // endregion
@@ -844,6 +934,39 @@ public actual object Syscall {
 
         return buffer.usePinned {
             recv(fd, it.addressOf(0), size, flags)
+        }
+    }
+
+    /**
+     * Writes [size] bytes into [socket] from [address].
+     *
+     * This method will attempt to retry until the full [size] bytes are written. Use a
+     * platform-specific method if you wish to avoid that.
+     */
+    @Unsafe
+    public fun __write_socket_with_retry(
+        socket: SOCKET, address: CPointer<ByteVar>, size: Int, flags: Int
+    ): BlockingResult {
+        var lastOffset = 0
+
+        // copied from write()
+
+        while (true) {
+            val ptr = (address + lastOffset) ?: error("pointer arithmetic returned null?")
+            val amount = this.recv(socket, ptr, size - lastOffset, flags)
+            if (!amount.isSuccess) break
+
+            lastOffset += amount.count.toInt()
+
+            if (lastOffset >= size) break
+        }
+
+        return if (lastOffset <= 0) {
+            // lastOffset of zero means write() returned EAGAIN immediately
+            BlockingResult.WOULD_BLOCK
+        } else {
+            // lastOffset of greater means we hit EAGAIN or finished writing fully
+            BlockingResult(lastOffset.toLong())
         }
     }
 

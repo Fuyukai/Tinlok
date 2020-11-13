@@ -10,9 +10,7 @@
 package tf.lotte.tinlok.fs
 
 import tf.lotte.tinlok.fs.path.*
-import tf.lotte.tinlok.io.peek
-import tf.lotte.tinlok.io.readUpTo
-import tf.lotte.tinlok.io.writeAll
+import tf.lotte.tinlok.io.*
 import tf.lotte.tinlok.util.b
 import tf.lotte.tinlok.util.substring
 import kotlin.test.Test

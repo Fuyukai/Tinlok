@@ -26,12 +26,12 @@ import tf.lotte.tinlok.util.b
  * Linux-based implementation of a [Path]. Is also a [PosixPurePath].
  */
 @OptIn(ExperimentalUnsignedTypes::class)
-internal class LinuxPath(rawParts: List<ByteString>) : Path, PosixPurePath(rawParts) {
-    companion object {
+public class LinuxPath(rawParts: List<ByteString>) : Path, PosixPurePath(rawParts) {
+    public companion object {
         /**
-         * Creates a new [LinuxPath]
+         * Creates a new [LinuxPath] from the specified ByteString.
          */
-        internal fun fromByteString(bs: ByteString): LinuxPath {
+        public fun fromByteString(bs: ByteString): LinuxPath {
             return LinuxPath(splitParts(bs))
         }
     }
@@ -59,8 +59,11 @@ internal class LinuxPath(rawParts: List<ByteString>) : Path, PosixPurePath(rawPa
         return Syscall.access(strPath, F_OK)
     }
 
+    /**
+     * Gets file stat information for this file, in a safe manner.
+     */
     @OptIn(Unsafe::class)
-    fun statSafe(followSymlinks: Boolean): Stat? = memScoped {
+    public fun statSafe(followSymlinks: Boolean): Stat? = memScoped {
         val strPath = unsafeToString()
         val pathStat = Syscall.__stat_safer(this, strPath, followSymlinks)
             ?: return null
@@ -74,8 +77,11 @@ internal class LinuxPath(rawParts: List<ByteString>) : Path, PosixPurePath(rawPa
         )
     }
 
+    /**
+     * Gets file stat information for this file.
+     */
     @OptIn(Unsafe::class)
-    fun stat(followSymlinks: Boolean): Stat = memScoped {
+    public fun stat(followSymlinks: Boolean): Stat = memScoped {
         val strPath = unsafeToString()
         val pathStat = Syscall.stat(this, strPath, followSymlinks)
 
@@ -88,6 +94,10 @@ internal class LinuxPath(rawParts: List<ByteString>) : Path, PosixPurePath(rawPa
         )
     }
 
+    /**
+     * Gets the owner username for this file, or null if this file doesn't have an owner (some
+     * filesystems or virtual filesystems).
+     */
     @OptIn(Unsafe::class)
     override fun owner(followSymlinks: Boolean): String? = memScoped {
         val strPath = unsafeToString()
@@ -98,21 +108,36 @@ internal class LinuxPath(rawParts: List<ByteString>) : Path, PosixPurePath(rawPa
         passwd?.pw_name?.toKString()
     }
 
+    /**
+     * Checks if this [Path] is a directory.
+     */
     @OptIn(Unsafe::class)
     override fun isDirectory(followSymlinks: Boolean): Boolean =
         statSafe(followSymlinks)?.isDirectory ?: false
 
+    /**
+     * Checks if this [Path] is a regular file.
+     */
     @OptIn(Unsafe::class)
     override fun isRegularFile(followSymlinks: Boolean): Boolean =
         statSafe(followSymlinks)?.isFile ?: false
 
+    /**
+     * Checks if this [Path] is a symbolic link.
+     */
     @OptIn(Unsafe::class)
     override fun isLink(): Boolean =
         statSafe(followSymlinks = false)?.isLink ?: false
 
+    /**
+     * Gets the size of this file.
+     */
     @OptIn(Unsafe::class)
     override fun size(): Long = stat(followSymlinks = false).size
 
+    /**
+     * Gets the link target of this path, or null if it is not a symlink.
+     */
     @OptIn(Unsafe::class)
     override fun linkTarget(): Path? = memScoped {
         // safer approach
@@ -126,6 +151,12 @@ internal class LinuxPath(rawParts: List<ByteString>) : Path, PosixPurePath(rawPa
         }
     }
 
+    /**
+     * Resolves a path into an absolute path, following symlinks, returning the new resolved path.
+     *
+     * If [strict] is true, the path must exist and [FileNotFoundException] will be raised if it
+     * is not. If [strict] is false, the path will be resolved as far as possible.
+     */
     @OptIn(Unsafe::class)
     override fun resolveFully(strict: Boolean): Path {
         if (!strict) TODO("Pure-Kotlin resolving")
@@ -281,7 +312,31 @@ internal class LinuxPath(rawParts: List<ByteString>) : Path, PosixPurePath(rawPa
             throw IsADirectoryException(unsafeToString())
         }
 
-        return LinuxSyncFile(this, modes.toSet())
+        val openModes = modes.toSet()
+
+        // initial read/write mode check
+        var mode = when {
+            openModes.containsAll(listOf(StandardOpenModes.READ, StandardOpenModes.WRITE)) -> O_RDWR
+            openModes.contains(StandardOpenModes.READ) -> O_RDONLY
+            openModes.contains(StandardOpenModes.WRITE) -> O_WRONLY
+            openModes.contains(StandardOpenModes.APPEND) -> O_WRONLY or O_APPEND
+            else -> 0
+        }
+
+        if (openModes.contains(StandardOpenModes.CREATE)) {
+            mode = mode or O_CREAT
+        } else if (openModes.contains(StandardOpenModes.CREATE_NEW)) {
+            mode = mode or O_CREAT or O_EXCL
+        }
+
+        // only pass permission bit if O_CREAT is passed
+        val fd = if ((mode and O_CREAT) == 0) {
+            Syscall.open(unsafeToString(), mode)
+        } else {
+            Syscall.open(unsafeToString(), mode, PosixFilePermission.DEFAULT_FILE.bit)
+        }
+
+        return SynchronousFilesystemFile(this, fd)
     }
 
     override fun equals(other: Any?): Boolean {

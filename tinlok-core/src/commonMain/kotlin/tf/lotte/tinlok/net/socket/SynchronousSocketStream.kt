@@ -74,6 +74,8 @@ public constructor(public val socket: Socket<I>) : HalfCloseableStream, Closeabl
         require(!socket.nonBlocking) {
             "This class only works on non-blocking sockets"
         }
+
+        require(socket.isOpen.value) { "Socket must be open" }
     }
 
     /**
@@ -93,34 +95,23 @@ public constructor(public val socket: Socket<I>) : HalfCloseableStream, Closeabl
     }
 
     /**
-     * Attempts to write the entirety of the ByteArray [ba] to this object, returning the number of
-     * bytes actually written before reaching EOF.
+     * Attempts to write all [size] bytes of the ByteArray [ba] to this object, starting from
+     * [offset], returning the number of bytes actually written before reaching EOF.
+     *
+     * This method will attempt retries to write all of the specified bytes.
      */
-    @OptIn(Unsafe::class)
-    override fun writeAllFrom(ba: ByteArray): Int {
-        // retry loop to ensure all is written
-        var written = 0
-        while (true) {
-            val result = socket.send( ba, ba.size - written, written, 0).ensureNonBlock()
-            written += result.toInt()
-
-            if (written >= ba.size) {
-                break
-            }
-        }
-
-        return written
+    override fun writeFrom(ba: ByteArray, size: Int, offset: Int): Int {
+        return socket.sendall(ba, size, offset, flags = 0).ensureNonBlock().toInt()
     }
 
     /**
-     * Attempts to write the entirety of the buffer [buffer] from the cursor onwards to this object,
+     * Attempts to write [size] bytes of [buffer] from the cursor onwards to this object,
      * returning the number of bytes actually written before reaching EOF.
+     *
+     * This method will attempt retries to write all of the specified bytes.
      */
-    @OptIn(Unsafe::class)
-    override fun writeAllFrom(buffer: Buffer): Int {
-        // ensure we're not trying to write to a buffer with no space left
-        if (buffer.cursor >= buffer.capacity - 1) return 0
-        return socket.retrySend(buffer).ensureNonBlock().toInt()
+    override fun writeFrom(buffer: Buffer, size: Int): Int {
+        return socket.sendall(buffer, size, flags = 0).ensureNonBlock().toInt()
     }
 
     /**

@@ -10,6 +10,7 @@
 package tf.lotte.tinlok.io
 
 import tf.lotte.tinlok.Unsafe
+import tf.lotte.tinlok.fs.SynchronousFile
 import tf.lotte.tinlok.util.ByteString
 
 /**
@@ -35,7 +36,7 @@ public fun Readable.readUpTo(count: Int): ByteString? {
 @OptIn(Unsafe::class)
 public fun Writeable.writeAll(bs: ByteString): Int {
     val unwrapped = bs.unwrap()
-    return writeAllFrom(unwrapped)
+    return writeFrom(unwrapped)
 }
 
 /**
@@ -49,4 +50,29 @@ public fun <T> T.peek(count: Int): ByteString?
     return bs
 }
 
+/**
+ * Reads all the bytes from this file.
+ */
+@OptIn(Unsafe::class)
+public fun SynchronousFile.readAll(): ByteString {
+    // TODO: We can do this better with some sort of linked list chunked array implementation.
+
+    // ensure that we read the size of the real file, not the size of the symlink.
+    val realPath = path.resolveFully(strict = true)
+    val size = realPath.size() - cursor()
+    if (size >= Int.MAX_VALUE) {
+        throw UnsupportedOperationException("File is too big to read in one go")
+    }
+
+    val ba = ByteArray(size.toInt())
+    val read = readInto(ba)
+    return if (read == size.toInt()) {
+        ByteString.fromUncopied(ba)
+    } else {
+        // need to reallocate...
+        val newBa = ba.copyOfRange(0, read)
+        ByteString.fromUncopied(newBa)
+    }
+
+}
 

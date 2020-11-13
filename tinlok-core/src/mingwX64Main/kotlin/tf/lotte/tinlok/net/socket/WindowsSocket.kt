@@ -9,15 +9,15 @@
 
 package tf.lotte.tinlok.net.socket
 
-import platform.posix.SOCKET
+import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.usePinned
 import platform.windows.FIONBIO
 import tf.lotte.tinlok.Unsafe
-import tf.lotte.tinlok.io.Buffer
+import tf.lotte.tinlok.io.*
 import tf.lotte.tinlok.io.async.SelectionKey
-import tf.lotte.tinlok.io.checkCapacityWrite
-import tf.lotte.tinlok.io.remaining
 import tf.lotte.tinlok.net.*
 import tf.lotte.tinlok.system.BlockingResult
+import tf.lotte.tinlok.system.SOCKET
 import tf.lotte.tinlok.system.Syscall
 import tf.lotte.tinlok.util.AtomicBoolean
 import tf.lotte.tinlok.util.ClosedException
@@ -125,8 +125,8 @@ public constructor(
 
         val conn = Syscall.accept(handle)
         return if (conn.isSuccess) {
-            // BlockingResult wraps the new socket value so we simply unwrap it into the ulong
-            WindowsSocket(family, type, protocol, conn.count.toULong(), creator)
+            // BlockingResult wraps the new socket value so we simply unwrap it
+            WindowsSocket(family, type, protocol, conn.count, creator)
         } else {
             null
         }
@@ -212,6 +212,43 @@ public constructor(
         // direct read path
         return buf.address(0L) {
             Syscall.send(handle, it, buf.remaining.toInt(), flags)
+        }
+    }
+
+    /**
+     * Attempts to send *all* [size] bytes from [buf] into this socket, starting at [offset], using
+     * the specified [flags], returning the actual number of bytes written. This will attempt retry
+     * logic.
+     */
+    @OptIn(Unsafe::class)
+    override fun sendall(buf: ByteArray, size: Int, offset: Int, flags: Int): BlockingResult {
+        checkOpen()
+
+        require(offset + size <= buf.size) {
+            "offset ($offset) + size ($size) > buf.size (${buf.size})"
+        }
+
+        return buf.usePinned {
+            Syscall.__write_socket_with_retry(handle, it.addressOf(offset), size, flags)
+        }
+    }
+
+    /**
+     * Sends up to [size] bytes from [buf] into this socket. This will attempt retry logic.
+     */
+    @OptIn(Unsafe::class)
+    override fun sendall(buf: Buffer, size: Int, flags: Int): BlockingResult {
+        checkOpen()
+        buf.checkCapacityRead(size)
+
+        if (!buf.supportsAddress()) {
+            val ba = buf.readArray(size)
+            return sendall(ba, ba.size, 0, flags)
+        }
+
+        // direct read path
+        return buf.address(0L) {
+            Syscall.__write_socket_with_retry(handle, it, size, flags)
         }
     }
 

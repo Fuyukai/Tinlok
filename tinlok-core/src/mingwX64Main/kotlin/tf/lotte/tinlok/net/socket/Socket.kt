@@ -9,7 +9,6 @@
 
 package tf.lotte.tinlok.net.socket
 
-import platform.posix.SOCKET
 import tf.lotte.tinlok.Unsafe
 import tf.lotte.tinlok.io.Buffer
 import tf.lotte.tinlok.io.OSException
@@ -18,6 +17,7 @@ import tf.lotte.tinlok.net.*
 import tf.lotte.tinlok.net.tcp.TcpConnectionInfo
 import tf.lotte.tinlok.net.udp.UdpConnectionInfo
 import tf.lotte.tinlok.system.BlockingResult
+import tf.lotte.tinlok.system.SOCKET
 import tf.lotte.tinlok.system.Syscall
 import tf.lotte.tinlok.util.AtomicBoolean
 import tf.lotte.tinlok.util.Closeable
@@ -157,6 +157,18 @@ public actual interface Socket<I: ConnectionInfo> : Selectable, Closeable {
      * Sends up to [size] bytes from [buf] into this socket, using the specified [flags].
      */
     public actual fun send(buf: Buffer, size: Int, flags: Int): BlockingResult
+
+    /**
+     * Attempts to send *all* [size] bytes from [buf] into this socket, starting at [offset], using
+     * the specified [flags], returning the actual number of bytes written. This will attempt retry
+     * logic.
+     */
+    public actual fun sendall(buf: ByteArray, size: Int, offset: Int, flags: Int): BlockingResult
+
+    /**
+     * Sends up to [size] bytes from [buf] into this socket. This will attempt retry logic.
+     */
+    public actual fun sendall(buf: Buffer, size: Int, flags: Int): BlockingResult
 
     /**
      * Sends up to [size] bytes from [buf] into this socket, starting at [offset], using the

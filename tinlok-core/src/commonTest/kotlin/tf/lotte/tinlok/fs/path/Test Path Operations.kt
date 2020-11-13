@@ -124,7 +124,7 @@ class `Test Path Operations` {
         assertEquals(second.resolveFully(strict = true), first.resolveFully(strict = true))
 
         val read = second.readAllBytes()
-        assertEquals(read, toWrite)
+        assertEquals(toWrite, read)
     }
 
     /**

@@ -9,6 +9,8 @@
 
 package tf.lotte.tinlok.net.socket
 
+import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.usePinned
 import platform.posix.O_NONBLOCK
 import tf.lotte.tinlok.Unsafe
 import tf.lotte.tinlok.io.*
@@ -235,15 +237,54 @@ public constructor(
     override fun send(buf: Buffer, size: Int, flags: Int): BlockingResult {
         checkOpen()
 
+        buf.checkCapacityRead(size)
+
         // copy path
         if (!buf.supportsAddress()) {
-            val ba = buf.readArray(buf.remaining.toInt())
+            val ba = buf.readArray(size)
             return send(ba, ba.size, 0, flags)
         }
 
         // direct read path
         return buf.address(0L) {
-            Syscall.send(fd, it, buf.remaining.toInt(), flags)
+            Syscall.send(fd, it, size, flags)
+        }
+    }
+
+    /**
+     * Attempts to send *all* [size] bytes from [buf] into this socket, starting at [offset], using
+     * the specified [flags], returning the actual number of bytes written. This will attempt retry
+     * logic.
+     */
+    @OptIn(Unsafe::class)
+    override fun sendall(buf: ByteArray, size: Int, offset: Int, flags: Int): BlockingResult {
+        checkOpen()
+
+        require(offset + size <= buf.size) {
+            "offset ($offset) + size ($size) > buf.size (${buf.size})"
+        }
+
+        return buf.usePinned {
+            Syscall.__write_socket_with_retry(fd, it.addressOf(offset), size, flags)
+        }
+    }
+
+    /**
+     * Sends up to [size] bytes from [buf] into this socket. This will attempt retry logic.
+     */
+    @OptIn(Unsafe::class)
+    override fun sendall(buf: Buffer, size: Int, flags: Int): BlockingResult {
+        checkOpen()
+        buf.checkCapacityRead(size)
+
+        if (!buf.supportsAddress()) {
+            val ba = buf.readArray(size)
+            return sendall(ba, ba.size, 0, flags)
+        }
+
+        // direct read path
+        return buf.address(0L) {
+            Syscall.__write_socket_with_retry(fd, it, size, flags)
         }
     }
 

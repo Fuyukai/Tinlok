@@ -9,8 +9,6 @@
 
 package tf.lotte.tinlok.fs
 
-import tf.lotte.tinlok.Unsafe
-
 /**
  * Represents the result of an ``(l)stat()`` call.
  *
@@ -18,7 +16,6 @@ import tf.lotte.tinlok.Unsafe
  * their purposes instead.
  */
 @OptIn(ExperimentalUnsignedTypes::class)
-@Unsafe
 public data class Stat(
     /** The owner UID of this file. */
     val ownerUID: Int,

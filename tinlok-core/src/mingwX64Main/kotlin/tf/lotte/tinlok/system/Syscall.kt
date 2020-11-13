@@ -31,6 +31,13 @@ import tf.lotte.tinlok.net.socket.RecvFrom
 import tf.lotte.tinlok.net.socket.ShutdownOption
 import tf.lotte.tinlok.util.*
 
+// FIXME: kotlinx.cinterop can do typealias CPointer<out CPointed>, but we can't!
+/** The type of a native file handle. */
+public actual class FILE(public val handle: HANDLE)
+
+/** The type of a native socket. */
+public actual typealias SOCKET = Long
+
 /**
  * Platform call container object for all Win32 calls.
  */
@@ -68,6 +75,14 @@ public actual object Syscall {
         if (res != TRUE) {
             throwErrno()
         }
+    }
+
+    /**
+     * Closes a file.
+     */
+    @Unsafe
+    public actual fun __close_file(fd: FILE) {
+        return CloseHandle(fd.handle)
     }
 
     /**
@@ -615,11 +630,29 @@ public actual object Syscall {
     }
 
     /**
+     * Gets the current cursor for a file (the seek point).
+     */
+    @Unsafe
+    public actual fun __get_file_cursor(fd: FILE): Long {
+        return SetFilePointer(fd.handle, 0, SeekWhence.CURRENT)
+    }
+
+    /**
+     * Sets the current absolute cursor for a file.
+     */
+    @Unsafe
+    public actual fun __set_file_cursor(fd: FILE, point: Long) {
+        SetFilePointer(fd.handle, point.toInt(), SeekWhence.START)
+    }
+
+    /**
      * Reads [size] bytes into [address] from the specified [handle], returning the number of bytes
      * read.
      */
     @Unsafe
-    public fun ReadFile(handle: HANDLE, address: CPointer<ByteVar>, size: Int): Int = memScoped {
+    public fun ReadFile(
+        handle: HANDLE, address: CPointer<ByteVar>, size: Int
+    ): BlockingResult = memScoped {
         val readCnt = alloc<UIntVar>()
 
         val res = ReadFile(
@@ -631,10 +664,11 @@ public actual object Syscall {
         )
 
         if (res != TRUE) {
+            if (GetLastError().toInt() == ERROR_IO_PENDING) return BlockingResult.WOULD_BLOCK
             throwErrno()
         }
 
-        return readCnt.value.toInt()
+        return BlockingResult(readCnt.value.toLong())
     }
 
     /**
@@ -644,7 +678,7 @@ public actual object Syscall {
     public fun ReadFile(
         handle: HANDLE, buf: ByteArray,
         count: Int = buf.size, offset: Int = 0,
-    ): Int = memScoped {
+    ): BlockingResult = memScoped {
         require(count + offset <= buf.size) {
             "count + offset > buf.sizew"
         }
@@ -653,11 +687,24 @@ public actual object Syscall {
         }
     }
 
+    /**
+     * Reads [size] bytes from the file [fd] to [address], returning the number of bytes written.
+     *
+     * This method will NOT attempt to retry.
+     */
+    @Unsafe
+    public actual fun __read_file(fd: FILE, address: CPointer<ByteVar>, size: Int): BlockingResult {
+        return this.ReadFile(fd.handle, address, size)
+    }
+
+    /**
+     * Writes [count] bytes from the pointer [buf] into the specified [handle].
+     */
     @Unsafe
     public fun WriteFile(
         handle: HANDLE, buf: CPointer<ByteVar>,
         count: Int
-    ): Int = memScoped {
+    ): BlockingResult = memScoped {
         val writtenCnt = alloc<UIntVar>()
         val res = WriteFile(
             handle,
@@ -668,10 +715,11 @@ public actual object Syscall {
         )
 
         if (res != TRUE) {
+            if (GetLastError().toInt() == ERROR_IO_PENDING) return BlockingResult.WOULD_BLOCK
             throwErrno()
         }
 
-        return writtenCnt.value.toInt()
+        return BlockingResult(writtenCnt.value.toLong())
     }
 
     /**
@@ -681,16 +729,65 @@ public actual object Syscall {
     public fun WriteFile(
         handle: HANDLE, buf: ByteArray,
         count: Int = buf.size, offset: Int = 0,
-    ): Int = memScoped {
+    ): BlockingResult = memScoped {
         require(count + offset <= buf.size) {
             "count + offset > buf.sizew"
         }
 
-        val writtenCnt = buf.usePinned {
+        return buf.usePinned {
             WriteFile(handle, it.addressOf(offset), count)
         }
+    }
 
-        return writtenCnt.toInt()
+    /**
+     * Writes [size] bytes from [address] to the file [fd], returning the number of bytes written.
+     *
+     * This method will NOT attempt to retry.
+     */
+    @Unsafe
+    public actual fun __write_file(
+        fd: FILE, address: CPointer<ByteVar>, size: Int
+    ): BlockingResult {
+        return this.WriteFile(fd.handle, address, size)
+    }
+
+    // Copied from linux Syscall
+    /**
+     * Writes [size] bytes from [address] to the file [fd], returning the number of bytes written.
+     *
+     * This method will attempt to retry until the full [size] bytes are written. Use a
+     * platform-specific method if you wish to avoid that.
+     */
+    @Unsafe
+    public actual fun __write_file_with_retry(
+        fd: FILE, address: CPointer<ByteVar>, size: Int
+    ): BlockingResult {
+        var lastOffset = 0
+
+        while (true) {
+            // pointer arithmetic...
+            // not fun!
+            // address is always the base address, so we always add the last offset
+            // and last offset is always incremented from the amount we've actually written
+
+            val ptr = (address + lastOffset) ?: error("pointer arithmetic returned null?")
+
+            //
+            val amount = this.WriteFile(fd.handle, ptr, size - lastOffset)
+            if (!amount.isSuccess) break
+
+            lastOffset += amount.count.toInt()
+
+            if (lastOffset >= size) break
+        }
+
+        return if (lastOffset <= 0) {
+            // lastOffset of zero means write() returned EAGAIN immediately
+            BlockingResult.WOULD_BLOCK
+        } else {
+            // lastOffset of greater means we hit EAGAIN or finished writing fully
+            BlockingResult(lastOffset.toLong())
+        }
     }
 
     /**
@@ -843,12 +940,13 @@ public actual object Syscall {
             throwErrnoWSA()
         }
 
-        return sock
+        return sock.toLong()
     }
 
     /**
      * Connects a socket to an address.
      */
+    @Suppress("RemoveRedundantQualifierName")
     @Unsafe
     public fun connect(sock: SOCKET, address: ConnectionInfo): BlockingResult = memScoped {
         val struct: sockaddr
@@ -868,7 +966,7 @@ public actual object Syscall {
             else -> throw UnsupportedOperationException("Don't know how to use $address")
         }
 
-        return when (val res = platform.windows.connect(sock, struct.ptr, size.toInt())) {
+        return when (val res = platform.windows.connect(sock.toULong(), struct.ptr, size.toInt())) {
             0 -> BlockingResult.DIDNT_BLOCK
             ERROR -> {
                 when (errno) {
@@ -887,7 +985,7 @@ public actual object Syscall {
     public fun ioctlsocket(sock: SOCKET, cmd: Int, param: UInt): Unit = memScoped {
         val ptr = alloc<UIntVar>()
         ptr.value = param
-        val res = platform.windows.ioctlsocket(sock, cmd, ptr.ptr)
+        val res = platform.windows.ioctlsocket(sock.toULong(), cmd, ptr.ptr)
         if (res == SOCKET_ERROR) {
             throwErrnoWSA()
         }
@@ -918,7 +1016,7 @@ public actual object Syscall {
 
             // start a poll operation
             val pollfd = allocArray<WSAPOLLFD>(1)
-            pollfd[0].fd = sock
+            pollfd[0].fd = sock.toULong()
             pollfd[0].events = POLLOUT.toShort()
 
             val res = WSAPoll(pollfd, 1u, timeout)
@@ -963,7 +1061,7 @@ public actual object Syscall {
                 else -> error("Unknown or unsupported address family: ${address.family}")
             }
 
-            platform.windows.bind(sock, struct.ptr, size.toInt())
+            platform.windows.bind(sock.toULong(), struct.ptr, size.toInt())
         }
 
         if (res == SOCKET_ERROR) {
@@ -976,7 +1074,7 @@ public actual object Syscall {
      */
     @Unsafe
     public fun listen(sock: SOCKET, backlog: Int) {
-        val res = platform.windows.listen(sock, backlog)
+        val res = platform.windows.listen(sock.toULong(), backlog)
         if (res == SOCKET_ERROR) {
             throwErrnoWSA()
         }
@@ -987,7 +1085,7 @@ public actual object Syscall {
      */
     @OptIn(Unsafe::class)
     public fun accept(sock: SOCKET): BlockingResult {
-        val res = WSAAccept(sock, null, null, null, 0UL)
+        val res = WSAAccept(sock.toULong(), null, null, null, 0UL)
         if (res == INVALID_SOCKET) {
             val error = platform.windows.WSAGetLastError()
             return if (error == platform.windows.WSAEWOULDBLOCK) BlockingResult.WOULD_BLOCK
@@ -1004,7 +1102,7 @@ public actual object Syscall {
     public fun recv(
         sock: SOCKET, address: CPointer<ByteVar>, size: Int, flags: Int
     ): BlockingResult {
-        val res = platform.windows.recv(sock, address, size, flags)
+        val res = platform.windows.recv(sock.toULong(), address, size, flags)
         if (res == SOCKET_ERROR) {
             val error = platform.windows.WSAGetLastError()
             return if (error == platform.windows.WSAEWOULDBLOCK) BlockingResult.WOULD_BLOCK
@@ -1057,7 +1155,7 @@ public actual object Syscall {
 
         val read = buf.usePinned {
             platform.posix.recvfrom(
-                sock, it.addressOf(offset), size, flags, addr.ptr,
+                sock.toULong(), it.addressOf(offset), size, flags, addr.ptr,
                 sizePtr.ptr
             )
         }
@@ -1084,7 +1182,7 @@ public actual object Syscall {
     public fun send(
         sock: SOCKET, address: CPointer<ByteVar>, size: Int, flags: Int
     ): BlockingResult {
-        val res = platform.posix.send(sock, address, size, flags)
+        val res = platform.posix.send(sock.toULong(), address, size, flags)
         if (res == SOCKET_ERROR) {
             val error = platform.windows.WSAGetLastError()
             return if (error == platform.windows.WSAEWOULDBLOCK) BlockingResult.WOULD_BLOCK
@@ -1108,6 +1206,40 @@ public actual object Syscall {
         return buf.usePinned {
             // XXX: ``platform.windows.send`` has buf turned into a CString for some reason.
             send(sock, it.addressOf(offset), size, flags)
+        }
+    }
+
+    // Copied from linuxMain
+    /**
+     * Writes [size] bytes into [socket] from [address].
+     *
+     * This method will attempt to retry until the full [size] bytes are written. Use a
+     * platform-specific method if you wish to avoid that.
+     */
+    @Unsafe
+    public fun __write_socket_with_retry(
+        socket: SOCKET, address: CPointer<ByteVar>, size: Int, flags: Int
+    ): BlockingResult {
+        var lastOffset = 0
+
+        // copied from write()
+
+        while (true) {
+            val ptr = (address + lastOffset) ?: error("pointer arithmetic returned null?")
+            val amount = this.recv(socket, ptr, size - lastOffset, flags)
+            if (!amount.isSuccess) break
+
+            lastOffset += amount.count.toInt()
+
+            if (lastOffset >= size) break
+        }
+
+        return if (lastOffset <= 0) {
+            // lastOffset of zero means write() returned EAGAIN immediately
+            BlockingResult.WOULD_BLOCK
+        } else {
+            // lastOffset of greater means we hit EAGAIN or finished writing fully
+            BlockingResult(lastOffset.toLong())
         }
     }
 
@@ -1142,7 +1274,7 @@ public actual object Syscall {
 
         val result = buffer.usePinned {
             platform.posix.sendto(
-                sock, it.addressOf(offset), size, flags, struct.ptr, addrSize
+                sock.toULong(), it.addressOf(offset), size, flags, struct.ptr, addrSize
             )
         }
 
@@ -1160,7 +1292,7 @@ public actual object Syscall {
     @Unsafe
     @Suppress("RemoveRedundantQualifierName")
     public fun shutdown(sock: SOCKET, how: ShutdownOption) {
-        val res = platform.windows.shutdown(sock, how.number)
+        val res = platform.windows.shutdown(sock.toULong(), how.number)
         if (res == SOCKET_ERROR) throwErrnoWSA()
     }
 
@@ -1169,7 +1301,7 @@ public actual object Syscall {
      */
     @Unsafe
     public fun closesocket(sock: SOCKET) {
-        val res = platform.windows.closesocket(sock)
+        val res = platform.windows.closesocket(sock.toULong())
         if (res == SOCKET_ERROR) throwErrnoWSA()
     }
 
