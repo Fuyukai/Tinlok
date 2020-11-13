@@ -31,7 +31,7 @@ public inline class BlockingResult(public val count: Long) {
         get() = count != -1L
 }
 
-@Suppress("NOTHING_TO_IINLINE")
+@Suppress("NOTHING_TO_INLINE")
 public inline fun BlockingResult.ensureNonBlock(): Long {
     // todo: change error?
     if (!isSuccess) throw IllegalStateException(
