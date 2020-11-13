@@ -93,6 +93,9 @@ public expect interface Socket<I: ConnectionInfo> : Selectable, Closeable {
     /**
      * Accepts a new client connection, returning the newly connected [Socket]. Returns null if this
      * is a non-blocking socket and no connections are available.
+     *
+     * Unlike the POSIX specification, this will inherit the non-blocking status of the parent
+     * socket.
      */
     @Throws(ClosedException::class, OSException::class)
     @Unsafe

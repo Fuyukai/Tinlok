@@ -64,16 +64,21 @@ public constructor(
         Syscall.close(fd)
     }
 
+    /** Internally used to inherit non-blocking. */
+    private val isNonBlocking: AtomicBoolean = AtomicBoolean(false)
+
     /** If this file descriptor is non-blocking. */
     public override var nonBlocking: Boolean
         get() {
             val flags = fcntl(FcntlParam.F_GETFL)
-            return flagged(flags, O_NONBLOCK)
+            // make sure that our own boolean tracker is updated
+            return flagged(flags, O_NONBLOCK).also { isNonBlocking.value = it }
         }
         set(value: Boolean) {
             var flags = fcntl(FcntlParam.F_GETFL)
             flags = if (value) flags.or(O_NONBLOCK) else flags.and(O_NONBLOCK.inv())
             fcntl(FcntlParam.F_SETFL, flags)
+            isNonBlocking.value = value
         }
 
     /** Performs a File CoNTroL call with no parameters. */
@@ -162,9 +167,13 @@ public constructor(
     override fun accept(): Socket<I>? {
         checkOpen()
 
+        // use accept4 if we're nonblocking, to automatically set O_NONBLOCK
         val sock = Syscall.accept(fd)
+
         if (sock.isSuccess) {
-            return LinuxSocket(family, type, protocol, sock.count.toInt(), creator)
+            val child = LinuxSocket(family, type, protocol, sock.count.toInt(), creator)
+            child.nonBlocking = isNonBlocking.value
+            return child
         }
         return null
     }

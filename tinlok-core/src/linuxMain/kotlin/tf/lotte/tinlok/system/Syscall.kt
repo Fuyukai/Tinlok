@@ -953,7 +953,7 @@ public actual object Syscall {
 
         while (true) {
             val ptr = (address + lastOffset) ?: error("pointer arithmetic returned null?")
-            val amount = this.recv(socket, ptr, size - lastOffset, flags)
+            val amount = this.send(socket, ptr, size - lastOffset, flags)
             if (!amount.isSuccess) break
 
             lastOffset += amount.count.toInt()
