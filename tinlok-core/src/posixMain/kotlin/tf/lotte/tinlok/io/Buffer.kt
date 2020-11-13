@@ -11,6 +11,7 @@ package tf.lotte.tinlok.io
 
 import kotlinx.cinterop.ByteVar
 import kotlinx.cinterop.CPointer
+import tf.lotte.tinlok.Unsafe
 import tf.lotte.tinlok.util.Closeable
 
 /**
@@ -77,6 +78,11 @@ public actual interface Buffer : Closeable {
      */
     public actual fun readLongLE(): Long
 
+    /**
+     * Reads a [ByteArray] of size [count] off this buffer.
+     */
+    public actual fun readArray(count: Int): ByteArray
+
     // == Write methods == //
     /**
      * Writes a single byte to this buffer at the current cursor, advancing it by one.
@@ -127,10 +133,11 @@ public actual interface Buffer : Closeable {
 
     /**
      * Pins the backing object for this [Buffer], then gets the memory address of the item at
-     * [offset].
+     * [offset]. This is relative to the cursor.
      *
      * This will raise if [supportsAddress] returns false.
      */
+    @Unsafe
     public fun <R> address(offset: Long, block: (CPointer<ByteVar>) -> R): R
 }
 

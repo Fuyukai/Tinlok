@@ -11,8 +11,7 @@ package tf.lotte.tinlok.net.socket
 
 import platform.posix.O_NONBLOCK
 import tf.lotte.tinlok.Unsafe
-import tf.lotte.tinlok.io.FdSelectionKey
-import tf.lotte.tinlok.io.OSException
+import tf.lotte.tinlok.io.*
 import tf.lotte.tinlok.io.async.Selectable
 import tf.lotte.tinlok.net.*
 import tf.lotte.tinlok.system.*
@@ -180,6 +179,28 @@ public constructor(
     }
 
     /**
+     * Receives up to [size] bytes from this socket into the buffer [buf], using the specified
+     * [flags].
+     */
+    @OptIn(Unsafe::class)
+    override fun recv(buf: Buffer, size: Int, flags: Int): BlockingResult {
+        checkOpen()
+        buf.checkCapacityWrite(size)
+
+        // copied from LinuxSyncFile
+        return if (!buf.supportsAddress()) {
+            val ba = ByteArray(size)
+            val amount = Syscall.recv(fd, ba, size, offset = 0, flags = flags)
+            buf.writeFrom(ba, ba.size, 0)
+            amount
+        } else {
+            buf.address(0) {
+                Syscall.recv(fd, it, size, flags)
+            }
+        }
+    }
+
+    /**
      * Receives up to [size] bytes from this socket into [buf], starting at [offset], using the
      * specified [flags]. This returns a [RecvFrom] which wraps both the [BlockingResult] for the
      * bytes read, and the address read from. A null return is the same as a -1 BlockingResult.
@@ -205,6 +226,25 @@ public constructor(
         checkOpen()
 
         return Syscall.send(fd, buf, size, offset, flags)
+    }
+
+    /**
+     * Sends up to [size] bytes from [buf] into this socket, using the specified [flags].
+     */
+    @OptIn(Unsafe::class)
+    override fun send(buf: Buffer, size: Int, flags: Int): BlockingResult {
+        checkOpen()
+
+        // copy path
+        if (!buf.supportsAddress()) {
+            val ba = buf.readArray(buf.remaining.toInt())
+            return send(ba, ba.size, 0, flags)
+        }
+
+        // direct read path
+        return buf.address(0L) {
+            Syscall.send(fd, it, buf.remaining.toInt(), flags)
+        }
     }
 
     /**

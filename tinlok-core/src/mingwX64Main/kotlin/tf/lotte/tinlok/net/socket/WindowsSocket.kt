@@ -12,7 +12,10 @@ package tf.lotte.tinlok.net.socket
 import platform.posix.SOCKET
 import platform.windows.FIONBIO
 import tf.lotte.tinlok.Unsafe
+import tf.lotte.tinlok.io.Buffer
 import tf.lotte.tinlok.io.async.SelectionKey
+import tf.lotte.tinlok.io.checkCapacityWrite
+import tf.lotte.tinlok.io.remaining
 import tf.lotte.tinlok.net.*
 import tf.lotte.tinlok.system.BlockingResult
 import tf.lotte.tinlok.system.Syscall
@@ -27,7 +30,7 @@ public constructor(
     override val family: AddressFamily,
     override val type: SocketType,
     override val protocol: IPProtocol,
-    private val handle: SOCKET,
+    override val handle: SOCKET,
     private val creator: ConnectionInfoCreator<I>,
 ) : Socket<I> {
     /** If this socket is still open. */
@@ -141,6 +144,29 @@ public constructor(
     }
 
     /**
+     * Receives up to [size] bytes from this socket into the buffer [buf], using the specified
+     * [flags].
+     */
+    @OptIn(Unsafe::class)
+    override fun recv(buf: Buffer, size: Int, flags: Int): BlockingResult {
+        checkOpen()
+
+        buf.checkCapacityWrite(size)
+
+        // copied from LinuxSocket
+        return if (!buf.supportsAddress()) {
+            val ba = ByteArray(size)
+            val amount = Syscall.recv(handle, ba, size, offset = 0, flags = flags)
+            buf.writeFrom(ba, ba.size, 0)
+            amount
+        } else {
+            buf.address(0) {
+                Syscall.recv(handle, it, size, flags = flags)
+            }
+        }
+    }
+
+    /**
      * Receives up to [size] bytes from this socket into [buf], starting at [offset], using the
      * specified [flags]. This returns a [RecvFrom] which wraps both the [BlockingResult] for the
      * bytes read, and the address read from. A null return is the same as a -1 BlockingResult.
@@ -166,6 +192,27 @@ public constructor(
         checkOpen()
 
         return Syscall.send(handle, buf, size, offset, flags)
+    }
+
+    /**
+     * Sends up to [size] bytes from [buf] into this socket, using the specified [flags].
+     */
+    @OptIn(Unsafe::class)
+    override fun send(buf: Buffer, size: Int, flags: Int): BlockingResult {
+        checkOpen()
+
+        // copied from LinuxSocket
+
+        // copy path
+        if (!buf.supportsAddress()) {
+            val ba = buf.readArray(buf.remaining.toInt())
+            return send(ba, ba.size, 0, flags)
+        }
+
+        // direct read path
+        return buf.address(0L) {
+            Syscall.send(handle, it, buf.remaining.toInt(), flags)
+        }
     }
 
     /**

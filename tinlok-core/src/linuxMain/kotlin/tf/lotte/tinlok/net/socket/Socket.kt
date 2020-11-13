@@ -10,6 +10,7 @@
 package tf.lotte.tinlok.net.socket
 
 import tf.lotte.tinlok.Unsafe
+import tf.lotte.tinlok.io.Buffer
 import tf.lotte.tinlok.io.OSException
 import tf.lotte.tinlok.io.async.Selectable
 import tf.lotte.tinlok.net.*
@@ -132,6 +133,12 @@ public actual interface Socket<I: ConnectionInfo> : Selectable, Closeable {
     public actual fun recv(buf: ByteArray, size: Int, offset: Int, flags: Int): BlockingResult
 
     /**
+     * Receives up to [size] bytes from this socket into the buffer [buf], using the specified
+     * [flags].
+     */
+    public actual fun recv(buf: Buffer, size: Int, flags: Int): BlockingResult
+
+    /**
      * Receives up to [size] bytes from this socket into [buf], starting at [offset], using the
      * specified [flags]. This returns a [RecvFrom] which wraps both the [BlockingResult] for the
      * bytes read, and the address read from. A null return is the same as a -1 BlockingResult.
@@ -150,6 +157,12 @@ public actual interface Socket<I: ConnectionInfo> : Selectable, Closeable {
      */
     @Throws(ClosedException::class, OSException::class)
     public actual fun send(buf: ByteArray, size: Int, offset: Int, flags: Int): BlockingResult
+
+    /**
+     * Sends up to [size] bytes from [buf] into this socket, using the specified [flags].
+     */
+    @Throws(ClosedException::class, OSException::class)
+    public actual fun send(buf: Buffer, size: Int, flags: Int): BlockingResult
 
     /**
      * Sends up to [size] bytes from [buf] into this socket, starting at [offset], using the

@@ -75,6 +75,11 @@ public expect interface Buffer : Closeable {
      */
     public fun readLongLE(): Long
 
+    /**
+     * Reads a [ByteArray] of size [count] off this buffer.
+     */
+    public fun readArray(count: Int): ByteArray
+
     // == Write methods == //
     /**
      * Writes a single byte to this buffer at the current cursor, advancing it by one.
@@ -118,3 +123,28 @@ public expect interface Buffer : Closeable {
     public fun writeFrom(array: ByteArray, size: Int, offset: Int)
 
 }
+
+/**
+ * Checks if we have the [needed] capacity available for reading. Throws an error if false.
+ * This is meant for internal usage.
+ */
+public fun Buffer.checkCapacityRead(needed: Int) {
+    if (cursor + needed > capacity) {
+        TODO("Buffer underflow")
+    }
+}
+
+/**
+ * Checks if we have the [needed] capacity available for writing. Throws an error if false.
+ * This is meant for internal usage.
+ */
+public fun Buffer.checkCapacityWrite(needed: Int) {
+    if (cursor + needed > capacity) {
+        TODO("Buffer overflow")
+    }
+}
+
+/**
+ * Gets the number of bytes left in this Buffer.
+ */
+public inline val Buffer.remaining: Long get() = capacity - cursor

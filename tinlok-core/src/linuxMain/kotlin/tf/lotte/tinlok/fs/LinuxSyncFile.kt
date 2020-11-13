@@ -13,6 +13,9 @@ import platform.posix.*
 import tf.lotte.tinlok.Unsafe
 import tf.lotte.tinlok.fs.StandardOpenModes.*
 import tf.lotte.tinlok.fs.path.LinuxPath
+import tf.lotte.tinlok.io.Buffer
+import tf.lotte.tinlok.io.checkCapacityWrite
+import tf.lotte.tinlok.io.remaining
 import tf.lotte.tinlok.system.*
 import tf.lotte.tinlok.util.AtomicBoolean
 import tf.lotte.tinlok.util.ByteString
@@ -92,14 +95,43 @@ internal class LinuxSyncFile(
         Syscall.lseek(fd, position, SeekWhence.CURRENT)
     }
 
+    /**
+     * Reads [size] amount of bytes into the specified [buffer], returning the number of bytes
+     * actually read.
+     */
     @OptIn(Unsafe::class)
-    override fun readInto(buf: ByteArray, size: Int, offset: Int): Int {
+    override fun readInto(buffer: Buffer, size: Int): Int {
+        checkOpen()
+        // ensure we can actually write into a buffer of that size
+        buffer.checkCapacityWrite(size)
+
+        return if (!buffer.supportsAddress()) {
+            val ba = ByteArray(size)
+            val amount = Syscall.read(fd, ba, size, offset = 0)
+            buffer.writeFrom(ba, ba.size, 0)
+            amount.ensureNonBlock().toInt()
+        } else {
+            buffer.address(0) {
+                Syscall.read(fd, it, size)
+            }.ensureNonBlock().toInt()
+        }
+    }
+
+    /**
+     * Reads no more than [size] amount of bytes into [ba], starting at [offset], returning the
+     * number of bytes actually written.
+     */
+    @OptIn(Unsafe::class)
+    override fun readInto(ba: ByteArray, size: Int, offset: Int): Int {
         checkOpen()
 
-        val result = Syscall.read(fd, buf, size, offset).ensureNonBlock()
+        val result = Syscall.read(fd, ba, size, offset).ensureNonBlock()
         return result.toInt()
     }
 
+    /**
+     * Reads all of the bytes of this file.
+     */
     @OptIn(Unsafe::class)
     override fun readAll(): ByteString {
         checkOpen()
@@ -129,10 +161,67 @@ internal class LinuxSyncFile(
         })
     }
 
+    /**
+     * Attempts to write the entirety of the ByteArray [ba] to this object, returning the number of
+     * bytes actually written before reaching EOF.
+     */
     @OptIn(Unsafe::class)
-    override fun writeAllFrom(buf: ByteArray): Int {
+    override fun writeAllFrom(ba: ByteArray): Int {
         checkOpen()
 
-        return Syscall.write(fd, buf, buf.size, 0).ensureNonBlock().toInt()
+        // retry loop to ensure all is written
+        var written = 0
+        while (true) {
+            val result = Syscall.write(fd, ba, ba.size - written, written).ensureNonBlock()
+            written += result.toInt()
+
+            if (written >= ba.size) {
+                break
+            }
+        }
+
+        return written
+    }
+
+    /**
+     * Attempts to write the entirety of the buffer [buffer] from the cursor onwards to this object,
+     * returning the number of bytes actually written before reaching EOF.
+     */
+    @OptIn(Unsafe::class)
+    override fun writeAllFrom(buffer: Buffer): Int {
+        checkOpen()
+
+        // ensure we're not trying to write to a buffer with no space left
+        if (buffer.cursor >= buffer.capacity - 1) return 0
+
+        // slow path, need to copy it from the buffer into a bytearray
+        // e.g. buffer-mapped sockets
+        if (!buffer.supportsAddress()) {
+            val ba = buffer.readArray((buffer.capacity - buffer.cursor).toInt())
+            return writeAllFrom(ba)
+        }
+
+        // fast path, write directly using the address
+        var size = (buffer.capacity - buffer.cursor).toInt()
+        var total = 0
+        while (true) {
+            // offset zero is ALWAYS relative to the buffer cursor
+            // so we always pass zero
+            val result = buffer.address(0) {
+                Syscall.write(fd, it, size)
+            }.ensureNonBlock().toInt()
+
+            // written up to the amount remaining, no more retries needed
+            if (result >= buffer.remaining) {
+                break
+            }
+
+            size -= result
+            total += result
+            // next read will now bee after the number of reads we did
+            buffer.cursor += result.toLong()
+        }
+
+        return total
     }
 }

@@ -106,10 +106,11 @@ kotlin {
     }
 }
 
-// commonizer hack
+// commonizer or expect/actual hacks
 tasks.register("copyCommonCBindings") {
     group = "interop"
 
+    // cryptography
     copy {
         from(
             "src/linuxX64Main/kotlin/tf/lotte/tinlok/crypto/Blake2b.kt",
@@ -128,6 +129,7 @@ tasks.register("copyCommonCBindings") {
         into("src/mingwX64Main/kotlin/tf/lotte/tinlok/crypto")
     }
 
+    // common libuuid binding
     copy {
         from("src/linuxX64Main/kotlin/tf/lotte/tinlok/util/UuidPlatform.kt")
         into("src/linuxArm64Main/kotlin/tf/lotte/tinlok/util")

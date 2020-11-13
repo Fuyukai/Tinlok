@@ -615,6 +615,29 @@ public actual object Syscall {
     }
 
     /**
+     * Reads [size] bytes into [address] from the specified [handle], returning the number of bytes
+     * read.
+     */
+    @Unsafe
+    public fun ReadFile(handle: HANDLE, address: CPointer<ByteVar>, size: Int): Int = memScoped {
+        val readCnt = alloc<UIntVar>()
+
+        val res = ReadFile(
+            handle,
+            address,
+            size.toUInt(),
+            readCnt.ptr,
+            null
+        )
+
+        if (res != TRUE) {
+            throwErrno()
+        }
+
+        return readCnt.value.toInt()
+    }
+
+    /**
      * Reads [count] bytes into the buffer [buf] from the specified [handle].
      */
     @Unsafe
@@ -622,24 +645,33 @@ public actual object Syscall {
         handle: HANDLE, buf: ByteArray,
         count: Int = buf.size, offset: Int = 0,
     ): Int = memScoped {
-        require(offset <= count) { "Offset must be less than count!" }
-        val readCnt = alloc<UIntVar>()
-
-        val res = buf.usePinned {
-            ReadFile(
-                handle,
-                it.addressOf(offset),
-                count.toUInt(),
-                readCnt.ptr,
-                null
-            )
+        require(count + offset <= buf.size) {
+            "count + offset > buf.sizew"
         }
+        return buf.usePinned {
+            ReadFile(handle, it.addressOf(offset), count)
+        }
+    }
+
+    @Unsafe
+    public fun WriteFile(
+        handle: HANDLE, buf: CPointer<ByteVar>,
+        count: Int
+    ): Int = memScoped {
+        val writtenCnt = alloc<UIntVar>()
+        val res = WriteFile(
+            handle,
+            buf,
+            count.toUInt(),
+            writtenCnt.ptr,
+            null
+        )
 
         if (res != TRUE) {
             throwErrno()
         }
 
-        return readCnt.value.toInt()
+        return writtenCnt.value.toInt()
     }
 
     /**
@@ -650,24 +682,15 @@ public actual object Syscall {
         handle: HANDLE, buf: ByteArray,
         count: Int = buf.size, offset: Int = 0,
     ): Int = memScoped {
-        require(offset <= count) { "Offset must be less than count!" }
-
-        val writtenCnt = alloc<UIntVar>()
-        val res = buf.usePinned {
-            WriteFile(
-                handle,
-                it.addressOf(offset),
-                count.toUInt(),
-                writtenCnt.ptr,
-                null
-            )
+        require(count + offset <= buf.size) {
+            "count + offset > buf.sizew"
         }
 
-        if (res != TRUE) {
-            throwErrno()
+        val writtenCnt = buf.usePinned {
+            WriteFile(handle, it.addressOf(offset), count)
         }
 
-        return writtenCnt.value.toInt()
+        return writtenCnt.toInt()
     }
 
     /**
@@ -978,6 +1001,23 @@ public actual object Syscall {
      * Receives data from the specified socket.
      */
     @Unsafe
+    public fun recv(
+        sock: SOCKET, address: CPointer<ByteVar>, size: Int, flags: Int
+    ): BlockingResult {
+        val res = platform.windows.recv(sock, address, size, flags)
+        if (res == SOCKET_ERROR) {
+            val error = platform.windows.WSAGetLastError()
+            return if (error == platform.windows.WSAEWOULDBLOCK) BlockingResult.WOULD_BLOCK
+            else throwErrnoWSA(error)
+        }
+
+        return BlockingResult(res.toLong())
+    }
+
+    /**
+     * Receives data from the specified socket.
+     */
+    @Unsafe
     @Suppress("RemoveRedundantQualifierName")
     public fun recv(
         sock: SOCKET, buf: ByteArray, size: Int, offset: Int, flags: Int
@@ -987,16 +1027,10 @@ public actual object Syscall {
             "offset ($offset) + size ($size) > buf.size (${buf.size})"
         }
 
-        val res = buf.usePinned {
-            platform.windows.recv(sock, it.addressOf(offset), size, flags)
-        }
-        if (res == SOCKET_ERROR) {
-            val error = platform.windows.WSAGetLastError()
-            return if (error == platform.windows.WSAEWOULDBLOCK) BlockingResult.WOULD_BLOCK
-            else throwErrnoWSA(error)
+        return buf.usePinned {
+            recv(sock, it.addressOf(offset), size, flags)
         }
 
-        return BlockingResult(res.toLong())
     }
 
     /**
@@ -1048,16 +1082,9 @@ public actual object Syscall {
      */
     @Unsafe
     public fun send(
-        sock: SOCKET, buf: ByteArray, size: Int, offset: Int, flags: Int
+        sock: SOCKET, address: CPointer<ByteVar>, size: Int, flags: Int
     ): BlockingResult {
-        require(size + offset <= buf.size) {
-            "offset ($offset) + size ($size) > buf.size (${buf.size})"
-        }
-
-        val res = buf.usePinned {
-            // XXX: ``platform.windows.send`` has buf turned into a CString for some reason.
-            send(sock, it.addressOf(offset), size, flags)
-        }
+        val res = platform.posix.send(sock, address, size, flags)
         if (res == SOCKET_ERROR) {
             val error = platform.windows.WSAGetLastError()
             return if (error == platform.windows.WSAEWOULDBLOCK) BlockingResult.WOULD_BLOCK
@@ -1065,6 +1092,23 @@ public actual object Syscall {
         }
 
         return BlockingResult(res.toLong())
+    }
+
+    /**
+     * Sends data on the specified socket.
+     */
+    @Unsafe
+    public fun send(
+        sock: SOCKET, buf: ByteArray, size: Int, offset: Int, flags: Int
+    ): BlockingResult {
+        require(size + offset <= buf.size) {
+            "offset ($offset) + size ($size) > buf.size (${buf.size})"
+        }
+
+        return buf.usePinned {
+            // XXX: ``platform.windows.send`` has buf turned into a CString for some reason.
+            send(sock, it.addressOf(offset), size, flags)
+        }
     }
 
     /**

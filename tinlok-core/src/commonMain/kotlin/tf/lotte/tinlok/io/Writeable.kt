@@ -14,8 +14,14 @@ package tf.lotte.tinlok.io
  */
 public interface Writeable {
     /**
-     * Attempts to write the entirety of the buffer [buf] to this object, returning the number of
+     * Attempts to write the entirety of the ByteArray [ba] to this object, returning the number of
      * bytes actually written before reaching EOF.
      */
-    public fun writeAllFrom(buf: ByteArray): Int
+    public fun writeAllFrom(ba: ByteArray): Int
+
+    /**
+     * Attempts to write the entirety of the buffer [buf] from the cursor onwards to this object,
+     * returning the number of bytes actually written before reaching EOF.
+     */
+    public fun writeAllFrom(buffer: Buffer): Int
 }

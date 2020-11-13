@@ -10,6 +10,7 @@
 package tf.lotte.tinlok.io
 
 import kotlinx.cinterop.*
+import tf.lotte.tinlok.Unsafe
 import tf.lotte.tinlok.util.*
 import kotlin.experimental.and
 
@@ -39,20 +40,10 @@ actual constructor(private val ba: ByteArray): Buffer {
     actual override val capacity: Long get() = ba.size.toLong()
 
     /**
-     * Checks if we have the [needed] capacity available for writing.
-     */
-    private fun checkCapacity(needed: Int, read: Boolean) {
-        if (cursor + needed > capacity) {
-            if (read) TODO("Buffer underflow")
-            else TODO("Buffer overflow")
-        }
-    }
-
-    /**
      * Reads a single byte off of the buffer at the current cursor, advancing it by one.
      */
     actual override fun readByte(): Byte {
-        checkCapacity(1, read = true)
+        checkCapacityRead(1)
         return ba[realCursor++]
     }
 
@@ -60,7 +51,7 @@ actual constructor(private val ba: ByteArray): Buffer {
      * Reads a single short off of the buffer at the current cursor, advancing it by two.
      */
     actual override fun readShort(): Short {
-        checkCapacity(2, read = true)
+        checkCapacityRead(2)
 
         val s = ba.toShort(realCursor)
         realCursor += 2
@@ -72,7 +63,7 @@ actual constructor(private val ba: ByteArray): Buffer {
      * it by two.
      */
     actual override fun readShortLE(): Short {
-        checkCapacity(2, read = true)
+        checkCapacityRead(2)
 
         val s = ba.toShortLE(realCursor)
         realCursor += 2
@@ -83,7 +74,7 @@ actual constructor(private val ba: ByteArray): Buffer {
      * Reads a single int off of the buffer at the current cursor, advancing it by four.
      */
     actual override fun readInt(): Int {
-        checkCapacity(4, read = true)
+        checkCapacityRead(4)
 
         val i = ba.toInt(realCursor)
         realCursor += 4
@@ -95,7 +86,7 @@ actual constructor(private val ba: ByteArray): Buffer {
      * by four.
      */
     actual override fun readIntLE(): Int {
-        checkCapacity(4, read = true)
+        checkCapacityRead(4)
 
         val i = ba.toIntLE(realCursor)
         realCursor += 4
@@ -106,7 +97,7 @@ actual constructor(private val ba: ByteArray): Buffer {
      * Reads a single long off of the buffer at the current cursor, advancing it by eight.
      */
     actual override fun readLong(): Long {
-        checkCapacity(8, read = true)
+        checkCapacityRead(8)
 
         val l = ba.toLong(realCursor)
         realCursor += 4
@@ -118,18 +109,26 @@ actual constructor(private val ba: ByteArray): Buffer {
      * by eight.
      */
     actual override fun readLongLE(): Long {
-        checkCapacity(8, read = true)
+        checkCapacityRead(8)
 
         val l = ba.toLongLE(realCursor)
         realCursor += 4
         return l
     }
 
+    actual override fun readArray(count: Int): ByteArray {
+        checkCapacityRead(count)
+
+        val arr = ByteArray(count)
+        ba.copyInto(arr, 0, realCursor, realCursor + arr.size)
+        return ba
+    }
+
     /**
      * Writes a single byte to this buffer at the current cursor, advancing it by one.
      */
     actual override fun writeByte(b: Byte) {
-        checkCapacity(1, read = false)
+        checkCapacityWrite(1)
 
         ba[realCursor++] = b
     }
@@ -138,7 +137,7 @@ actual constructor(private val ba: ByteArray): Buffer {
      * Writes a single short to this buffer at the current cursor, advancing it by two.
      */
     actual override fun writeShort(short: Short) {
-        checkCapacity(2, read = false)
+        checkCapacityWrite(2)
 
         val upper = short.toInt().and(0xff00).ushr(4).toByte()
         val lower = short.and(0xff).toByte()
@@ -150,7 +149,7 @@ actual constructor(private val ba: ByteArray): Buffer {
      * Writes a single short to this buffer in little endian, advancing it by two.
      */
     actual override fun writeShortLE(short: Short) {
-        checkCapacity(2, read = false)
+        checkCapacityWrite(2)
 
         val upper = short.toInt().and(0xff00).ushr(4).toByte()
         val lower = short.and(0xff).toByte()
@@ -162,7 +161,7 @@ actual constructor(private val ba: ByteArray): Buffer {
      * Writes a single int to this buffer at the current cursor, advancing it by four.
      */
     actual override fun writeInt(int: Int) {
-        checkCapacity(4, read = false)
+        checkCapacityWrite(4)
 
         val bytes = int.toByteArray()
         bytes.copyInto(ba, realCursor)
@@ -173,7 +172,7 @@ actual constructor(private val ba: ByteArray): Buffer {
      * Writes a single int to this buffer in little endian, advancing it by four.
      */
     actual override fun writeIntLE(int: Int) {
-        checkCapacity(4, read = false)
+        checkCapacityWrite(4)
 
         val bytes = int.toByteArrayLE()
         bytes.copyInto(ba, realCursor)
@@ -184,7 +183,7 @@ actual constructor(private val ba: ByteArray): Buffer {
      * Writes a single long to this buffer at the current cursor, advancing it by eight.
      */
     actual override fun writeLong(long: Long) {
-        checkCapacity(8, read = false)
+        checkCapacityWrite(8)
 
         val bytes = long.toByteArray()
         bytes.copyInto(ba, realCursor)
@@ -195,7 +194,7 @@ actual constructor(private val ba: ByteArray): Buffer {
      * Writes a single long to this buffer in little endian, advancing it by eight.
      */
     actual override fun writeLongLE(long: Long) {
-        checkCapacity(8, read = false)
+        checkCapacityWrite(8)
 
         val bytes = long.toByteArrayLE()
         bytes.copyInto(ba, realCursor)
@@ -211,7 +210,7 @@ actual constructor(private val ba: ByteArray): Buffer {
             "offset $offset + size $size > array size ${array.size}"
         }
 
-        checkCapacity(size, read = false)
+        checkCapacityWrite(size)
 
         array.copyInto(array, realCursor, offset, offset + size)
     }
@@ -223,11 +222,15 @@ actual constructor(private val ba: ByteArray): Buffer {
     override fun supportsAddress(): Boolean = true
 
     /**
-     * Pins the backing object for this [Buffer], then gets the memory address of the first item.
+     * Pins the backing object for this [Buffer], then gets the memory address of the item at
+     * [offset]. This is relative to the cursor.
      */
+    @Unsafe
     override fun <R> address(offset: Long, block: (CPointer<ByteVar>) -> R): R {
+        require(offset < Int.MAX_VALUE) { "Offset cannot be larger than MAX_INT" }
+
         return ba.usePinned {
-            block(it.addressOf(offset.toInt()))
+            block(it.addressOf(offset.toInt() + realCursor))
         }
     }
 

@@ -9,7 +9,10 @@
 
 package tf.lotte.tinlok.net.socket
 
+import platform.posix.SOCKET
 import tf.lotte.tinlok.Unsafe
+import tf.lotte.tinlok.io.Buffer
+import tf.lotte.tinlok.io.OSException
 import tf.lotte.tinlok.io.async.Selectable
 import tf.lotte.tinlok.net.*
 import tf.lotte.tinlok.net.tcp.TcpConnectionInfo
@@ -18,6 +21,7 @@ import tf.lotte.tinlok.system.BlockingResult
 import tf.lotte.tinlok.system.Syscall
 import tf.lotte.tinlok.util.AtomicBoolean
 import tf.lotte.tinlok.util.Closeable
+import tf.lotte.tinlok.util.ClosedException
 
 /**
  * A BSD socket, an abstraction used for inter-process communication. Sockets can be either local or
@@ -55,6 +59,9 @@ public actual interface Socket<I: ConnectionInfo> : Selectable, Closeable {
 
     }
 
+    /** The underlying handle for this socket. */
+    public val handle: SOCKET
+
     /** The address family this socket was created with. */
     public actual val family: AddressFamily
 
@@ -64,20 +71,22 @@ public actual interface Socket<I: ConnectionInfo> : Selectable, Closeable {
     /** The protocol this socket was created with. */
     public actual val protocol: IPProtocol
 
-    /** If this socket is still open. */
+    /** If the FD for this socket is still open. */
     public actual val isOpen: AtomicBoolean
 
-    /** If this socket is non-blocking. */
+    /** If this file descriptor is non-blocking. */
     public actual var nonBlocking: Boolean
 
     /**
      * Sets the [option] on this BSD socket to [value].
      */
+    @Throws(ClosedException::class, OSException::class)
     public actual fun <T> setOption(option: BsdSocketOption<T>, value: T)
 
     /**
      * Gets the [option] on this BSD socket.
      */
+    @Throws(ClosedException::class, OSException::class)
     public actual fun <T> getOption(option: BsdSocketOption<T>): T
 
     /**
@@ -88,22 +97,26 @@ public actual interface Socket<I: ConnectionInfo> : Selectable, Closeable {
      * If the socket is non-blocking, this returns if the socket was connected immediately or if it
      * requires a poll() operation to notify when connected.
      */
+    @Throws(ClosedException::class, OSException::class)
     public actual fun connect(addr: I, timeout: Int): Boolean
 
     /**
      * Binds this socket to the specified [addr].
      */
+    @Throws(ClosedException::class, OSException::class)
     public actual fun bind(addr: I)
 
     /**
      * Marks this socket for listening with the specified [backlog].
      */
+    @Throws(ClosedException::class, OSException::class)
     public actual fun listen(backlog: Int)
 
     /**
      * Accepts a new client connection, returning the newly connected [Socket]. Returns null if this
      * is a non-blocking socket and no connections are available.
      */
+    @Throws(ClosedException::class, OSException::class)
     @Unsafe
     public actual fun accept(): Socket<I>?
 
@@ -111,7 +124,14 @@ public actual interface Socket<I: ConnectionInfo> : Selectable, Closeable {
      * Receives up to [size] bytes from this socket into [buf], starting at [offset], using the
      * specified [flags].
      */
+    @Throws(ClosedException::class, OSException::class)
     public actual fun recv(buf: ByteArray, size: Int, offset: Int, flags: Int): BlockingResult
+
+    /**
+     * Receives up to [size] bytes from this socket into the buffer [buf], using the specified
+     * [flags].
+     */
+    public actual fun recv(buf: Buffer, size: Int, flags: Int): BlockingResult
 
     /**
      * Receives up to [size] bytes from this socket into [buf], starting at [offset], using the
@@ -123,13 +143,20 @@ public actual interface Socket<I: ConnectionInfo> : Selectable, Closeable {
      *     This will raise an error on connection-oriented sockets; it is designed to be used on
      *     connectionless protocols.
      */
+    @Throws(ClosedException::class, OSException::class)
     public actual fun recvfrom(buf: ByteArray, size: Int, offset: Int, flags: Int): RecvFrom<I>?
 
     /**
      * Sends up to [size] bytes from [buf] into this socket, starting at [offset], using the
      * specified [flags].
      */
+    @Throws(ClosedException::class, OSException::class)
     public actual fun send(buf: ByteArray, size: Int, offset: Int, flags: Int): BlockingResult
+
+    /**
+     * Sends up to [size] bytes from [buf] into this socket, using the specified [flags].
+     */
+    public actual fun send(buf: Buffer, size: Int, flags: Int): BlockingResult
 
     /**
      * Sends up to [size] bytes from [buf] into this socket, starting at [offset], using the
@@ -139,6 +166,7 @@ public actual interface Socket<I: ConnectionInfo> : Selectable, Closeable {
      *
      *     The ``addr`` parameter is ignored on connection-oriented sockets.
      */
+    @Throws(ClosedException::class, OSException::class)
     public actual fun sendto(
         buf: ByteArray, size: Int, offset: Int, flags: Int, addr: I
     ): BlockingResult
@@ -146,6 +174,6 @@ public actual interface Socket<I: ConnectionInfo> : Selectable, Closeable {
     /**
      * Shuts down this socket either at one end or both ends.
      */
+    @Throws(ClosedException::class, OSException::class)
     public actual fun shutdown(how: ShutdownOption)
-
 }

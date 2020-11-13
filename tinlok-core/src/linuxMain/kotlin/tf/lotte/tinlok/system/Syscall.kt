@@ -232,19 +232,11 @@ public actual object Syscall {
     public const val IO_MAX: Int = 0x7ffff000
 
     /**
-     * Reads up to [size] bytes from file descriptor [fd] into the buffer [buffer], at the offset
-     * [offset].
+     * Reads [size] bytes from [fd] into the specified [address]
      */
     @Unsafe
-    public fun read(fd: FD, buffer: ByteArray, size: Int, offset: Int = 0): BlockingResult {
-        require(size <= IO_MAX) { "$size is more than IO_MAX" }
-        require(buffer.size >= size) { "$size is more than buffer size (${buffer.size})" }
-        require(offset + size <= buffer.size) {
-            "offset ($offset) + size ($size) > buffer.size (${buffer.size})"
-        }
-        val readCount = buffer.usePinned {
-            retry { read(fd, it.addressOf(offset), size.toULong()) }
-        }
+    public fun read(fd: FD, address: CPointer<ByteVar>, size: Int): BlockingResult {
+        val readCount = retry { read(fd, address, size.toULong()) }
 
         if (readCount.isError) {
             return when (errno) {
@@ -257,58 +249,60 @@ public actual object Syscall {
     }
 
     /**
-     * Writes up to [size] bytes to the specified file descriptor, returning the number of bytes
-     * actually written.
-     *
-     * This handles EINTR transparently, continuing a write if interrupted.
+     * Reads up to [size] bytes from file descriptor [fd] into the buffer [buffer], at the offset
+     * [offset].
      */
     @Unsafe
-    public fun write(
-        fd: FD, buffer: ByteArray, size: Int = buffer.size, offset: Int = 0,
-    ): BlockingResult {
+    public fun read(fd: FD, buffer: ByteArray, size: Int, offset: Int = 0): BlockingResult {
         require(size <= IO_MAX) { "$size is more than IO_MAX" }
         require(buffer.size >= size) { "$size is more than buffer size (${buffer.size})" }
         require(offset + size <= buffer.size) {
             "offset ($offset) + size ($size) > buffer.size (${buffer.size})"
         }
 
-        var nextOffset = offset
-        var hitAgain = false
+        return buffer.usePinned {
+            read(fd, it.addressOf(offset), size)
+        }
+    }
 
-        // head spinny logic
-        buffer.usePinned {
-            while (true) {
-                val written = write(
-                    fd, it.addressOf(nextOffset),
-                    (size - nextOffset).toULong()
-                )
-
-                // eintr means it didn't write anything, so we can transparently retry
-                if (written.isError) {
-                    when (errno) {
-                        EINTR -> continue
-                        EAGAIN -> {
-                            hitAgain = true
-                            break
-                        }
-                        else -> throwErrno(errno)
-                    }
-                }
-
-                // make sure we actually write all of the bytes we want to write
-                // this will never be more than INT_MAX, so we're fine
-                nextOffset += written.toInt()
-                if (nextOffset >= size) {
-                    break
-                }
+    /**
+     * Writes up to [size] bytes to the specified file descriptor, returning the number of bytes
+     * actually written.
+     *
+     * This only performs retry logic on EINTR; a higher layer should be doing real retry logic.
+     */
+    @Unsafe
+    public fun write(fd: FD, address: CPointer<ByteVar>, size: Int): BlockingResult {
+        val written = retry { write(fd, address, size.toULong()) }
+        if (written.isError) {
+            when (errno) {
+                EAGAIN -> return BlockingResult.WOULD_BLOCK
+                else -> throwErrno(errno)
             }
         }
 
-        // if we hit EAGAIN, and nextOffset is 0, we didn't write anything
-        return if (hitAgain && nextOffset == 0) {
-            BlockingResult.WOULD_BLOCK
-        } else {
-            BlockingResult(nextOffset.toLong())
+        return BlockingResult(written)
+    }
+
+    /**
+     * Writes up to [size] bytes to the specified file descriptor, returning the number of bytes
+     * actually written.
+     *
+     * This handles EINTR only if write() returns -1. Proper retry logic should be done by a higher
+     * layer.
+     */
+    @Unsafe
+    public fun write(
+        fd: FD, buf: ByteArray, size: Int = buf.size, offset: Int = 0,
+    ): BlockingResult {
+        require(size <= IO_MAX) { "$size is more than IO_MAX" }
+        require(buf.size >= size) { "$size is more than buffer size (${buf.size})" }
+        require(offset + size <= buf.size) {
+            "offset ($offset) + size ($size) > buf.size (${buf.size})"
+        }
+
+        return buf.usePinned {
+            write(fd, it.addressOf(offset), size)
         }
     }
 
@@ -821,10 +815,26 @@ public actual object Syscall {
      */
     @Unsafe
     public fun recv(
+        fd: FD, buf: CPointer<ByteVar>, size: Int, flags: Int
+    ): BlockingResult {
+        val read = retry { recv(fd, buf, size.toULong(), flags) }
+        if (read.isError) {
+            if (errno == EAGAIN) return BlockingResult.WOULD_BLOCK
+            throwErrno(errno)
+        }
+
+        return BlockingResult(read)
+    }
+
+    /**
+     * Receives bytes from a socket into the specified buffer.
+     */
+    @Unsafe
+    public fun recv(
         fd: FD,
         buffer: ByteArray,
-        size: Int = buffer.size, offset: Int = 0,
-        flags: Int = 0,
+        size: Int = buffer.size, offset: Int,
+        flags: Int,
     ): BlockingResult {
         require(size <= IO_MAX) { "$size is more than IO_MAX" }
         require(buffer.size >= size) { "$size is more than buffer size (${buffer.size})" }
@@ -832,16 +842,9 @@ public actual object Syscall {
             "offset ($offset) + size ($size) > buffer.size (${buffer.size})"
         }
 
-        val read = buffer.usePinned {
-            retry { recv(fd, it.addressOf(offset), size.toULong(), flags) }
+        return buffer.usePinned {
+            recv(fd, it.addressOf(0), size, flags)
         }
-
-        if (read.isError) {
-            if (errno == EAGAIN) return BlockingResult.WOULD_BLOCK
-            throwErrno(errno)
-        }
-
-        return BlockingResult(read)
     }
 
     // Eww!
@@ -887,59 +890,43 @@ public actual object Syscall {
     }
 
     /**
-     * Writes bytes to a socket from the specified buffer.
+     * Writes up to [size] bytes to the specified socket, returning the number of bytes
+     * actually written.
+     *
+     * This only performs retry logic on EINTR; a higher layer should be doing real retry logic.
      */
     @Unsafe
-    public fun send(
-        fd: FD, buffer: ByteArray, size: Int = buffer.size, offset: Int = 0,
-        flags: Int
-    ): BlockingResult {
-        require(size <= IO_MAX) { "$size is more than IO_MAX" }
-        require(buffer.size >= size) { "$size is more than buffer size (${buffer.size})" }
-        require(offset + size <= buffer.size) {
-            "offset ($offset) + size ($size) > buffer.size (${buffer.size})"
-        }
-
-        // copied directly from write()
-
-        var nextOffset = offset
-        var hitAgain = false
-
-        // head spinny logic
-        buffer.usePinned {
-            while (true) {
-                val written = send(
-                    fd, it.addressOf(nextOffset),
-                    (size - nextOffset).toULong(),
-                    flags
-                )
-
-                // eintr means it didn't write anything, so we can transparently retry
-                if (written.isError) {
-                    when (errno) {
-                        EINTR -> continue
-                        EAGAIN -> {
-                            hitAgain = true
-                            break
-                        }
-                        else -> throwErrno(errno)
-                    }
-                }
-
-                // make sure we actually write all of the bytes we want to write
-                // this will never be more than INT_MAX, so we're fine
-                nextOffset += written.toInt()
-                if (nextOffset >= size) {
-                    break
-                }
+    public fun send(fd: FD, address: CPointer<ByteVar>, size: Int, flags: Int): BlockingResult {
+        val written = retry { send(fd, address, size.toULong(), flags) }
+        if (written.isError) {
+            when (errno) {
+                EAGAIN -> return BlockingResult.WOULD_BLOCK
+                else -> throwErrno(errno)
             }
         }
 
-        // if we hit EAGAIN, and nextOffset is 0, we didn't write anything
-        return if (hitAgain && nextOffset == 0) {
-            BlockingResult.WOULD_BLOCK
-        } else {
-            BlockingResult(nextOffset.toLong())
+        return BlockingResult(written)
+    }
+
+    /**
+     * Writes up to [size] bytes to the specified file descriptor, returning the number of bytes
+     * actually written.
+     *
+     * This handles EINTR only if write() returns -1. Proper retry logic should be done by a higher
+     * layer.
+     */
+    @Unsafe
+    public fun send(
+        fd: FD, buf: ByteArray, size: Int = buf.size, offset: Int = 0, flags: Int = 0,
+    ): BlockingResult {
+        require(size <= IO_MAX) { "$size is more than IO_MAX" }
+        require(buf.size >= size) { "$size is more than buffer size (${buf.size})" }
+        require(offset + size <= buf.size) {
+            "offset ($offset) + size ($size) > buf.size (${buf.size})"
+        }
+
+        return buf.usePinned {
+            send(fd, it.addressOf(offset), size, flags)
         }
     }
 

@@ -14,8 +14,14 @@ package tf.lotte.tinlok.io
  */
 public interface Readable {
     /**
-     * Reads no more than [size] amount of bytes into [buf], starting at [offset], returning the
+     * Reads no more than [size] amount of bytes into [ba], starting at [offset], returning the
      * number of bytes actually written.
      */
-    public fun readInto(buf: ByteArray, size: Int = buf.size, offset: Int = 0): Int
+    public fun readInto(ba: ByteArray, size: Int = ba.size, offset: Int = 0): Int
+
+    /**
+     * Reads [size] amount of bytes into the specified [buffer], returning the number of bytes
+     * actually read.
+     */
+    public fun readInto(buffer: Buffer, size: Int = buffer.capacity.toInt()): Int
 }
