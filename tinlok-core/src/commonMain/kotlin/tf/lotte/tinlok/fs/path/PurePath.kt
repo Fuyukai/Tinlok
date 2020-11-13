@@ -102,4 +102,9 @@ public interface PurePath {
      */
     @Unsafe
     public fun unsafeToString(): String
+
+    /**
+     * Converts the path within to a Kotlin string, escaping illegal values.
+     */
+    public fun escapedString(): String
 }

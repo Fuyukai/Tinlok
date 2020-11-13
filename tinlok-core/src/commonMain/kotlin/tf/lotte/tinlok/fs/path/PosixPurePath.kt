@@ -190,6 +190,19 @@ public open class PosixPurePath(rawParts: List<ByteString>) : PurePath {
         return joined.unwrap().decodeToString(throwOnInvalidSequence = true)
     }
 
+    @Unsafe
+    override fun escapedString(): String {
+        val joined = if (isAbsolute) {
+            val copy = rawComponents.toMutableList()
+            copy[0] = b("")
+            copy.join(SLASH)
+        } else {
+            rawComponents.join(SLASH)
+        }
+
+        return joined.escapedString()
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || other !is PosixPurePath) return false

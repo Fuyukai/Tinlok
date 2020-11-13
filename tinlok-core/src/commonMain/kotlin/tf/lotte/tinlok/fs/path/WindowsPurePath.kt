@@ -233,6 +233,10 @@ public open class WindowsPurePath protected constructor(
         return components.joinToString("\\")
     }
 
+    override fun escapedString(): String {
+        return rawComponents.join(b("\\")).escapedString()
+    }
+
     override fun isChildOf(other: PurePath): Boolean {
         if (other !is WindowsPurePath) return false
 
