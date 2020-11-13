@@ -40,12 +40,8 @@ public actual object GlobalResolver : AddressResolver {
         val addresses = ArrayList<ConnectionInfo>(cAddresses.size)
         for (info in cAddresses) {
             // lookup the values in our enum
-            val family = StandardAddressFamilies.values()
-                .find { it.number == info.ai_family } ?: continue
             val type = StandardSocketTypes.values()
                 .find { it.number == info.ai_socktype } ?: continue
-            val protocol = StandardIPProtocols.values()
-                .find { it.number == info.ai_protocol } ?: continue
 
             // addresses with a nullptr IP are skipped because ???
             val sockaddr = info.ai_addr?.pointed ?: continue

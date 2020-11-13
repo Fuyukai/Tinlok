@@ -36,7 +36,7 @@ public data class DirEntry(
     /** Returns true if this entry represents a regular file. */
     public fun isRegularFile(followSymlinks: Boolean = true): Boolean {
         if (type == FileType.UNKNOWN) {
-            return path.isRegularFile()
+            return path.isRegularFile(followSymlinks = followSymlinks)
         }
         return type == FileType.REGULAR_FILE
     }

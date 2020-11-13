@@ -54,7 +54,7 @@ public constructor(public val socket: Socket<I>) : HalfCloseableStream, Closeabl
          * [timeout], adding it to the specified [scope].
          */
         @OptIn(Unsafe::class)
-        public inline fun <R> tcpConnect(
+        public fun <R> tcpConnect(
             scope: ClosingScope,
             address: TcpSocketAddress,
             timeout: Int = 30_000

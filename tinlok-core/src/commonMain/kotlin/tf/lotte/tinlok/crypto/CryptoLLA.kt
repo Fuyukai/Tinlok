@@ -12,4 +12,5 @@ package tf.lotte.tinlok.crypto
 /**
  * Verifies if two UByteArray's with a length of 64 are the same.
  */
+@OptIn(ExperimentalUnsignedTypes::class)
 public expect fun crypto_verify64(first: UByteArray, second: UByteArray): Boolean

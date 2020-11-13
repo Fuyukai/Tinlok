@@ -48,7 +48,7 @@ public inline fun <T: Closeable, R> Listener<T>.accept(
  * Accepts a new incoming connection, and adds it to the specified [scope].
  */
 @OptIn(Unsafe::class)
-public inline fun <T: Closeable> Listener<T>.accept(
+public fun <T: Closeable> Listener<T>.accept(
     scope: ClosingScope
 ): T {
     val item = unsafeAccept()

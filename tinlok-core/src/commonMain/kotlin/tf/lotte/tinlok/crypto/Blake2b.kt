@@ -60,7 +60,7 @@ public operator fun Blake2b.Companion.invoke(
  * Creates a [Blake2bHash] for the contents of this [ByteString].
  */
 @OptIn(ExperimentalUnsignedTypes::class)
-public fun ByteString.blake2b(key: UByteArray = ubyteArrayOf()): Blake2bHash = Blake2b {
+public fun ByteString.blake2b(key: UByteArray = ubyteArrayOf()): Blake2bHash = Blake2b(key) {
     it.feed(this)
     it.hash()
 }

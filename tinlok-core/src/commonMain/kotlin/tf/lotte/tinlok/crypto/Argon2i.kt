@@ -19,6 +19,7 @@ package tf.lotte.tinlok.crypto
  * set as recommended by Monocypher, but you can increase the blocks count to fit your machine
  * better.
  */
+@OptIn(ExperimentalUnsignedTypes::class)
 public expect fun passwordHash(
     password: String, salt: UByteArray? = null,
     blocks: Int = 100_000, iterations: Int = 3,
