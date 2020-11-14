@@ -1171,5 +1171,17 @@ public actual object Syscall {
         return passwd
     }
 
+    /**
+     * Creates a new event file descriptor.
+     */
+    @Unsafe
+    public fun eventfd(initial: UInt, flags: Int): FD {
+        val result = __eventfd(initial, flags)
+        if (result.isError) {
+            throwErrno(result)
+        }
+        return result
+    }
+
     // endregion
 }

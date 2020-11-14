@@ -74,6 +74,11 @@ kotlin {
         val main = compilations.getByName("main")
         main.cinterops.create("uuid") {
             defFile(project.file("src/linuxMain/cinterop/uuid.def"))
+            compilerOpts += "-I/usr/include"
+        }
+
+        main.cinterops.create("extra") {
+            defFile(project.file("src/linuxMain/cinterop/linux_extra.def"))
         }
     }
 
@@ -88,6 +93,11 @@ kotlin {
         val main = compilations.getByName("main")
         main.cinterops.create("uuid") {
             defFile(project.file("src/linuxMain/cinterop/uuid.def"))
+        }
+
+        main.cinterops.create("extra") {
+            defFile(project.file("src/linuxMain/cinterop/linux_extra.def"))
+            compilerOpts += "-I/usr/include"
         }
     }
 

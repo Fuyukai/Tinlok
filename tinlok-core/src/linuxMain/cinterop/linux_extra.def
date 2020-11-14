@@ -1,0 +1,11 @@
+## Includes extra headers for the Linux platform.
+package = platform.linux.extra
+---
+#include <sys/types.h>
+
+extern int eventfd (unsigned int __count, int __flags);
+
+ssize_t getrandom (void *__buffer, size_t __length,
+                   unsigned int __flags);
+
+int getentropy (void *__buffer, size_t __length);
