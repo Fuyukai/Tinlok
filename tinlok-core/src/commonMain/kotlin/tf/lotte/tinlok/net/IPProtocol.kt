@@ -22,14 +22,14 @@ public interface IPProtocol {
  */
 public enum class StandardIPProtocols(override val number: Int) : IPProtocol {
     /** Kernel's choice */
-    IPPROTO_IP(0),
+    IPPROTO_IP(tf.lotte.tinlok.net.socket.IPPROTO_IP),
 
     /** ICMP protocol */
-    IPPROTO_ICMP(1),
+    IPPROTO_ICMP(tf.lotte.tinlok.net.socket.IPPROTO_ICMP),
 
     /** TCP protocol */
-    IPPROTO_TCP(6),
+    IPPROTO_TCP(tf.lotte.tinlok.net.socket.IPPROTO_TCP),
 
     /** UDP protocol */
-    IPPROTO_UDP(17);
+    IPPROTO_UDP(tf.lotte.tinlok.net.socket.IPPROTO_UDP);
 }

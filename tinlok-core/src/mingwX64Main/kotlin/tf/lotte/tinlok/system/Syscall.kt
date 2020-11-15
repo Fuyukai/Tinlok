@@ -19,7 +19,8 @@ import platform.windows.WSAECONNRESET
 import platform.windows.WSAENETUNREACH
 import platform.windows.WSAESHUTDOWN
 import platform.windows.WSAETIMEDOUT
-import platform.windows.WSAStartup
+import platform.winsock2.posix_getsockopt
+import platform.winsock2.posix_setsockopt
 import tf.lotte.tinlok.Unsafe
 import tf.lotte.tinlok.exc.WindowsException
 import tf.lotte.tinlok.fs.DirEntry
@@ -27,6 +28,7 @@ import tf.lotte.tinlok.fs.FileType
 import tf.lotte.tinlok.fs.path.resolveChild
 import tf.lotte.tinlok.io.*
 import tf.lotte.tinlok.net.*
+import tf.lotte.tinlok.net.socket.BsdSocketOption
 import tf.lotte.tinlok.net.socket.RecvFrom
 import tf.lotte.tinlok.net.socket.ShutdownOption
 import tf.lotte.tinlok.util.*
@@ -43,18 +45,9 @@ public actual typealias SOCKET = Long
  */
 @OptIn(ExperimentalUnsignedTypes::class)
 public actual object Syscall {
-    @Suppress("ObjectPropertyName")
-    private val _WSADATA = nativeHeap.allocPointerTo<WSAData>()
-
-    /** The winsock data information. */
-    @Suppress("unused")
-    public val WSADATA: WSAData get() = _WSADATA.pointed!!
 
     init {
-        val res = WSAStartup(514u /* (2 << 8) | 2 */, _WSADATA.value)
-        if (res != 0) {
-            throw Error("Winsock failed to initialise")
-        }
+        platform.posix.init_sockets()
     }
 
     // == Macros and helpers == //
@@ -875,7 +868,12 @@ public actual object Syscall {
             WSAESHUTDOWN -> SocketShutdownException()
             WSAETIMEDOUT -> TimeoutException()
             in 0..999 -> throwErrno(code)
-            else -> WindowsException(code, message = FormatMessage(code))
+            else -> {
+                WindowsException(
+                    winerror = code,
+                    message = "[WinError ${code}] ${FormatMessage(code)}"
+                )
+            }
         }
     }
 
@@ -928,12 +926,9 @@ public actual object Syscall {
      */
     @Unsafe
     public fun socket(family: AddressFamily, type: SocketType, protocol: IPProtocol): SOCKET {
-        val sock = WSASocketW(
+        val sock = platform.windows.socket(
             // socket numbers
-            family.number, type.number, protocol.number,
-            null,  // protocol info, we don't care
-            0,  // groups, we don't care yet
-            WSA_FLAG_OVERLAPPED  // sockets are always opened for IOCP
+            family.number, type.number, protocol.number
         )
 
         if (sock == INVALID_SOCKET) {
@@ -942,6 +937,42 @@ public actual object Syscall {
 
         return sock.toLong()
     }
+    /**
+     * Sets the socket [option] to the [value] provided.
+     */
+    @Unsafe
+    public fun <T> setsockopt(sock: SOCKET, option: BsdSocketOption<T>, value: T): Unit = memScoped {
+        val native = option.toNativeStructure(this, value)
+        val size = option.nativeSize()
+        val res = posix_setsockopt(
+            sock.toULong(), option.level, option.bsdOptionValue, native,
+            size.toInt()
+        )
+
+        if (res == SOCKET_ERROR) {
+            throwErrnoWSA()
+        }
+    }
+
+    /**
+     * Gets a socket option.
+     */
+    @Unsafe
+    public fun <T> getsockopt(sock: SOCKET, option: BsdSocketOption<T>): T = memScoped {
+        val storage = option.allocateNativeStructure(this)
+        val size = cValuesOf(option.nativeSize().toInt())
+        val res = posix_getsockopt(
+            sock.toULong(), option.level, option.bsdOptionValue,
+            storage, size
+        )
+
+        if (res == SOCKET_ERROR) {
+            throwErrnoWSA()
+        }
+
+        option.fromNativeStructure(this, storage)
+    }
+
 
     /**
      * Connects a socket to an address.
@@ -966,12 +997,15 @@ public actual object Syscall {
             else -> throw UnsupportedOperationException("Don't know how to use $address")
         }
 
-        return when (val res = platform.windows.connect(sock.toULong(), struct.ptr, size.toInt())) {
+        val res = platform.windows.connect(sock.toULong(), struct.ptr, size.toInt())
+
+        return when (res) {
             0 -> BlockingResult.DIDNT_BLOCK
-            ERROR -> {
-                when (errno) {
-                    EINTR, EINPROGRESS, EWOULDBLOCK -> BlockingResult.WOULD_BLOCK
-                    else -> throwErrnoWSA(errno)
+            SOCKET_ERROR -> {
+                when (val err = platform.windows.WSAGetLastError()) {
+                    platform.windows.WSAEINPROGRESS,
+                    platform.windows.WSAEWOULDBLOCK -> BlockingResult.WOULD_BLOCK
+                    else -> throwErrnoWSA(err)
                 }
             }
             else -> error("Unknown return value: $res")
@@ -1226,7 +1260,7 @@ public actual object Syscall {
 
         while (true) {
             val ptr = (address + lastOffset) ?: error("pointer arithmetic returned null?")
-            val amount = this.recv(socket, ptr, size - lastOffset, flags)
+            val amount = this.send(socket, ptr, size - lastOffset, flags)
             if (!amount.isSuccess) break
 
             lastOffset += amount.count.toInt()

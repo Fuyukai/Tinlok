@@ -79,6 +79,7 @@ public class `Test Socket` {
         assertNull(result)
     }
 
+    // TODO: Use select/poll to ensure this works less flakily.
     /**
      * Tests accepting a new socket connection.
      */
@@ -102,8 +103,16 @@ public class `Test Socket` {
         clientLocal.connect(TcpConnectionInfo.localhost(5556), timeout = 0)
 
         // incoming connection from the accepting socket
-        val clientRemote = server.accept()
-        assertNotNull(clientRemote)
+        // retry loop because on windows it can take a little while to actually connect over
+        // loopback.
+        var clientRemote: Socket<TcpConnectionInfo>? = null
+        for (try_ in 0..1000) {
+            clientRemote = server.accept()
+            @Suppress("SENSELESS_COMPARISON")  // IntelliJ lies!
+            if (clientRemote != null) break
+        }
+
+        assertTrue(clientRemote != null)
         it.add(clientRemote)
         assertTrue(clientRemote.nonBlocking)
 

@@ -1,0 +1,12 @@
+package = platform.winsock2
+---
+#include "winsock2.h"
+
+// Hacky header re-defines.
+static inline int posix_setsockopt(SOCKET s, int level, int optname, const void *optval, int optlen) {
+    return setsockopt(s, level, optname, (const char*)optval, optlen);
+}
+
+static inline int posix_getsockopt(SOCKET s, int level, int optname, void *optval, int *optlen) {
+    return getsockopt(s, level, optname, (char*)optval, optlen);
+}

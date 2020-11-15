@@ -119,6 +119,11 @@ kotlin {
             val path = project.file("src/mingwX64Main/cinterop/ddk.def")
             defFile(path)
         }
+
+        main.cinterops.create("sockwrapper") {
+            val path = project.file("src/mingwX64Main/cinterop/sockwrapper.def")
+            defFile(path)
+        }
     }
 }
 

@@ -23,16 +23,15 @@ public interface AddressFamily {
 public enum class StandardAddressFamilies(override val number: Int) : AddressFamily {
     // main IP
     /** Unspecified address family. */
-    AF_UNSPEC(0),
+    AF_UNSPEC(tf.lotte.tinlok.net.socket.AF_UNSPEC),
 
     /** IPv4 */
-    AF_INET(2),
+    AF_INET(tf.lotte.tinlok.net.socket.AF_INET),
 
     /** IPv6 */
-    AF_INET6(10),
+    AF_INET6(tf.lotte.tinlok.net.socket.AF_INET6),
     // AF_UNIX is available on newer versions of Windows 10 so it's available on all platforms
     /** Unix pipes */
-    AF_UNIX(1),
+    AF_UNIX(tf.lotte.tinlok.net.socket.AF_UNIX),
     ;
-
 }

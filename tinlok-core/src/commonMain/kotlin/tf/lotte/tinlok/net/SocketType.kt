@@ -22,12 +22,12 @@ public interface SocketType {
  */
 public enum class StandardSocketTypes(override val number: Int) : SocketType {
     /** Stream sockets (TCP) */
-    SOCK_STREAM(1),
+    SOCK_STREAM(tf.lotte.tinlok.net.socket.SOCK_STREAM),
 
     /** Datagram sockets (UDP) */
-    SOCK_DGRAM(2),
+    SOCK_DGRAM(tf.lotte.tinlok.net.socket.SOCK_DGRAM),
 
     /** Raw sockets (SCARY) */
-    SOCK_RAW(3),
+    SOCK_RAW(tf.lotte.tinlok.net.socket.SOCK_RAW),
     ;
 }

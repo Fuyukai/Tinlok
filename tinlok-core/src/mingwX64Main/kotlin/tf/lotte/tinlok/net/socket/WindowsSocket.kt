@@ -14,7 +14,6 @@ import kotlinx.cinterop.usePinned
 import platform.windows.FIONBIO
 import tf.lotte.tinlok.Unsafe
 import tf.lotte.tinlok.io.*
-import tf.lotte.tinlok.io.async.SelectionKey
 import tf.lotte.tinlok.net.*
 import tf.lotte.tinlok.system.BlockingResult
 import tf.lotte.tinlok.system.SOCKET
@@ -62,15 +61,21 @@ public constructor(
     /**
      * Sets the [option] on this BSD socket to [value].
      */
+    @OptIn(Unsafe::class)
     override fun <T> setOption(option: BsdSocketOption<T>, value: T) {
-        TODO("Not yet implemented")
+        checkOpen()
+
+        Syscall.setsockopt(handle, option, value)
     }
 
     /**
      * Gets the [option] on this BSD socket.
      */
+    @OptIn(Unsafe::class)
     override fun <T> getOption(option: BsdSocketOption<T>): T {
-        TODO("Not yet implemented")
+        checkOpen()
+
+        return Syscall.getsockopt(handle, option)
     }
 
     /**
@@ -125,8 +130,12 @@ public constructor(
 
         val conn = Syscall.accept(handle)
         return if (conn.isSuccess) {
-            // BlockingResult wraps the new socket value so we simply unwrap it
-            WindowsSocket(family, type, protocol, conn.count, creator)
+            val newSock = WindowsSocket(family, type, protocol, conn.count, creator)
+            // set socket to non-blocking if needed
+            if (nonBlocking) {
+                newSock.nonBlocking = nonBlocking
+            }
+            newSock
         } else {
             null
         }
@@ -277,15 +286,6 @@ public constructor(
         checkOpen()
 
         Syscall.shutdown(handle, how)
-    }
-
-    /**
-     * Gets the selection key for this selectable.
-     */
-    override fun key(): SelectionKey {
-        checkOpen()
-
-        TODO("Not yet implemented")
     }
 
     /**

@@ -19,8 +19,6 @@ import tf.lotte.tinlok.Unsafe
  */
 @OptIn(ExperimentalUnsignedTypes::class, Unsafe::class)
 public object StandardSocketOptions {
-    private const val SOL_SOCKET = 1
-
     // https://sites.uclouvain.be/SystInfo/usr/include/asm-generic/socket.h.html
 
     // TODO: SO_LINGER high level
@@ -29,7 +27,7 @@ public object StandardSocketOptions {
      */
     public val SO_DEBUG: BsdSocketOption<Boolean> =
         BooleanSocketOption(
-            bsdOptionValue = 1  /* SO_DEBUG */,
+            bsdOptionValue = tf.lotte.tinlok.net.socket.SO_DEBUG,
             level = SOL_SOCKET,
             name = "SO_DEBUG"
         )
@@ -40,7 +38,7 @@ public object StandardSocketOptions {
      */
     public val SO_REUSEADDR: BsdSocketOption<Boolean> =
         BooleanSocketOption(
-            bsdOptionValue = 2  /* SO_REUSEADDR */,
+            bsdOptionValue = tf.lotte.tinlok.net.socket.SO_REUSEADDR,
             level = SOL_SOCKET,
             name = "SO_REUSEADDR"
         )
@@ -52,7 +50,7 @@ public object StandardSocketOptions {
      */
     public val SO_KEEPALIVE: BsdSocketOption<Boolean> =
         BooleanSocketOption(
-            bsdOptionValue = 9  /* SO_KEEPALIVE */,
+            bsdOptionValue = tf.lotte.tinlok.net.socket.SO_KEEPALIVE,
             level = SOL_SOCKET,
             name = "SO_KEEPALIVE"
         )
@@ -63,7 +61,7 @@ public object StandardSocketOptions {
      */
     public val SO_BROADCAST: BsdSocketOption<Boolean> =
         BooleanSocketOption(
-            bsdOptionValue = 6  /* SO_BROADCAST */,
+            bsdOptionValue = tf.lotte.tinlok.net.socket.SO_BROADCAST,
             level = SOL_SOCKET,
             name = "SO_BROADCAST"
         )
@@ -74,7 +72,7 @@ public object StandardSocketOptions {
      */
     public val SO_OOBINLINE: BsdSocketOption<Boolean> =
         BooleanSocketOption(
-            bsdOptionValue = 10  /* SO_OOBINLINE */,
+            bsdOptionValue = tf.lotte.tinlok.net.socket.SO_OOBINLINE,
             level = SOL_SOCKET,
             name = "SO_OOBINLINE"
         )
@@ -84,7 +82,7 @@ public object StandardSocketOptions {
      */
     public val SO_SNDBUF: BsdSocketOption<ULong> =
         ULongSocketOption(
-            bsdOptionValue = 7  /* SO_SNDBUF */,
+            bsdOptionValue = tf.lotte.tinlok.net.socket.SO_SNDBUF  /* SO_SNDBUF */,
             level = SOL_SOCKET,
             name = "SO_OOBINLINE"
         )
@@ -94,7 +92,7 @@ public object StandardSocketOptions {
      */
     public val SO_RCVBUF: BsdSocketOption<ULong> =
         ULongSocketOption(
-            bsdOptionValue = 8  /* SO_RCVBUF */,
+            bsdOptionValue = tf.lotte.tinlok.net.socket.SO_RCVBUF  /* SO_RCVBUF */,
             level = SOL_SOCKET,
             name = "SO_OOBINLINE"
         )
