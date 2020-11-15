@@ -12,9 +12,4 @@ package tf.lotte.tinlok.io.async
 /**
  * Marks an object that can be selected on.
  */
-public interface Selectable {
-    /**
-     * Gets the selection key for this selectable.
-     */
-    public fun key(): SelectionKey
-}
+public expect interface Selectable

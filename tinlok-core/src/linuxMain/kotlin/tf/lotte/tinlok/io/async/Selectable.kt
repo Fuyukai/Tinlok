@@ -7,12 +7,13 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
-package tf.lotte.tinlok.io
+package tf.lotte.tinlok.io.async
 
-import tf.lotte.tinlok.io.async.SelectionKey
 import tf.lotte.tinlok.system.FD
 
 /**
- * A selection key based on a file descriptor.
+ * Defines an object that can be selected on with a file descriptor.
  */
-public inline class FdSelectionKey(public val fd: FD) : SelectionKey
+public actual interface Selectable {
+    public val fd: FD
+}

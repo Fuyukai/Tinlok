@@ -14,7 +14,6 @@ import kotlinx.cinterop.usePinned
 import platform.posix.O_NONBLOCK
 import tf.lotte.tinlok.Unsafe
 import tf.lotte.tinlok.io.*
-import tf.lotte.tinlok.io.async.Selectable
 import tf.lotte.tinlok.net.*
 import tf.lotte.tinlok.system.*
 import tf.lotte.tinlok.util.*
@@ -30,7 +29,7 @@ public constructor(
     public override val fd: FD,
     /** A connection info creator for going from sockaddr -> ConnectionInfo. */
     private val creator: ConnectionInfoCreator<I>
-) : Socket<I>, Closeable, Selectable {
+) : Socket<I>, EasyFdCloseable() {
     public companion object {
         /**
          * Opens a new unconnected socket, using the specified [family], [type], and [protocol]
@@ -45,24 +44,6 @@ public constructor(
         }
     }
 
-    /** If the FD for this socket is still open. */
-    public override val isOpen: AtomicBoolean = AtomicBoolean(true)
-
-    private fun checkOpen() {
-        if (!isOpen) throw ClosedException("underlying fd is closed")
-    }
-
-    /**
-     * Closes this socket.
-     *
-     * This method is idempotent; subsequent calls will have no effects.
-     */
-    @OptIn(Unsafe::class)
-    override fun close() {
-        if (!isOpen.compareAndSet(true, false)) return
-
-        Syscall.close(fd)
-    }
 
     /** Internally used to inherit non-blocking. */
     private val isNonBlocking: AtomicBoolean = AtomicBoolean(false)
@@ -70,11 +51,15 @@ public constructor(
     /** If this file descriptor is non-blocking. */
     public override var nonBlocking: Boolean
         get() {
+            checkOpen()
+
             val flags = fcntl(FcntlParam.F_GETFL)
             // make sure that our own boolean tracker is updated
             return flagged(flags, O_NONBLOCK).also { isNonBlocking.value = it }
         }
         set(value: Boolean) {
+            checkOpen()
+
             var flags = fcntl(FcntlParam.F_GETFL)
             flags = if (value) flags.or(O_NONBLOCK) else flags.and(O_NONBLOCK.inv())
             fcntl(FcntlParam.F_SETFL, flags)
@@ -322,12 +307,5 @@ public constructor(
         checkOpen()
 
         return Syscall.shutdown(fd, how)
-    }
-
-    /**
-     * Gets the selection key for this selectable.
-     */
-    override fun key(): FdSelectionKey {
-        return FdSelectionKey(fd)
     }
 }

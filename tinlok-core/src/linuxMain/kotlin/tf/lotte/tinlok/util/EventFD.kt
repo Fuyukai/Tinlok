@@ -11,9 +11,6 @@ package tf.lotte.tinlok.util
 
 import kotlinx.cinterop.*
 import tf.lotte.tinlok.Unsafe
-import tf.lotte.tinlok.io.FdSelectionKey
-import tf.lotte.tinlok.io.async.Selectable
-import tf.lotte.tinlok.io.async.SelectionKey
 import tf.lotte.tinlok.system.BlockingResult
 import tf.lotte.tinlok.system.FD
 import tf.lotte.tinlok.system.Syscall
@@ -22,7 +19,7 @@ import tf.lotte.tinlok.system.Syscall
  * A wrapper around an event file descriptor.
  */
 @OptIn(ExperimentalUnsignedTypes::class)
-public class EventFD @Unsafe public constructor(vararg flag: Flag) : Closeable, Selectable {
+public class EventFD @Unsafe public constructor(vararg flag: Flag) : EasyFdCloseable() {
     /** An enumeration of valid flags to open this EventFD with. */
     public enum class Flag(public val number: Int) {
         /** Close-on-exec. */
@@ -54,15 +51,8 @@ public class EventFD @Unsafe public constructor(vararg flag: Flag) : Closeable, 
         }
     }
 
-    /** If this eventfd is open. */
-    private val isOpen = AtomicBoolean(true)
-
-    private fun checkOpen() {
-        if (!isOpen) throw ClosedException("This eventfd is closed")
-    }
-
     /** The underlying file descriptor for this event fd. */
-    public val fd: FD
+    public override val fd: FD
 
     init {
         val flagArr = flag.map { it.number }.toIntArray()
@@ -70,25 +60,6 @@ public class EventFD @Unsafe public constructor(vararg flag: Flag) : Closeable, 
 
         @OptIn(Unsafe::class)
         fd = Syscall.eventfd(0u, flagBits)
-    }
-
-    /**
-     * Closes this resource.
-     *
-     * This method is idempotent; subsequent calls will have no effects.
-     */
-    @OptIn(Unsafe::class)
-    override fun close() {
-        if (!isOpen) return
-
-        Syscall.close(fd)
-    }
-
-    /**
-     * Gets the selection key for this selectable.
-     */
-    override fun key(): SelectionKey {
-        return FdSelectionKey(fd)
     }
 
     /**

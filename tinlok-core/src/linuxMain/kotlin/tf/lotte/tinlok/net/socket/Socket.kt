@@ -55,7 +55,7 @@ public actual interface Socket<I: ConnectionInfo> : Selectable, Closeable {
     }
 
     /** The file descriptor for this socket. */
-    public val fd: FD
+    public override val fd: FD
 
     /** The address family this socket was created with. */
     public actual val family: AddressFamily

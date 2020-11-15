@@ -12,6 +12,7 @@
 package tf.lotte.tinlok.system
 
 import kotlinx.cinterop.*
+import platform.linux.epoll_create1
 import platform.posix.*
 import tf.lotte.tinlok.Unsafe
 import tf.lotte.tinlok.io.*
@@ -237,6 +238,20 @@ public actual object Syscall {
     }
 
     // endregion
+
+    // == Select/Poll/Epoll == //
+    /**
+     * Creates a new epoll(7) object.
+     */
+    @Unsafe
+    public fun epoll_create(flags: Int): FD {
+        val ret = epoll_create1(flags)
+        if (ret.isError) {
+            throwErrno(errno)
+        }
+
+        return ret
+    }
 
     // == Generic Linux I/O == //
     // region Linux I/O

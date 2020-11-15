@@ -9,4 +9,7 @@
 
 package tf.lotte.tinlok.io.async
 
-
+/**
+ * Marks an object that can be selected on.
+ */
+public actual interface Selectable
