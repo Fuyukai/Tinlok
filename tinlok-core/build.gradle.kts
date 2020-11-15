@@ -102,6 +102,12 @@ kotlin {
     }
 
     mingwX64() {
+        compilations.all {
+            kotlinOptions {
+                freeCompilerArgs += listOf("-linker-option", "-lrpcrt4")
+            }
+        }
+
         val mingwX64Main by sourceSets.getting {
             dependencies {
                 implementation(project(":tinlok-static-monocypher"))
