@@ -7,6 +7,8 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
+@file:Suppress("RemoveRedundantQualifierName")
+
 package tf.lotte.tinlok.system
 
 import ddk._K_REPARSE_DATA_BUFFER
@@ -28,6 +30,7 @@ import tf.lotte.tinlok.fs.FileType
 import tf.lotte.tinlok.fs.path.resolveChild
 import tf.lotte.tinlok.io.*
 import tf.lotte.tinlok.net.*
+import tf.lotte.tinlok.net.dns.GAIException
 import tf.lotte.tinlok.net.socket.BsdSocketOption
 import tf.lotte.tinlok.net.socket.RecvFrom
 import tf.lotte.tinlok.net.socket.ShutdownOption
@@ -997,9 +1000,7 @@ public actual object Syscall {
             else -> throw UnsupportedOperationException("Don't know how to use $address")
         }
 
-        val res = platform.windows.connect(sock.toULong(), struct.ptr, size.toInt())
-
-        return when (res) {
+        return when (val res = platform.windows.connect(sock.toULong(), struct.ptr, size.toInt())) {
             0 -> BlockingResult.DIDNT_BLOCK
             SOCKET_ERROR -> {
                 when (val err = platform.windows.WSAGetLastError()) {
@@ -1338,6 +1339,70 @@ public actual object Syscall {
         val res = platform.windows.closesocket(sock.toULong())
         if (res == SOCKET_ERROR) throwErrnoWSA()
     }
+
+    /**
+     * Looks up DNS information.
+     */
+    @Unsafe
+    public actual fun getaddrinfo(
+        node: String?, service: String?,
+        family: Int, type: Int, protocol: Int, flags: Int,
+    ): List<AddrInfo> = memScoped {
+        // copied from linuxMain
+        val hints = alloc<ADDRINFOW>()
+        val res = allocPointerTo<ADDRINFOW>()
+        memset(hints.ptr, 0, sizeOf<ADDRINFOW>().convert())
+
+        hints.ai_flags = flags
+        if (node == null) {
+            hints.ai_flags = hints.ai_flags or AI_PASSIVE
+        }
+        hints.ai_socktype = type
+        hints.ai_family = family
+        hints.ai_protocol = protocol
+
+        val nodePtr = node?.wcstr?.getPointer(this)
+        val servicePtr = service?.wcstr?.getPointer(this)
+
+        val code = GetAddrInfoW(nodePtr, servicePtr, hints.ptr, res.ptr)
+        if (code < 0) {
+            val err = platform.windows.WSAGetLastError()
+            throw GAIException(errno = code, message = FormatMessage(err))
+        }
+
+        // copy over the structures, then free them
+        val items = mutableListOf<AddrInfo>()
+
+        var nextPtr = res.value
+        while (true) {
+            if (nextPtr == null) break
+            val addrinfo = nextPtr.pointed
+            // ?
+            if (addrinfo.ai_addr == null) {
+                nextPtr = addrinfo.ai_next
+                continue
+            }
+
+
+            val sockaddr = addrinfo.ai_addr!!.readBytesFast(addrinfo.ai_addrlen.toInt())
+            val kAddrinfo = AddrInfo(
+                addr = sockaddr,
+                canonname = addrinfo.ai_canonname?.toKStringFromUtf16(),
+                family = addrinfo.ai_family,
+                flags = addrinfo.ai_flags,
+                protocol = addrinfo.ai_protocol,
+                type = addrinfo.ai_socktype,
+            )
+            items.add(kAddrinfo)
+            nextPtr = addrinfo.ai_next
+        }
+
+        // now free the linked-list C structure, now that kotlin is managing the object
+        FreeAddrInfoW(res.value)
+
+        return items
+    }
+
 
     // == Generic stuff == //
     /**

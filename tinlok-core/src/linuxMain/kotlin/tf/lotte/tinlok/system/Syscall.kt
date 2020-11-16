@@ -649,13 +649,12 @@ public actual object Syscall {
      * Calls getaddrinfo(). You are responsible for calling freeaddrinfo() afterwards.
      */
     @Unsafe
-    public fun getaddrinfo(
-        alloc: NativePlacement,
+    public actual fun getaddrinfo(
         node: String?, service: String?,
         family: Int, type: Int, protocol: Int, flags: Int,
-    ): addrinfo {
-        val hints = alloc.alloc<addrinfo>()
-        val res = alloc.allocPointerTo<addrinfo>()
+    ): List<AddrInfo> = memScoped {
+        val hints = alloc<addrinfo>()
+        val res = allocPointerTo<addrinfo>()
         memset(hints.ptr, 0, sizeOf<addrinfo>().convert())
 
         hints.ai_flags = flags
@@ -671,16 +670,36 @@ public actual object Syscall {
             throw GAIException(errno = code, message = gai_strerror(code))
         }
 
-        // safe (non-null) if this didn't error
-        return res.pointed!!
-    }
+        // copy over the structures, then free them
+        val items = mutableListOf<AddrInfo>()
 
-    /**
-     * Frees an [addrinfo] object.
-     */
-    @Unsafe
-    public fun freeaddrinfo(addrinfo: CPointer<addrinfo>) {
-        platform.posix.freeaddrinfo(addrinfo)
+        var nextPtr = res.value
+        while (true) {
+            if (nextPtr == null) break
+            val addrinfo = nextPtr.pointed
+            if (addrinfo.ai_addr == null) {
+                nextPtr = addrinfo.ai_next
+                continue
+            }
+
+            // read the raw bytes of the socket address
+            val sockaddr = addrinfo.ai_addr!!.readBytesFast(addrinfo.ai_addrlen.toInt())
+            val kAddrinfo = AddrInfo(
+                addr = sockaddr,
+                canonname = addrinfo.ai_canonname?.toKString(),
+                family = addrinfo.ai_family,
+                flags = addrinfo.ai_flags,
+                protocol = addrinfo.ai_protocol,
+                type = addrinfo.ai_socktype,
+            )
+            items.add(kAddrinfo)
+            nextPtr = addrinfo.ai_next
+        }
+
+        // safe (non-null) if this didn't error
+        freeaddrinfo(res.value)
+
+        return items
     }
 
     /**

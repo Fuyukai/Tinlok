@@ -79,4 +79,13 @@ public expect object Syscall {
     public fun __write_file_with_retry(
         fd: FILE, address: CPointer<ByteVar>, size: Int
     ): BlockingResult
+
+    /**
+     * Looks up address information.
+     */
+    @Unsafe
+    public fun getaddrinfo(
+        node: String?, service: String?,
+        family: Int, type: Int, protocol: Int, flags: Int,
+    ): List<AddrInfo>
 }
