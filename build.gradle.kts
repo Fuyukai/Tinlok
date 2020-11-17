@@ -93,7 +93,7 @@ fun hasAmd64(): Boolean {
 
 subprojects {
     // ALL projects get the appropriately tracked version
-    version = "1.3.0"
+    version = "1.4.0"
     // all projects get the group
     group = "tf.lotte.tinlok"
 
