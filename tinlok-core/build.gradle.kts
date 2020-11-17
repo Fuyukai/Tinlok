@@ -102,12 +102,6 @@ kotlin {
     }
 
     mingwX64() {
-        compilations.all {
-            kotlinOptions {
-                freeCompilerArgs += listOf("-linker-option", "-lrpcrt4")
-            }
-        }
-
         val mingwX64Main by sourceSets.getting {
             dependencies {
                 implementation(project(":tinlok-static-monocypher"))
@@ -117,11 +111,6 @@ kotlin {
         val main = compilations.getByName("main")
         main.cinterops.create("ddk") {
             val path = project.file("src/mingwX64Main/cinterop/ddk.def")
-            defFile(path)
-        }
-
-        main.cinterops.create("sockwrapper") {
-            val path = project.file("src/mingwX64Main/cinterop/sockwrapper.def")
             defFile(path)
         }
     }

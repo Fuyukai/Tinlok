@@ -33,7 +33,12 @@ public interface PurePath {
             return PosixPurePath.fromByteString(path)
         }
 
-        // TODO: Windows
+        /**
+         * Creates a new [WindowsPurePath].
+         */
+        public fun windows(path: ByteString): WindowsPurePath {
+            return WindowsPurePath.fromByteString(path)
+        }
     }
 
     /**

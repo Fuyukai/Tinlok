@@ -1,7 +1,7 @@
 .. _bytestring:
 
-Types - Bytestrings
-===================
+Bytestrings
+===========
 
 .. versionchanged:: 1.2.0
 
@@ -60,7 +60,17 @@ Usage
     assert((2).toByte() in bs)
     assert(bs.containsAll(byteArrayOf(2, 4, 3)))
 
-Some convenience methods are also provided:
+``ByteString`` implements the ``+`` operator for immutable concatenation:
+
+.. code-block:: kotlin
+
+    // concatenates two bytestrings
+    val first = b("HK")
+    val second = b("416")
+    assert((first + second) == b("HK416"))
+
+Additionally, ``ByteString`` provides extensions similar to a standard ``String``. A short set of
+examples for these:
 
 .. code-block:: kotlin
 
@@ -84,10 +94,36 @@ Some convenience methods are also provided:
     val slice = str.substring(2, str.size - 2)
     assert(slice == b("real"))
 
+If a ``String`` extension equivalent is missing for ``ByteString``, please raise an issue.
+
+Conversion to Strings
+---------------------
+
 ``ByteString`` objects can be decoded to a ``String`` using the ``decode`` method:
 
 .. code-block:: kotlin
 
     val bs = b("string!")
     assert(bs.decode() == "string!")
+
+``ByteString`` objects can also be turned into an escaped string, for invalid unicode values.
+
+.. code-block:: kotlin
+
+    val bs = byteArrayOf(1, 2).toByteString()
+    val s1 = bs.decode()  // fails!
+    val s2 = bs.escapedString()  // succeeds, "\\x01\\x02"
+
+Unwrapping
+----------
+
+A ``ByteString`` can be turned into a regular ``ByteArray`` in one of several ways:
+
+- With ``Collection<Byte>.toByteArray()`` which iterates over each ``Byte`` and copes them into a
+  ``ByteArray``.
+- With ``unwrapCopy``, which makes a direct copy of the backing ``ByteArray``. This is the preferred
+  method.
+- With ``unwrap``, which is ``@Unsafe`` and returns the backing ``ByteArray`` directly. This should
+  only be used for performance concerns inside low-level code when you need to pass a ``ByteArray``
+  to a C funcrtion, for example.
 

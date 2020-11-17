@@ -3,10 +3,6 @@
 Networking - IP Addresses
 =========================
 
-.. versionchanged:: 1.3.0
-
-    Moved from Tinlok-Core to Copperchain.
-
 Copperchain provides high-level immutable wrappers for IPv4 and IPv6 addresses, which can be used
 everywhere an IP address is used.
 

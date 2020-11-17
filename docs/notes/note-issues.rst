@@ -9,6 +9,8 @@ Here's a list of issues I know about with the codebase:
 
   - See Python's `ipaddress`_ module for what they would ideally be like.
 
+* IPv6 parser doesn't support IPv4 addresses
+
 * Several path functions do explicit checks instead of trying and failing.
 
   - This is both slower, and (potentially) riskier.
@@ -17,13 +19,13 @@ Here's a list of issues I know about with the codebase:
 
   - This is a Kotlin issue; see `KT-41853`_.
 
+  - Pending a workaround with cinterops.
+
 * No pure-Kotlin path resolving
 
   - Basically means that every ``toAbsolutePath()`` has to call ``realpath(3)`` underneath
 
-* No UDP socket support
-
-* No TCP socket options (low hanging fruit)
+* No buffer operations for datagrams
 
 * Not really optimised for performance
 
@@ -44,9 +46,15 @@ Here's a list of issues I know about with the codebase:
     - Linux doesn't have this issue because symlinks can always be treated as just files, and it
       has realpath() to do the symlink shenanigans for us.
 
-  * No winsock support (although Syscall does initialise WinSock)
+    - I think some can be reduced, at least, by merging some checks...
 
-  * No overlapped support on files.
+  * No overlapped support on files. (Yet!)
+
+  * File handles require a new allocation due to an ``expect/actual`` bug.
+
+* Several interfaces are missing convenient default values.
+
+  - This is ALSO a Kotlin bug!
 
 .. _ipaddress: https://docs.python.org/3/library/ipaddress.html
 .. _KT-41853: https://youtrack.jetbrains.com/issue/KT-41853

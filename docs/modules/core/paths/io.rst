@@ -30,6 +30,10 @@ object:
 File I/O
 --------
 
+.. versionchanged:: 1.3.0
+
+    File code was commonised between platforms.
+
 The contents of a file can be read using the ``Path.readAllBytes`` and ``Path.readAllString``
 convenience methods:
 

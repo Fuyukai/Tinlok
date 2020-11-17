@@ -10,7 +10,28 @@ Changelog
 
    - The new parser is less featureful currently, but removes an external dependency.
 
- - Move large amounts of IP-address based code to the Copperchain module.
+ - IP addresses now wrap a public ``ByteString``, not a private ``ByteArray``,
+
+ - Unrefactor the common stuff.
+
+   - This wouldn't've worked the way I wanted.
+
+ - Sockets entirely reworked.
+
+   - The new ``Socket`` interface was defined, and ``SynchronousSocketStream`` was created for a
+     stream over a socket.
+
+   - Socket options now actually work.
+
+ - File code is now common to all platforms. This should help with maintainence.
+
+ - Add :ref:`buffer` for efficient I/O.
+
+ - Add ``escapedString`` to ``ByteString``, and ``PurePath``.
+
+ - Port nearly fully to Windows.
+
+   - Only a handful of small functions don't work anymore.
 
 1.2.0 (Released 2020-11-04)
 ---------------------------

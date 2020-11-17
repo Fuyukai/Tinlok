@@ -21,24 +21,22 @@ These platforms have priority support:
     Tinlok needs relatively new versions of the Linux kernel and glibc for all features. Ensure
     you are on at least the latest kernel.org LTS (5.4 at time of writing).
 
+* Windows AMD64 (``mingwX64``)
+
+  - My dev box is Linux, so the default branch may have outdated or broken Windows support; but
+    official releases will have support.
+
 Pending support
 ---------------
 
 These platforms are platforms it would be ideal to support, but can't for various reasons:
-
-* Windows AMD64 (``mingwX64``)
-
-  - K/N does not currently support cross-compiling from Linux to Windows, and cinterop commonizer
-    also breaks.
-
-  - This is very high priority! I promise!
 
 * Linux MIPS(el)32 (``linuxMips32``)
 
   - I don't have any sort of MIPS development board so there's no way for me to test or develop
     for these architectures.
 
-* macOS (``macosX64()``)
+* macOS (``macosX64``, ARM)
 
   - I don't have a macOS device, and there are no cross-compilers due to the nature of macOS.
 

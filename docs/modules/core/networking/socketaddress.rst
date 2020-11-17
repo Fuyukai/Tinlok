@@ -5,10 +5,6 @@ Networking - Socket Addresses
 
 .. versionchanged:: 1.3.0
 
-    Moved from Tinlok-Core to Copperchain.
-
-.. versionchanged:: 1.3.0
-
     Added the ability to create addresses directly through the constructor.
 
 Under the BSD socket model, sockets are bound or connected to a specific single address, which
@@ -16,7 +12,7 @@ is of a single address family, protocol and socket type. In the real world, this
 sufficient; with dual stack networks being common but not too common, you want to be able to
 connect to IPv6 if possible then fall back to IPv4.
 
-Copperchain and Tinlok builds socket abstractions around this model by separating out an address
+Tinlok builds socket abstractions around this model by separating out an address
 a socket will bind to with the actual networking address using two classes: ``SocketAddress`` and
 ``ConnectionInfo``.
 
@@ -24,13 +20,11 @@ ConnectionInfo
 --------------
 
 A ``ConnectionInfo`` instance contains the raw information a socket can use to open and connect
-or bind to.
-It wraps a ``IPAddress``, maybe an integer port, and the socket constant required to create a new
-BSD socket (which are provided by the specific subclass).
+or bind to. It contains the socket constants for a BSD socket, and is subclassed for things such as
+internet sockets or unix sockets.
 
-Client sockets don't require these (as they perform dual-stack connection), but server sockets do
-require a ``ConnectionInfo`` instance (as they cannot perform dual-stack binding) with the same
-type as
+For internet sockets, the ``InetConnectionInfo`` abstract class exists. It wraps an ``IPAddress``
+and an integer port.
 
 Usually, a ``ConnectionInfo`` subclass instance can be created by passing the IP and port:
 

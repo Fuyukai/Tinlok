@@ -5,11 +5,8 @@ Networking - Enums
 
 .. versionchanged:: 1.3.0
 
-    Moved from Tinlok-Core to Copperchain.
-
-.. versionchanged:: 1.3.0
-
     An interface was extracted from each enumeration, making these more forwards-compatible.
+
 
 Copperchain provides several interfaces defining the socket creation constant, and enumerations
 containing a set of possible values that are known to be supported by all platforms.

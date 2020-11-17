@@ -138,6 +138,7 @@ public actual interface Buffer : Closeable {
      * This will raise if [supportsAddress] returns false.
      */
     @Unsafe
+    @Throws(UnsupportedOperationException::class)
     public fun <R> address(offset: Long, block: (CPointer<ByteVar>) -> R): R
 }
 

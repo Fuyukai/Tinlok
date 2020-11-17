@@ -159,11 +159,10 @@ private constructor(
      * Gets the escaped String for this [ByteString].
      */
     public fun escapedString(): String {
-        val s = this.joinToString("") {
+        return joinToString("") {
             if (it in 32..126) it.toChar().toString()
             else "\\x" + it.toUByte().toString(16).padStart(2, '0')
         }
-        return s
     }
 
     override fun toString(): String {

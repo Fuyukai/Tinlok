@@ -47,12 +47,18 @@ Contents
 .. toctree::
    :maxdepth: 2
 
+   closingscope.rst
+   bytestring.rst
    cryptography.rst
    uuid.rst
+
+   buffer.rst
+   streams-listeners.rst
 
    paths/pure.rst
    paths/io.rst
 
-   networking/socket.rst
-   networking/tcp.rst
-   networking/tls.rst
+   networking/ipaddress.rst
+   networking/network-enums.rst
+   networking/socketaddress.rst
+   networking/sockets.rst
