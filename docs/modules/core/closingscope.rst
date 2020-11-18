@@ -82,6 +82,11 @@ The ``use`` extension function is equivalent to the following:
         close()
     }
 
+.. warning::
+
+    The close method on ``Closeable`` is **idempotent**, so subsequent calls **must not** fail if
+    the object is already closed.
+
 ClosingScope
 ------------
 

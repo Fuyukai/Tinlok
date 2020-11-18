@@ -27,8 +27,19 @@ public interface ClosingScope : Closeable {
         }
     }
 
-    /** Adds a closeable to this scope, that will be closed when this scope is also closed. */
+    /**
+     * Adds a closeable to this scope, that will be closed when this scope is also closed.
+     */
     public fun add(closeable: Closeable)
+
+    /**
+     * Removes a closeable from this scope, stopping it from being tracked.
+     *
+     * This is useful for avoiding memory leaks with long-lived scopes and objects that are
+     * explicitly closed. It is safe to close a Closeable without doing this method, as ``close`` is
+     * idempotent.
+     */
+    public fun remove(closeable: Closeable)
 }
 
 @PublishedApi
@@ -37,6 +48,10 @@ internal class ClosingScopeImpl @Unsafe constructor() : ClosingScope {
 
     override fun add(closeable: Closeable) {
         toClose.add(closeable)
+    }
+
+    override fun remove(closeable: Closeable) {
+        toClose.remove(closeable)
     }
 
     override fun close() {
