@@ -7,8 +7,8 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
-package tf.lotte.tinlok.system
+package tf.lotte.tinlok.crypto
 
-internal actual fun __eventfd(count: UInt, flags: Int): Int {
-    return platform.linux.extra.eventfd(count, flags)
+internal fun __getrandom() {
+
 }

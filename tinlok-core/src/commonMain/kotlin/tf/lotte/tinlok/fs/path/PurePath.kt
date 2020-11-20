@@ -112,4 +112,9 @@ public interface PurePath {
      * Converts the path within to a Kotlin string, escaping illegal values.
      */
     public fun escapedString(): String
+
+    /**
+     * Converts this path to a singular ByteString.
+     */
+    public fun toByteString(): ByteString
 }

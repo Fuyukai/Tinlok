@@ -84,7 +84,7 @@ public actual object Syscall {
     /**
      * Throws on errno for paths.
      */
-    public fun throwErrnoPath(errno: Int, path: String): Nothing {
+    public fun throwErrnoPath(errno: Int, path: ByteString): Nothing {
         throw when (errno) {
             ENOENT -> FileNotFoundException(path)
             EEXIST -> FileAlreadyExistsException(path)
@@ -172,7 +172,7 @@ public actual object Syscall {
     // region File opening/closing
 
     @Unsafe
-    private fun openShared(path: String, fd: Int): Int {
+    private fun openShared(path: ByteString, fd: Int): Int {
         if (fd.isError) {
             throwErrnoPath(errno, path)
         }
@@ -180,18 +180,27 @@ public actual object Syscall {
         return fd
     }
 
-    @Unsafe
-    public fun open(path: String, mode: Int): FD {
-        val fd = retry { platform.posix.open(path, mode) }
-        return openShared(path, fd)
-    }
-
     /**
      * Opens a new file descriptor for the path [path].
      */
     @Unsafe
-    public fun open(path: String, mode: Int, permissions: Int): FD {
-        val fd = retry { platform.posix.open(path, mode, permissions) }
+    public fun open(path: ByteString, mode: Int): FD {
+        val ba = path.toNullTerminated()
+        val fd = ba.usePinned {
+            retry { __open(it.addressOf(0), mode) }
+        }
+        return openShared(path, fd)
+    }
+
+    /**
+     * Opens a new file descriptor for the path [path], using the specified [permissions]
+     */
+    @Unsafe
+    public fun open(path: ByteString, mode: Int, permissions: Int): FD {
+        val ba = path.toNullTerminated()
+        val fd = ba.usePinned {
+            retry { __open(it.addressOf(0), mode, permissions) }
+        }
         return openShared(path, fd)
     }
 
@@ -462,10 +471,22 @@ public actual object Syscall {
      * Performs a stat/lstat() call without throwing, returning null instead.
      */
     @Unsafe
-    public fun __stat_safer(alloc: NativePlacement, path: String, followSymlinks: Boolean): stat? {
+    public fun __stat_safer(
+        alloc: NativePlacement,
+        path: ByteString,
+        followSymlinks: Boolean
+    ): stat? {
         val pathStat = alloc.alloc<stat>()
+        val ba = path.toNullTerminated()
 
-        val res = if (followSymlinks) stat(path, pathStat.ptr) else lstat(path, pathStat.ptr)
+        val res = ba.usePinned {
+            if (followSymlinks) {
+                __stat(it.addressOf(0), pathStat.ptr)
+            } else {
+                __lstat(it.addressOf(0), pathStat.ptr)
+            }
+        }
+
         if (res.isError) {
             if (errno == ENOENT) return null
             else throwErrnoPath(errno, path)
@@ -478,7 +499,7 @@ public actual object Syscall {
      * Gets statistics about a file.
      */
     @Unsafe
-    public fun stat(alloc: NativePlacement, path: String, followSymlinks: Boolean): stat {
+    public fun stat(alloc: NativePlacement, path: ByteString, followSymlinks: Boolean): stat {
         return __stat_safer(alloc, path, followSymlinks)
             ?: throwErrnoPath(errno, path)
     }
@@ -487,8 +508,11 @@ public actual object Syscall {
      * Gets access information about a file.
      */
     @Unsafe
-    public fun access(path: String, mode: Int): Boolean {
-        val result = platform.posix.access(path, mode)
+    public fun access(path: ByteString, mode: Int): Boolean {
+        val ba = path.toNullTerminated()
+        val result = ba.usePinned {
+            __access(it.addressOf(0), mode)
+        }
         if (result.isError) {
             if (errno == EACCES) return false
             if (errno == ENOENT && mode == F_OK) return false
@@ -503,8 +527,11 @@ public actual object Syscall {
      */
     @Suppress("FoldInitializerAndIfToElvis")
     @Unsafe
-    public fun opendir(path: String): CPointer<DIR> {
-        val dirfd = platform.posix.opendir(path)
+    public fun opendir(path: ByteString): CPointer<DIR> {
+        val ba = path.toNullTerminated()
+        val dirfd = ba.usePinned {
+            __opendir(it.addressOf(0))
+        }
         if (dirfd == null) {
             throwErrnoPath(errno, path)
         }
@@ -546,9 +573,12 @@ public actual object Syscall {
      * Creates a new filesystem directory.
      */
     @Unsafe
-    public fun mkdir(path: String, mode: UInt, existOk: Boolean) {
-        val result = mkdir(path, mode)
-        if (result.isError) {
+    public fun mkdir(path: ByteString, mode: UInt, existOk: Boolean) {
+        val ba = path.toNullTerminated()
+        val res = ba.usePinned {
+            __mkdir(it.addressOf(0), mode)
+        }
+        if (res.isError) {
             if (errno == EEXIST && existOk) return
             else throwErrnoPath(errno, path)
         }
@@ -558,9 +588,13 @@ public actual object Syscall {
      * Removes a filesystem directory.
      */
     @Unsafe
-    public fun rmdir(path: String) {
-        val result = platform.posix.rmdir(path)
-        if (result.isError) {
+    public fun rmdir(path: ByteString) {
+        val ba = path.toNullTerminated()
+        val res = ba.usePinned {
+            __rmdir(it.addressOf(0))
+        }
+
+        if (res.isError) {
             throwErrnoPath(errno, path)
         }
     }
@@ -569,9 +603,13 @@ public actual object Syscall {
      * Unlinks a symbolic file or deletes a file.
      */
     @Unsafe
-    public fun unlink(path: String) {
-        val result = platform.posix.unlink(path)
-        if (result.isError) {
+    public fun unlink(path: ByteString) {
+        val ba = path.toNullTerminated()
+        val res = ba.usePinned {
+            __unlink(it.addressOf(0))
+        }
+
+        if (res.isError) {
             throwErrnoPath(errno, path)
         }
     }
@@ -595,9 +633,12 @@ public actual object Syscall {
      */
     @Suppress("FoldInitializerAndIfToElvis")
     @Unsafe
-    public fun realpath(path: String): ByteString = memScoped {
+    public fun realpath(path: ByteString): ByteString = memScoped {
+        val input = path.toNullTerminated()
         val buffer = allocArray<ByteVar>(PATH_MAX)
-        val res = realpath(path, buffer)
+        val res = input.usePinned {
+            __realpath(it.addressOf(0), buffer)
+        }
         if (res == null) {
             throwErrnoPath(errno, path)
         }
@@ -610,9 +651,12 @@ public actual object Syscall {
      * Gets the real value of the symbolic link at [path].
      */
     @Unsafe
-    public fun readlink(alloc: NativePlacement, path: String): ByteString {
+    public fun readlink(alloc: NativePlacement, path: ByteString): ByteString {
+        val input = path.toNullTerminated()
         val buffer = alloc.allocArray<ByteVar>(PATH_MAX)
-        val res = readlink(path, buffer, PATH_MAX)
+        val res = input.usePinned {
+            __readlink(it.addressOf(0), buffer, PATH_MAX.convert())
+        }
         if (res.isError) {
             throwErrnoPath(errno, path)
         }
@@ -625,8 +669,14 @@ public actual object Syscall {
      * Renames a file or directory.
      */
     @Unsafe
-    public fun rename(from: String, to: String) {
-        val res = platform.posix.rename(from, to)
+    public fun rename(from: ByteString, to: ByteString) {
+        val first = from.toNullTerminated()
+        val second = to.toNullTerminated()
+        val res = first.usePinned { a ->
+            second.usePinned { b ->
+                __rename(a.addressOf(0), b.addressOf(0))
+            }
+        }
         // TODO: figure out error for ENOENT...
         if (res.isError) {
             throwErrno(errno)
@@ -637,8 +687,15 @@ public actual object Syscall {
      * Creates a new symlink at [linkpath] that points to [target].
      */
     @Unsafe
-    public fun symlink(target: String, linkpath: String) {
-        val res = platform.posix.symlink(target, linkpath)
+    public fun symlink(target: ByteString, linkpath: ByteString) {
+        val first = target.toNullTerminated()
+        val second = linkpath.toNullTerminated()
+        val res = first.usePinned { a ->
+            second.usePinned { b ->
+                __symlink(a.addressOf(0), b.addressOf(0))
+            }
+        }
+
         if (res.isError) {
             throwErrnoPath(errno, linkpath)
         }

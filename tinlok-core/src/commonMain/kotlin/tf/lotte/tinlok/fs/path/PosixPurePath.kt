@@ -177,30 +177,24 @@ public open class PosixPurePath(rawParts: List<ByteString>) : PurePath {
         return PosixPurePath(components)
     }
 
-    @Unsafe
-    override fun unsafeToString(): String {
-        val joined = if (isAbsolute) {
+    override fun toByteString(): ByteString {
+        return if (isAbsolute) {
             val copy = rawComponents.toMutableList()
             copy[0] = b("")
             copy.join(SLASH)
         } else {
             rawComponents.join(SLASH)
         }
+    }
 
-        return joined.unwrap().decodeToString(throwOnInvalidSequence = true)
+    @Unsafe
+    override fun unsafeToString(): String {
+        return toByteString().decode()
     }
 
     @Unsafe
     override fun escapedString(): String {
-        val joined = if (isAbsolute) {
-            val copy = rawComponents.toMutableList()
-            copy[0] = b("")
-            copy.join(SLASH)
-        } else {
-            rawComponents.join(SLASH)
-        }
-
-        return joined.escapedString()
+        return toByteString().escapedString()
     }
 
     override fun equals(other: Any?): Boolean {
@@ -214,7 +208,7 @@ public open class PosixPurePath(rawParts: List<ByteString>) : PurePath {
     }
 
     override fun toString(): String {
-        val s = rawComponents.joinToString(", ") { it.toString() }
+        val s = rawComponents.joinToString(", ") { it.escapedString() }
         return "PosixPurePath[$s]"
     }
 }

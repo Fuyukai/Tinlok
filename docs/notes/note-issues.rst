@@ -15,12 +15,6 @@ Here's a list of issues I know about with the codebase:
 
   - This is both slower, and (potentially) riskier.
 
-* Non-unicode paths don't work
-
-  - This is a Kotlin issue; see `KT-41853`_.
-
-  - Pending a workaround with cinterops.
-
 * No pure-Kotlin path resolving
 
   - Basically means that every ``toAbsolutePath()`` has to call ``realpath(3)`` underneath

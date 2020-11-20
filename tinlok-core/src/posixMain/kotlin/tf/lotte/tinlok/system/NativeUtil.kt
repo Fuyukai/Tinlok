@@ -15,16 +15,14 @@ import tf.lotte.tinlok.Unsafe
 /**
  * Reads out a Kotlin [ByteArray] from a [CArrayPointer].
  */
+@OptIn(ExperimentalUnsignedTypes::class)
 @Unsafe
 public fun CArrayPointer<ByteVar>.readZeroTerminated(): ByteArray {
-    var length = 0
-    while (true) {
-        if (this[length] != 0.toByte()) length += 1
-        else break
-    }
+    val length = __strlen(this)
+    require(length < UInt.MAX_VALUE) { "Size $length is too big" }
 
-    val buf = ByteArray(length)
-    Syscall.__fast_ptr_to_bytearray(this, buf, length)
+    val buf = ByteArray(length.toInt())
+    Syscall.__fast_ptr_to_bytearray(this, buf, buf.size)
     return buf
 }
 
@@ -32,16 +30,14 @@ public fun CArrayPointer<ByteVar>.readZeroTerminated(): ByteArray {
  * Reads out a Kotlin [ByteArray] from a [CArrayPointer], with maximum size [maxSize] to avoid
  * buffer overflows.
  */
+@OptIn(ExperimentalUnsignedTypes::class)
 @Unsafe
 public fun CArrayPointer<ByteVar>.readZeroTerminated(maxSize: Int): ByteArray {
-    var length = 0
-    while (true) {
-        if (length > maxSize) error("Buffer overflow! $length > $maxSize")
-        else if (this[length] != 0.toByte()) length += 1
-        else break
-    }
-    val buf = ByteArray(length)
-    Syscall.__fast_ptr_to_bytearray(this, buf, length)
+    val length = __strnlen(this, maxSize.toULong())
+    require(length < UInt.MAX_VALUE) { "Size $length is too big" }
+
+    val buf = ByteArray(length.toInt())
+    Syscall.__fast_ptr_to_bytearray(this, buf, buf.size)
     return buf
 }
 
@@ -65,13 +61,4 @@ public fun CArrayPointer<ByteVar>.unsafeClobber(other: ByteArray) {
     for (idx in other.indices) {
         this[idx] = other[idx]
     }
-}
-
-/**
- * Creates a pointer to a pinned Long.
- */
-public fun NativePlacement.ptrTo(value: Pinned<Long>): CPointer<LongVar> {
-    val var_ = alloc<LongVar>()
-    var_.value = value.get()
-    return var_.ptr
 }

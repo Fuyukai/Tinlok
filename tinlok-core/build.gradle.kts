@@ -144,6 +144,12 @@ tasks.register("copyCommonCBindings") {
         from("src/linuxX64Main/kotlin/tf/lotte/tinlok/util/UuidPlatform.kt")
         into("src/linuxArm64Main/kotlin/tf/lotte/tinlok/util")
     }
+
+    // common extra linux cinterop
+    copy {
+        from("src/linuxX64Main/kotlin/tf/lotte/tinlok/system/ExtraCinterop.kt")
+        into("src/linuxArm64Main/kotlin/tf/lotte/tinlok/system/ExtraCinterop.kt")
+    }
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile> {

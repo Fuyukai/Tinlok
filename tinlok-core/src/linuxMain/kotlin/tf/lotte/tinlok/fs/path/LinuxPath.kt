@@ -55,8 +55,7 @@ public class LinuxPath(rawParts: List<ByteString>) : Path, PosixPurePath(rawPart
     // == path functionality == //
     @OptIn(Unsafe::class)
     override fun exists(): Boolean {
-        val strPath = unsafeToString()
-        return Syscall.access(strPath, F_OK)
+        return Syscall.access(toByteString(), F_OK)
     }
 
     /**
@@ -64,8 +63,7 @@ public class LinuxPath(rawParts: List<ByteString>) : Path, PosixPurePath(rawPart
      */
     @OptIn(Unsafe::class)
     public fun statSafe(followSymlinks: Boolean): Stat? = memScoped {
-        val strPath = unsafeToString()
-        val pathStat = Syscall.__stat_safer(this, strPath, followSymlinks)
+        val pathStat = Syscall.__stat_safer(this, toByteString(), followSymlinks)
             ?: return null
 
         return Stat(
@@ -82,8 +80,7 @@ public class LinuxPath(rawParts: List<ByteString>) : Path, PosixPurePath(rawPart
      */
     @OptIn(Unsafe::class)
     public fun stat(followSymlinks: Boolean): Stat = memScoped {
-        val strPath = unsafeToString()
-        val pathStat = Syscall.stat(this, strPath, followSymlinks)
+        val pathStat = Syscall.stat(this, toByteString(), followSymlinks)
 
         return Stat(
             ownerUID = pathStat.st_uid.toInt(),
@@ -101,7 +98,7 @@ public class LinuxPath(rawParts: List<ByteString>) : Path, PosixPurePath(rawPart
     @OptIn(Unsafe::class)
     override fun owner(followSymlinks: Boolean): String? = memScoped {
         val strPath = unsafeToString()
-        val stat = Syscall.stat(this, strPath, followSymlinks)
+        val stat = Syscall.stat(this, toByteString(), followSymlinks)
         val uid = stat.st_uid
         val passwd = Syscall.getpwuid_r(this, uid)
 
@@ -142,7 +139,7 @@ public class LinuxPath(rawParts: List<ByteString>) : Path, PosixPurePath(rawPart
     override fun linkTarget(): Path? = memScoped {
         // safer approach
         return try {
-            val link = Syscall.readlink(this, unsafeToString())
+            val link = Syscall.readlink(this, toByteString())
             LinuxPath(splitParts(link))
         } catch (e: FileNotFoundException) {
             null
@@ -160,7 +157,7 @@ public class LinuxPath(rawParts: List<ByteString>) : Path, PosixPurePath(rawPart
     @OptIn(Unsafe::class)
     override fun resolveFully(strict: Boolean): Path {
         if (!strict) TODO("Pure-Kotlin resolving")
-        val realPath = Syscall.realpath(unsafeToString())
+        val realPath = Syscall.realpath(toByteString())
         return LinuxPath(splitParts(realPath))
     }
 
@@ -170,7 +167,6 @@ public class LinuxPath(rawParts: List<ByteString>) : Path, PosixPurePath(rawPart
         existOk: Boolean,
         vararg permissions: FilePermission,
     ) {
-        val path = unsafeToString()
         val permMask = if (permissions.isEmpty()) {
             PosixFilePermission.ALL.bit
         } else {
@@ -188,13 +184,13 @@ public class LinuxPath(rawParts: List<ByteString>) : Path, PosixPurePath(rawPart
             }
         }
 
-        Syscall.mkdir(path, permMask, existOk)
+        Syscall.mkdir(toByteString(), permMask, existOk)
     }
 
     @OptIn(Unsafe::class)
     override fun scanDir(block: (DirEntry) -> Unit) {
         val path = unsafeToString()
-        val dir = Syscall.opendir(path)
+        val dir = Syscall.opendir(toByteString())
         try {
             val dot = b(".")
             val dotdot = b("..")
@@ -223,7 +219,7 @@ public class LinuxPath(rawParts: List<ByteString>) : Path, PosixPurePath(rawPart
 
     @Unsafe
     override fun rename(path: PurePath): Path {
-        Syscall.rename(unsafeToString(), path.unsafeToString())
+        Syscall.rename(toByteString(), path.toByteString())
         return path.ensureLinuxPath()
     }
 
@@ -265,16 +261,16 @@ public class LinuxPath(rawParts: List<ByteString>) : Path, PosixPurePath(rawPart
         // open() doesn't fail on directories (with O_RDONLY)...
         // so we have to check it ourselves
         if (this.isDirectory(followSymlinks = true)) {
-            throw IsADirectoryException(unsafeToString())
+            throw IsADirectoryException(toByteString())
         }
 
         // sendfile to B from A which does an efficient copy
         // also, get the correct permissions from the original file
         val perms = stat(followSymlinks = false).permBits
-        val to = Syscall.open(path.unsafeToString(), O_WRONLY or O_CREAT, perms.toInt())
+        val to = Syscall.open(path.toByteString(), O_WRONLY or O_CREAT, perms.toInt())
         // always close to if opening from errors
         val from = try {
-            Syscall.open(this.unsafeToString(), O_RDONLY)
+            Syscall.open(toByteString(), O_RDONLY)
         } catch (e: Throwable) {
             Syscall.close(to)
             throw e
@@ -291,25 +287,23 @@ public class LinuxPath(rawParts: List<ByteString>) : Path, PosixPurePath(rawPart
 
     @OptIn(Unsafe::class)
     override fun symlinkTo(path: Path) {
-        Syscall.symlink(path.unsafeToString(), this.unsafeToString())
+        Syscall.symlink(path.toByteString(), toByteString())
     }
 
     @OptIn(Unsafe::class)
     override fun removeDirectory() {
-        val path = this.unsafeToString()
-        Syscall.rmdir(path)
+        Syscall.rmdir(toByteString())
     }
 
     @OptIn(Unsafe::class)
     override fun unlink() {
-        val path = this.unsafeToString()
-        Syscall.unlink(path)
+        Syscall.unlink(toByteString())
     }
 
     @Unsafe
     override fun unsafeOpen(vararg modes: FileOpenMode): SynchronousFile {
         if (this.isDirectory(followSymlinks = false)) {
-            throw IsADirectoryException(unsafeToString())
+            throw IsADirectoryException(toByteString())
         }
 
         val openModes = modes.toSet()
@@ -331,9 +325,9 @@ public class LinuxPath(rawParts: List<ByteString>) : Path, PosixPurePath(rawPart
 
         // only pass permission bit if O_CREAT is passed
         val fd = if ((mode and O_CREAT) == 0) {
-            Syscall.open(unsafeToString(), mode)
+            Syscall.open(toByteString(), mode)
         } else {
-            Syscall.open(unsafeToString(), mode, PosixFilePermission.DEFAULT_FILE.bit)
+            Syscall.open(toByteString(), mode, PosixFilePermission.DEFAULT_FILE.bit)
         }
 
         return SynchronousFilesystemFile(this, fd)

@@ -129,7 +129,7 @@ public fun Path.recursiveCopy(to: Path) {
 
     if (to.exists()) {
         if (!to.isDirectory(followSymlinks = true)) {
-            throw FileAlreadyExistsException(to.unsafeToString())
+            throw FileAlreadyExistsException(to.toByteString())
         }
     } else {
         to.createDirectory(parents = true, existOk = false)
@@ -247,11 +247,11 @@ public fun Path.writeBytes(bs: ByteString, atomic: Boolean = true) {
     if (atomic) {
         val realPath = if (this.exists()) {
             if (this.isDirectory(followSymlinks = true)) {
-                throw IsADirectoryException(unsafeToString())
+                throw IsADirectoryException(toByteString())
             }
 
             if (!this.isRegularFile(followSymlinks = false) && !this.isLink()) {
-                throw FileAlreadyExistsException(unsafeToString())
+                throw FileAlreadyExistsException(toByteString())
             }
 
             // resolve through symlinks

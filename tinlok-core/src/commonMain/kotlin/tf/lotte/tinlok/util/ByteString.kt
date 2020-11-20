@@ -142,6 +142,21 @@ private constructor(
         return backing.unwrap().toUByteArray()
     }
 
+    /**
+     * Creates a new [ByteArray] with a null terminator, for passing to C functions that expect a
+     * C string.
+     */
+    public fun toNullTerminated(): ByteArray {
+        val copy = unwrapCopy()
+        // already null-terminated
+        if (copy.last() == 0.toByte()) return copy
+
+        val newSize = size + 1
+        val realArr = ByteArray(newSize)
+        copy.copyInto(realArr)
+        return realArr
+    }
+
     override fun iterator(): Iterator<Byte> {
         return backing.iterator()
     }

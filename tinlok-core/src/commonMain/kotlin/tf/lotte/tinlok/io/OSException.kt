@@ -11,6 +11,8 @@
 
 package tf.lotte.tinlok.io
 
+import tf.lotte.tinlok.util.ByteString
+
 // See: https://docs.python.org/3/library/exceptions.html#OSError
 /**
  * Thrown when a platform call returns an unhandleable error.
@@ -28,10 +30,10 @@ public open class OSException(
  */
 public open class FileAlreadyExistsException
 public constructor(
-    public val path: String,
+    public val path: ByteString,
     cause: Throwable?,
-) : OSException(message = "File exists: $path", cause = cause) {
-    public constructor(path: String) : this(path, null)
+) : OSException(message = "File exists: ${path.escapedString()}", cause = cause) {
+    public constructor(path: ByteString) : this(path, null)
 }
 
 /**
@@ -39,10 +41,10 @@ public constructor(
  */
 public open class FileNotFoundException
 constructor(
-    public val path: String,
+    public val path: ByteString,
     cause: Throwable?,
-) : OSException(message = "File not found: $path", cause = cause) {
-    public constructor(path: String) : this(path, null)
+) : OSException(message = "File not found: ${path.escapedString()}", cause = cause) {
+    public constructor(path: ByteString) : this(path, null)
 }
 
 /**
@@ -51,10 +53,10 @@ constructor(
  */
 public open class IsADirectoryException
 constructor(
-    public val path: String,
+    public val path: ByteString,
     cause: Throwable?,
-) : OSException(message = "Is a directory: $path", cause = cause) {
-    public constructor(path: String) : this(path, null)
+) : OSException(message = "Is a directory: ${path.escapedString()}", cause = cause) {
+    public constructor(path: ByteString) : this(path, null)
 }
 
 /**
@@ -62,10 +64,10 @@ constructor(
  */
 public open class DirectoryNotEmptyException
 constructor(
-    public val path: String,
+    public val path: ByteString,
     cause: Throwable?,
-) : OSException(message = "Directory not empty: $path", cause = cause) {
-    public constructor(path: String) : this(path, null)
+) : OSException(message = "Directory not empty: ${path.escapedString()}", cause = cause) {
+    public constructor(path: ByteString) : this(path, null)
 }
 
 /**
