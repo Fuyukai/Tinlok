@@ -881,16 +881,14 @@ public actual object Syscall {
             if (pres.isError) {
                 throwErrno(errno)
             } else {
-                // always set back to non-blocking if it just fails to connect
+                // maybe success?
+                // don't bother checking pollfd because we only used one socket anyway so we know
+                // which one succeeded
                 fcntl(sock, FcntlParam.F_SETFL, origin)
 
-                // socket timed out
+                // not success, socket timed out
                 if (pres == 0) throw TimeoutException()
             }
-
-            // success
-            // don't bother checking pollfd because we only used one socket anyway so we know
-            // which one succeeded
         }
     }
 
