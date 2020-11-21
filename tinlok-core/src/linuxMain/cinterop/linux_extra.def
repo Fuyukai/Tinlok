@@ -2,7 +2,6 @@
 package = platform.linux.extra
 noStringConversion = open opendir access mkdir rmdir unlink realpath readlink rename symlink stat lstat strlen strnlen
 ---
-#include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <dirent.h>

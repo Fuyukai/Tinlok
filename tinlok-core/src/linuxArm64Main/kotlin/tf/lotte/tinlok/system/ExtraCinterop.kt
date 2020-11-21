@@ -9,9 +9,7 @@
 
 package tf.lotte.tinlok.system
 
-import kotlinx.cinterop.ByteVar
-import kotlinx.cinterop.CPointer
-import kotlinx.cinterop.convert
+import kotlinx.cinterop.*
 import platform.posix.*
 
 
@@ -36,11 +34,11 @@ internal actual fun __open(path: CPointer<ByteVar>, oflag: Int, perms: Int): Int
 }
 
 internal actual fun __stat(pathname: CPointer<ByteVar>, statbuf: CPointer<stat>): Int {
-    return platform.linux.extra.stat(pathname, statbuf)
+    return platform.linux.extra.stat(pathname, statbuf.reinterpret())
 }
 
 internal actual fun __lstat(pathname: CPointer<ByteVar>, statbuf: CPointer<stat>): Int {
-    return platform.linux.extra.lstat(pathname, statbuf)
+    return platform.linux.extra.lstat(pathname, statbuf.reinterpret())
 }
 
 internal actual fun __access(path: CPointer<ByteVar>, amode: Int): Int {
