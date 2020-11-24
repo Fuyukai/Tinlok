@@ -9,6 +9,7 @@
 
 @file:Suppress("PropertyName")
 
+import org.gradle.nativeplatform.platform.internal.ArchitectureInternal
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 import java.nio.file.Files
 import java.nio.file.Path
@@ -21,7 +22,7 @@ plugins {
 
 
 // == Architecture detection == //
-val ARCH = DefaultNativePlatform.getCurrentArchitecture()
+val ARCH: ArchitectureInternal = DefaultNativePlatform.getCurrentArchitecture()
 val DEFAULT_SEARCH_PATHS = listOf("/usr/lib", "/lib").map { Path.of(it) }
 
 /**
@@ -64,17 +65,20 @@ fun getAMD64LibraryPaths(): List<Path> {
 // == End architecture detection == //
 
 kotlin {
-    val x64 = linuxX64() {
-        val linuxX64Main by sourceSets.getting {
+    linuxX64 {
+        sourceSets["linuxX64Main"].apply {
             dependencies {
                 implementation(project(":tinlok-static-monocypher"))
             }
         }
 
         val main = compilations.getByName("main")
+        main.cinterops.create("openssl") {
+            defFile(project.file("src/linuxMain/cinterop/openssl.def"))
+        }
+
         main.cinterops.create("uuid") {
             defFile(project.file("src/linuxMain/cinterop/uuid.def"))
-            compilerOpts += "-I/usr/include"
         }
 
         main.cinterops.create("extra") {
@@ -82,15 +86,18 @@ kotlin {
         }
     }
 
-    val arm64 = linuxArm64() {
-        val linuxMain by sourceSets.getting
-        val linuxArm64Main by sourceSets.getting {
+    linuxArm64 {
+        sourceSets["linuxArm64Main"].apply {
             dependencies {
                 implementation(project(":tinlok-static-monocypher"))
             }
         }
 
         val main = compilations.getByName("main")
+        main.cinterops.create("openssl") {
+            defFile(project.file("src/linuxMain/cinterop/openssl.def"))
+        }
+
         main.cinterops.create("uuid") {
             defFile(project.file("src/linuxMain/cinterop/uuid.def"))
         }
@@ -101,7 +108,7 @@ kotlin {
         }
     }
 
-    mingwX64() {
+    mingwX64 {
         val mingwX64Main by sourceSets.getting {
             dependencies {
                 implementation(project(":tinlok-static-monocypher"))

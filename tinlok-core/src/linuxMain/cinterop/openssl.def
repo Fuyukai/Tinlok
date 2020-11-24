@@ -1,0 +1,36 @@
+package = external.openssl
+headers = openssl/bio.h openssl/err.h openssl/pem.h openssl/ssl.h openssl/x509.h openssl/x509v3.h
+
+compilerOpts.linux_x64 = -I/usr/include
+compilerOpts.linux_arm64 = -I/usr/include
+
+# Awful!
+linkerOpts.linux_x64 = -L/usr/x86_64-pc-linux-gnu -L/usr/lib/x86_64-pc-linux-gnu \
+    -L/usr/x86_64-linux-gnu/lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib -L/lib/x86_64-linux-gnu \
+    -lssl -lcrypto
+
+linkerOpts.linux_arm64 = -L/usr/lib/aarch64-linux-gnu -L/lib/aarch64-linux-gnu \
+    -L/usr/aarch64-linux-gnu/lib -L/usr/lib \
+    -lssl -lcrypto
+
+---
+// Macro re-exports
+static inline int K_BIO_set_close(BIO *b, long flag) {
+    return BIO_set_close(b, flag);
+}
+
+static inline long K_SSL_CTX_set_mode(SSL_CTX *ctx, long mode) {
+    return SSL_CTX_set_mode(ctx, mode);
+}
+
+static inline int K_SSL_CTX_set_min_proto_version(SSL_CTX *ctx, int version) {
+    return SSL_CTX_set_min_proto_version(ctx, version);
+}
+
+static inline int K_SSL_CTX_set_max_proto_version(SSL_CTX *ctx, int version) {
+    return SSL_CTX_set_max_proto_version(ctx, version);
+}
+
+static inline int K_SSL_set_mode(SSL *ssl, long mode) {
+    return SSL_set_mode(ssl, mode);
+}

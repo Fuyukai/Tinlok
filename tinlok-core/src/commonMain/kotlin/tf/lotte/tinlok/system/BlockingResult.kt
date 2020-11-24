@@ -20,6 +20,9 @@ public inline class BlockingResult(public val count: Long) {
         /** Singleton failure result. */
         public val WOULD_BLOCK: BlockingResult = BlockingResult(-1L)
 
+        /** A second failure result, e.g. for TLS. */
+        public val WOULD_BLOCK_2: BlockingResult = BlockingResult(-2L)
+
         /** Singleton success result, for results without a meaningful count. */
         public val DIDNT_BLOCK: BlockingResult = BlockingResult(0L)
     }
@@ -28,7 +31,7 @@ public inline class BlockingResult(public val count: Long) {
      * If this result didn't need a blocking call to be complete.
      */
     public inline val isSuccess: Boolean
-        get() = count != -1L
+        get() = count >= 0L
 }
 
 @Suppress("NOTHING_TO_INLINE")
