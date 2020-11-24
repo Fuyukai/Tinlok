@@ -45,6 +45,7 @@ import tf.lotte.tinlok.util.Closeable
  * This class is @Unsafe as it contains references to externally allocated objects, which are not
  * automatically cleaned up.
  */
+@Suppress("UNNECESSARY_LATEINIT")
 @Unsafe
 public actual class TlsObject actual constructor(
     public actual val context: TlsContext, private val hostname: String,

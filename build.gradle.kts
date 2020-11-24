@@ -7,6 +7,8 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
+@file:Suppress("PropertyName")
+
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -14,7 +16,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 plugins {
-    id("org.jetbrains.kotlin.multiplatform").version("1.4.10").apply(false)
+    id("org.jetbrains.kotlin.multiplatform").version("1.4.20").apply(false)
     /*id("org.jetbrains.dokka").version("1.4.0").apply(true)*/
     id("maven-publish")
 }
