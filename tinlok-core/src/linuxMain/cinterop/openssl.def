@@ -1,5 +1,6 @@
 package = external.openssl
-headers = openssl/bio.h openssl/err.h openssl/pem.h openssl/ssl.h openssl/x509.h openssl/x509v3.h
+headers = openssl/bio.h openssl/err.h openssl/pem.h openssl/ssl.h openssl/x509.h openssl/x509v3.h openssl/pem.h openssl/asn1.h openssl/bn.h
+headerFilter = openssl/*
 
 compilerOpts.linux_x64 = -I/usr/include
 compilerOpts.linux_arm64 = -I/usr/include
@@ -33,4 +34,8 @@ static inline int K_SSL_CTX_set_max_proto_version(SSL_CTX *ctx, int version) {
 
 static inline int K_SSL_set_mode(SSL *ssl, long mode) {
     return SSL_set_mode(ssl, mode);
+}
+
+static inline void K_OPENSSL_free(void* ptr) {
+    OPENSSL_free(ptr);
 }

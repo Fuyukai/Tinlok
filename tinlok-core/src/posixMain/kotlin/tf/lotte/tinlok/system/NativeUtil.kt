@@ -42,6 +42,15 @@ public fun CArrayPointer<ByteVar>.readZeroTerminated(maxSize: Int): ByteArray {
 }
 
 /**
+ * Reads out a Kotlin [String] from a [CArrayPointer], but faster than the native method.
+ */
+@Unsafe
+public fun CPointer<ByteVar>.toKStringUtf8Fast(): String {
+    val ba = readZeroTerminated()
+    return ba.decodeToString()
+}
+
+/**
  * Reads bytes from a [COpaquePointer] using __fast_ptr_to_bytearray instead of the naiive Kotlin
  * byte-by-byte copy.
  */
