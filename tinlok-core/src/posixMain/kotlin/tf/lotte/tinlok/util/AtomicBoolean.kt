@@ -14,9 +14,9 @@ import kotlin.native.concurrent.AtomicInt
 /**
  * Implements an atomic boolean, using an [AtomicInt] underneath.
  */
-public actual class AtomicBoolean(value: Boolean) {
+public actual class AtomicBoolean actual constructor(initial: Boolean) {
     /** The backing int. */
-    private val _value = AtomicInt(if (value) 1 else 0)
+    private val _value = AtomicInt(if (initial) 1 else 0)
 
     /** The actual value of this boolean. */
     public actual var value: Boolean
@@ -28,9 +28,9 @@ public actual class AtomicBoolean(value: Boolean) {
     public override fun toString(): String = value.toString()
 
     /** Gets the inversion of this atomic boolean. */
-    public operator fun not(): Boolean = _value.value == 0
+    public actual operator fun not(): Boolean = _value.value == 0
 
-    public fun compareAndSet(expected: Boolean, new: Boolean): Boolean {
+    public actual fun compareAndSet(expected: Boolean, new: Boolean): Boolean {
         val realExpected = if (expected) 1 else 0
         val realNew = if (new) 1 else 0
         return _value.compareAndSet(realExpected, realNew)

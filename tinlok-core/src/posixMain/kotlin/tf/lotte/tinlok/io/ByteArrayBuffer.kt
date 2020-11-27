@@ -18,7 +18,7 @@ import kotlin.experimental.and
  * A [Buffer] that wraps a [ByteArray].
  */
 public actual class ByteArrayBuffer
-actual constructor(private val ba: ByteArray): Buffer {
+actual constructor(private val ba: ByteArray) : Buffer {
     public actual companion object;
 
     // the real cursor, to avoid extra long conversions

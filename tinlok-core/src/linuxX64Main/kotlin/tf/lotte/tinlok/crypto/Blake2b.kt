@@ -14,15 +14,13 @@ package tf.lotte.tinlok.crypto
 import kotlinx.cinterop.*
 import tf.lotte.tinlok.Unsafe
 import tf.lotte.tinlok.interop.libmonocypher.*
-import tf.lotte.tinlok.util.ByteString
-import tf.lotte.tinlok.util.Closeable
-import tf.lotte.tinlok.util.ClosedException
+import tf.lotte.tinlok.util.*
 
 /**
  * A class that takes in data and will eventually produce a hash using the Blake2b algorithm.
  */
 @OptIn(ExperimentalUnsignedTypes::class)
-public actual class Blake2b internal actual constructor(key: UByteArray) : Closeable {
+public actual class Blake2b internal actual constructor(key: UByteArray) : Closeable, AtomicSafeCloseable() {
     public actual companion object {
         // output blake2b hash size
         public const val HASH_SIZE: Int = 64
@@ -30,7 +28,6 @@ public actual class Blake2b internal actual constructor(key: UByteArray) : Close
 
     private val arena = Arena()
     private val context: crypto_blake2b_ctx = arena.alloc<crypto_blake2b_ctx>()
-    private var closed: Boolean = false
 
     init {
         if (key.isNotEmpty()) {
@@ -53,7 +50,7 @@ public actual class Blake2b internal actual constructor(key: UByteArray) : Close
      */
     @OptIn(Unsafe::class)
     public actual fun feed(data: ByteString) {
-        if (closed) throw ClosedException("This hasher is closed")
+        if (!_isOpen) throw ClosedException("This hasher is closed")
 
         // zero-element byte arrays throw on addressOf(0)
         // and obviously it wouldn't do anything.
@@ -71,7 +68,7 @@ public actual class Blake2b internal actual constructor(key: UByteArray) : Close
      */
     @OptIn(Unsafe::class)
     public actual fun hash(): Blake2bHash {
-        if (closed) throw ClosedException("This hasher is closed")
+        if (!_isOpen) throw ClosedException("This hasher is closed")
 
         val hash = UByteArray(HASH_SIZE)
         hash.usePinned {
@@ -82,11 +79,9 @@ public actual class Blake2b internal actual constructor(key: UByteArray) : Close
         return Blake2bHash(ByteString.fromUncopied(hash.toByteArray()))
     }
 
-    public override fun close() {
-        if (closed) return
+    public override fun closeImpl() {
         crypto_wipe(context.ptr, sizeOf<crypto_blake2b_ctx>().toULong())
         arena.clear()
-        closed = true
     }
 
 }

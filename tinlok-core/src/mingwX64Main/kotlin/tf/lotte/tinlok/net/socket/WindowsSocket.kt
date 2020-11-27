@@ -19,7 +19,7 @@ import tf.lotte.tinlok.system.BlockingResult
 import tf.lotte.tinlok.system.SOCKET
 import tf.lotte.tinlok.system.Syscall
 import tf.lotte.tinlok.util.AtomicBoolean
-import tf.lotte.tinlok.util.ClosedException
+import tf.lotte.tinlok.util.AtomicSafeCloseable
 
 /**
  * A Winsock-based socket.
@@ -31,13 +31,9 @@ public constructor(
     override val protocol: IPProtocol,
     override val handle: SOCKET,
     private val creator: ConnectionInfoCreator<I>,
-) : Socket<I> {
+) : Socket<I>, AtomicSafeCloseable() {
     /** If this socket is still open. */
-    override val isOpen: AtomicBoolean = AtomicBoolean(true)
-
-    private fun checkOpen() {
-        if (!isOpen) throw ClosedException("socket is closed")
-    }
+    override val isOpen: AtomicBoolean get() = _isOpen
 
     /** If this socket is non-blocking. */
     private val isNonBlocking = AtomicBoolean(false)
@@ -294,9 +290,7 @@ public constructor(
      * This method is idempotent; subsequent calls will have no effects.
      */
     @OptIn(Unsafe::class)
-    override fun close() {
-        checkOpen()
-
+    override fun closeImpl() {
         Syscall.closesocket(handle)
     }
 

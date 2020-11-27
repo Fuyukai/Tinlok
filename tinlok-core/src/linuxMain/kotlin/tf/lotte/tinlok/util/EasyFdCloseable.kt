@@ -16,21 +16,9 @@ import tf.lotte.tinlok.system.Syscall
 /**
  * Automatically implements good [Closeable] behaviour.
  */
-public abstract class EasyFdCloseable : Closeable, Selectable {
-    /** If this object is currently open. */
-    public open val isOpen: AtomicBoolean = AtomicBoolean(true)
-
-    /**
-     * Checks if this object is still open.
-     */
-    protected fun checkOpen() {
-        if (!isOpen) throw ClosedException("this object is closed")
-    }
-
+public abstract class EasyFdCloseable : AtomicSafeCloseable(), Selectable {
     @OptIn(Unsafe::class)
-    override fun close() {
-        if (!isOpen.compareAndSet(expected = true, new = false)) return
-
+    override fun closeImpl() {
         Syscall.close(fd)
     }
 }

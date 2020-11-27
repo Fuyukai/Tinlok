@@ -44,6 +44,8 @@ public constructor(
         }
     }
 
+    override val isOpen: AtomicBoolean
+        get() = _isOpen
 
     /** Internally used to inherit non-blocking. */
     private val isNonBlocking: AtomicBoolean = AtomicBoolean(false)

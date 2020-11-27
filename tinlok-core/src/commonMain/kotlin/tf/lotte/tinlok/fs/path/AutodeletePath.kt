@@ -9,13 +9,13 @@
 
 package tf.lotte.tinlok.fs.path
 
-import tf.lotte.tinlok.util.Closeable
+import tf.lotte.tinlok.util.AtomicSafeCloseable
 
 /**
  * A path that will automatically delete itself when closed.
  */
-public class AutodeletePath(realPath: Path) : Path by realPath, Closeable {
-    override fun close() {
+public class AutodeletePath(realPath: Path) : Path by realPath, AtomicSafeCloseable() {
+    override fun closeImpl() {
         delete()
     }
 }

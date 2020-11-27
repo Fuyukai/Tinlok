@@ -20,7 +20,7 @@ import tf.lotte.tinlok.system.FILE
 import tf.lotte.tinlok.system.Syscall
 import tf.lotte.tinlok.system.ensureNonBlock
 import tf.lotte.tinlok.util.AtomicBoolean
-import tf.lotte.tinlok.util.ClosedException
+import tf.lotte.tinlok.util.AtomicSafeCloseable
 
 /**
  * Common cross-platform implementation of a synchronous file, pointing to a filesystem file.
@@ -28,13 +28,9 @@ import tf.lotte.tinlok.util.ClosedException
 public class SynchronousFilesystemFile(
     override val path: Path,
     public val handle: FILE
-) : SynchronousFile {
+) : SynchronousFile, AtomicSafeCloseable() {
     /** If this file is still open. */
-    override val isOpen: AtomicBoolean = AtomicBoolean(true)
-
-    private fun checkOpen() {
-        if (!isOpen) throw ClosedException("File is closed")
-    }
+    override val isOpen: AtomicBoolean get() = _isOpen
 
     /**
      * Closes this file.
@@ -42,9 +38,7 @@ public class SynchronousFilesystemFile(
      * This method is idempotent; subsequent calls will have no effects.
      */
     @OptIn(Unsafe::class)
-    override fun close() {
-        if (!isOpen.compareAndSet(expected = true, new = false)) return
-
+    override fun closeImpl() {
         Syscall.__close_file(handle)
     }
 
