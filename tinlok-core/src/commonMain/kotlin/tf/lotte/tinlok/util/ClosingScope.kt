@@ -10,6 +10,7 @@
 package tf.lotte.tinlok.util
 
 import tf.lotte.tinlok.Unsafe
+import tf.lotte.tinlok.collection.IdentitySet
 
 /**
  * A scope that can have objects added to it to automatically close them.
@@ -44,7 +45,10 @@ public interface ClosingScope : Closeable {
 
 @PublishedApi
 internal class ClosingScopeImpl @Unsafe constructor() : ClosingScope {
-    private val toClose = mutableSetOf<Closeable>()
+    // Note: This is an identity set to ensure that two objects which may be equal are both added
+    // to the set.
+    // This ensures that they both get closed.
+    private val toClose = IdentitySet<Closeable>()
 
     override fun add(closeable: Closeable) {
         toClose.add(closeable)
