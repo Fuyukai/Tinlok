@@ -10,12 +10,11 @@
 package tf.lotte.tinlok.net.tls.x509
 
 import external.openssl.*
-import kotlinx.cinterop.CPointer
-import kotlinx.cinterop.cstr
-import kotlinx.cinterop.memScoped
+import kotlinx.cinterop.*
 import tf.lotte.tinlok.Unsafe
 import tf.lotte.tinlok.net.tls.x509.X509Certificate.Companion.fromPEM
 import tf.lotte.tinlok.system.toKStringUtf8Fast
+import tf.lotte.tinlok.util.AtomicSafeCloseable
 import tf.lotte.tinlok.util.Closeable
 
 // https://zakird.com/2013/10/13/certificate-parsing-with-openssl
@@ -30,10 +29,10 @@ import tf.lotte.tinlok.util.Closeable
  * companion object to parse and load certificates. A certificate can be loaded from a PEM-encoded
  * string with [fromPEM].
  */
-public actual class X509Certificate private actual constructor() : Closeable {
-    private constructor(handle: CPointer<X509>) : this() {
-        this.handle = handle
-    }
+public actual class X509Certificate internal constructor(
+    /** Underlying handle to the OpenSSL X509 struct. */
+    private val handle: CPointer<X509>
+) : Closeable, AtomicSafeCloseable() {
 
     public actual companion object {
         /**
@@ -60,19 +59,16 @@ public actual class X509Certificate private actual constructor() : Closeable {
         }
     }
 
-    // Note: This is a lateinit because I don't think there's a way to have the constructor differ
-    // in the common sourceset.
-    /** Underlying handle to the OpenSSL X509 struct. */
-    private lateinit var handle: CPointer<X509>
-
-    override fun close() {
-        if (::handle.isInitialized) X509_free(handle)
+    override fun closeImpl() {
+        X509_free(handle)
     }
 
     /**
      * The X.509 version of this certificate. See 4.1.2.1.
      */
     public actual val version: Long get () {
+        checkOpen()
+
         return X509_get_version(handle)
     }
 
@@ -82,6 +78,8 @@ public actual class X509Certificate private actual constructor() : Closeable {
      */
     @OptIn(Unsafe::class)
     public actual val serial: String get() = memScoped {
+        checkOpen()
+
         // Ew, yuck, gross!
         val i = X509_get_serialNumber(handle) ?: error("Failed to get serial number?")
         val bn = ASN1_INTEGER_to_BN(i, null) ?: error("Failed to convert serial to bignum")
@@ -96,6 +94,8 @@ public actual class X509Certificate private actual constructor() : Closeable {
     /** The entity that has signed and issued this certificate. */
     @OptIn(ExperimentalUnsignedTypes::class, Unsafe::class)
     public actual val issuer: List<Pair<String, String>> get() {
+        checkOpen()
+
         // an X509_name has multiple entries, which we iterate over and return a "mapping" of
         val name = X509_get_issuer_name(handle) ?: error("Failed to get issuer name")
         return name.toPairs()
@@ -104,9 +104,49 @@ public actual class X509Certificate private actual constructor() : Closeable {
     /** The entity this certificate was issued for. */
     @OptIn(Unsafe::class)
     public actual val subject: List<Pair<String, String>> get() {
+        checkOpen()
+
         // similar deal here.
         val name = X509_get_subject_name(handle) ?: error("Failed to get subject name")
         return name.toPairs()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is X509Certificate) return false
+        if (!_isOpen) return false  // meaningless
+
+        val res = X509_cmp(handle, other.handle)
+        return res == 0
+    }
+
+    @OptIn(ExperimentalUnsignedTypes::class)
+    private val hashCode by lazy {
+        memScoped {
+            checkOpen()
+
+            // we use the standard x509 digest as the hash code. not the "best", but oh well.
+            val md = EVP_blake2b512() ?: error("failed to get message digest")
+            val buf = ByteArray(64)  // we know what the size will be for blake2b
+            val outSize = alloc<UIntVar>()
+            val res = buf.usePinned {
+                val ptr = it.addressOf(0).reinterpret<UByteVar>()
+                X509_digest(handle, md, ptr, outSize.ptr)
+            }
+            if (res != 1) error("X509_digest failed")
+
+            assert(outSize.value == 64U)
+            buf.contentHashCode()
+        }
+    }
+
+    @OptIn(ExperimentalUnsignedTypes::class)
+    override fun hashCode(): Int {
+        return hashCode
+    }
+
+    override fun toString(): String {
+        return "<X509Certificate CN='${commonName}'>"
     }
 
     /**

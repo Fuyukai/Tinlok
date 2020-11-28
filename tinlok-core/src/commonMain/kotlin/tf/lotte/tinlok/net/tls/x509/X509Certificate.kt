@@ -24,7 +24,7 @@ import tf.lotte.tinlok.util.Closeable
  * string with [fromPEM], or from a raw byte stream using [fromRaw].
  */
 @Suppress("NO_ACTUAL_FOR_EXPECT")
-public expect class X509Certificate private constructor() : Closeable {
+public expect class X509Certificate : Closeable {
     public companion object {
         /**
          * Creates an [X509Certificate] from a PEM-encoded certificate.
@@ -54,3 +54,9 @@ public expect class X509Certificate private constructor() : Closeable {
     /** The subject this signature was issued for. */
     public val subject: List<Pair<String, String>>
 }
+
+/**
+ * Gets the common name for this certificate.
+ */
+public val X509Certificate.commonName: String?
+    get() = subject.find { it.first == "commonName" }?.second
