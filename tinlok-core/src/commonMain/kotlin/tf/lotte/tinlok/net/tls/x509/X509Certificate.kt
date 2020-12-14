@@ -53,6 +53,9 @@ public expect class X509Certificate : Closeable {
 
     /** The subject this signature was issued for. */
     public val subject: List<Pair<String, String>>
+
+    /** Checks if this certificate is a CA (i.e. it can issue new certificates. */
+    public val isCertificateAuthority: Boolean
 }
 
 /**

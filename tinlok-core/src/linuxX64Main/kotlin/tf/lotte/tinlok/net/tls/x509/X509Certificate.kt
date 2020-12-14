@@ -111,6 +111,13 @@ public actual class X509Certificate internal constructor(
         return name.toPairs()
     }
 
+    /** If this certificate is a CA. */
+    public actual val isCertificateAuthority: Boolean get() {
+        checkOpen()
+
+        return X509_check_ca(handle) != 0
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is X509Certificate) return false
