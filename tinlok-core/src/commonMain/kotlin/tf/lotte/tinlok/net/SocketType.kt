@@ -10,17 +10,9 @@
 package tf.lotte.tinlok.net
 
 /**
- * Defines a single socket type for usage in socket creation.
- */
-public interface SocketType {
-    /** The socket number for the socket type. */
-    public val number: Int
-}
-
-/**
  * An enumeration of the available socket kinds.
  */
-public enum class StandardSocketTypes(override val number: Int) : SocketType {
+public enum class SocketType(public val number: Int) {
     /** Stream sockets (TCP) */
     SOCK_STREAM(tf.lotte.tinlok.net.socket.SOCK_STREAM),
 

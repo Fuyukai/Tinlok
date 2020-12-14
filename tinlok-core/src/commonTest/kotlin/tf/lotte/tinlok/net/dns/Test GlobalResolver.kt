@@ -10,7 +10,7 @@
 package tf.lotte.tinlok.net.dns
 
 import tf.lotte.tinlok.Unsafe
-import tf.lotte.tinlok.net.StandardAddressFamilies
+import tf.lotte.tinlok.net.AddressFamily
 import tf.lotte.tinlok.net.tcp.TcpConnectionInfo
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -32,7 +32,7 @@ class `Test GlobalResolver` {
 
         run {
             val inet4 = tcpAddrs.find {
-                it.family == StandardAddressFamilies.AF_INET
+                it.family == AddressFamily.AF_INET
             }!!
             assertEquals(inet4.port, 443)
             // the ip returned may be either, so we chekc if its either
@@ -42,7 +42,7 @@ class `Test GlobalResolver` {
 
         run {
             val inet6 = tcpAddrs.find {
-                it.family == StandardAddressFamilies.AF_INET6
+                it.family == AddressFamily.AF_INET6
             }!!
             assertEquals(inet6.port, 443)
             val addrStr = inet6.ip.toString()

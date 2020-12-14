@@ -71,7 +71,7 @@ public class IPv4Address(bytes: ByteArray) : IPAddress() {
     override val representation: ByteString = ByteString.fromUncopied(bytes)
 
     override val version: Int = IP_VERSION_4
-    override val family: AddressFamily get() = StandardAddressFamilies.AF_INET
+    override val family: AddressFamily get() = AddressFamily.AF_INET
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -114,7 +114,7 @@ public class IPv6Address(bytes: ByteArray) : IPAddress() {
     override val representation: ByteString = ByteString.fromUncopied(bytes)
 
     override val version: Int = IP_VERSION_6
-    override val family: AddressFamily get() = StandardAddressFamilies.AF_INET6
+    override val family: AddressFamily get() = AddressFamily.AF_INET6
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

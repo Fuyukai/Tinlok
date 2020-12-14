@@ -818,12 +818,12 @@ public actual object Syscall {
         val size: UInt
 
         when (address.family) {
-            StandardAddressFamilies.AF_INET6 -> {
+            AddressFamily.AF_INET6 -> {
                 val info = (address as InetConnectionInfo)
                 struct = __ipv6_to_sockaddr(this, info.ip as IPv6Address, info.port)
                 size = sizeOf<sockaddr_in6>().toUInt()
             }
-            StandardAddressFamilies.AF_INET -> {
+            AddressFamily.AF_INET -> {
                 val info = (address as InetConnectionInfo)
                 struct = __ipv4_to_sockaddr(this, info.ip as IPv4Address, info.port)
                 size = sizeOf<sockaddr_in>().toUInt()
@@ -956,12 +956,12 @@ public actual object Syscall {
             val size: UInt
 
             when (address.family) {
-                StandardAddressFamilies.AF_INET6 -> {
+                AddressFamily.AF_INET6 -> {
                     val info = (address as InetConnectionInfo)
                     struct = __ipv6_to_sockaddr(this, info.ip as IPv6Address, info.port)
                     size = sizeOf<sockaddr_in6>().toUInt()
                 }
-                StandardAddressFamilies.AF_INET -> {
+                AddressFamily.AF_INET -> {
                     val info = (address as InetConnectionInfo)
                     struct = __ipv4_to_sockaddr(this, info.ip as IPv4Address, info.port)
                     size = sizeOf<sockaddr_in>().toUInt()

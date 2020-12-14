@@ -19,8 +19,8 @@ Sockets can be created easily with the helper functions on the ``Socket.Companio
 
 .. code-block:: kotlin
 
-    val tcp = Socket.tcp(StandardAddressFamilies.AF_INET6)
-    val udp = Socket.udp(StandardAddressFamilies.AF_INET6)
+    val tcp = Socket.tcp(AddressFamily.AF_INET6)
+    val udp = Socket.udp(AddressFamily.AF_INET6)
 
 Socket Options
 --------------
@@ -43,7 +43,7 @@ property on the socket object.
 
     Do NOT set the socket to non-blocking with an ``fcntl`` or ``ioctlsocket`` call on the
     underlying handle. Internally, implementations track the non-blocking status with a boolean
-    value.
+    value, as the status cannot be simply retreived on some implementations.
 
 Due to this, sockets return a ``BlockingResult`` inline class in various locations, which wraps
 either the result of a call, or ``-1`` to signify that the socket needs to be polled on until

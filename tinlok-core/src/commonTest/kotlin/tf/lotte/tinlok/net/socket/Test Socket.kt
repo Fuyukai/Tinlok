@@ -12,7 +12,7 @@ package tf.lotte.tinlok.net.socket
 import tf.lotte.tinlok.Unsafe
 import tf.lotte.tinlok.io.ByteArrayBuffer
 import tf.lotte.tinlok.io.ofSize
-import tf.lotte.tinlok.net.StandardAddressFamilies
+import tf.lotte.tinlok.net.AddressFamily
 import tf.lotte.tinlok.net.tcp.TcpConnectionInfo
 import tf.lotte.tinlok.util.ClosingScope
 import kotlin.test.*
@@ -27,7 +27,7 @@ public class `Test Socket` {
     @Test
     @OptIn(Unsafe::class)
     public fun `Test socket boolean option`() = ClosingScope {
-        val socket = Socket.tcp(StandardAddressFamilies.AF_INET6)
+        val socket = Socket.tcp(AddressFamily.AF_INET6)
         it.add(socket)
         // reasonable option
         assertFalse(socket.getOption(StandardSocketOptions.SO_REUSEADDR))
@@ -41,7 +41,7 @@ public class `Test Socket` {
     @Test
     @OptIn(Unsafe::class, ExperimentalUnsignedTypes::class)
     public fun `Test socket ULong option`() = ClosingScope {
-        val socket = Socket.tcp(StandardAddressFamilies.AF_INET6)
+        val socket = Socket.tcp(AddressFamily.AF_INET6)
         it.add(socket)
 
         // note: the kernel doubles this on linux, so we have to test both the normal and double
@@ -59,7 +59,7 @@ public class `Test Socket` {
     @Test
     @OptIn(Unsafe::class)
     public fun `Test socket nonblocking`() = ClosingScope {
-        val socket = Socket.tcp(StandardAddressFamilies.AF_INET6)
+        val socket = Socket.tcp(AddressFamily.AF_INET6)
         // Not safe on Windows: But it doesn't matter. This is test code.
         socket.setOption(StandardSocketOptions.SO_REUSEADDR, true)
         it.add(socket)
@@ -86,7 +86,7 @@ public class `Test Socket` {
     @Test
     @OptIn(Unsafe::class)
     public fun `Test socket accept`(): Unit = ClosingScope {
-        val server = Socket.tcp(StandardAddressFamilies.AF_INET6)
+        val server = Socket.tcp(AddressFamily.AF_INET6)
         server.setOption(StandardSocketOptions.SO_REUSEADDR, true)
         it.add(server)
 
@@ -96,7 +96,7 @@ public class `Test Socket` {
         server.listen(1)
 
         // outgoing connection to the accepting socket
-        val clientLocal = Socket.tcp(StandardAddressFamilies.AF_INET6)
+        val clientLocal = Socket.tcp(AddressFamily.AF_INET6)
         it.add(clientLocal)
         clientLocal.nonBlocking = true
         // non-blocking connect

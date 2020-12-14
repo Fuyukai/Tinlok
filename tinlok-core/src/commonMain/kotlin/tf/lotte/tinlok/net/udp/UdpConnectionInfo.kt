@@ -16,6 +16,6 @@ import tf.lotte.tinlok.net.*
  */
 public class UdpConnectionInfo(ip: IPAddress, port: Int) : InetConnectionInfo(ip, port) {
     override val family: AddressFamily get() = ip.family
-    override val protocol: IPProtocol get() = StandardIPProtocols.IPPROTO_UDP
-    override val type: SocketType = StandardSocketTypes.SOCK_DGRAM
+    override val protocol: IPProtocol get() = IPProtocol.IPPROTO_UDP
+    override val type: SocketType = SocketType.SOCK_DGRAM
 }

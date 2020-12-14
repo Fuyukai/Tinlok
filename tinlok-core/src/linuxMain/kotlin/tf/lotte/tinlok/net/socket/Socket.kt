@@ -36,7 +36,7 @@ public actual interface Socket<I: ConnectionInfo> : Selectable, Closeable {
         public actual fun tcp(family: AddressFamily): Socket<TcpConnectionInfo> {
             return LinuxSocket.open(
                 family,
-                StandardSocketTypes.SOCK_STREAM, StandardIPProtocols.IPPROTO_TCP,
+                SocketType.SOCK_STREAM, IPProtocol.IPPROTO_TCP,
                 ::TcpConnectionInfo
             )
         }
@@ -48,7 +48,7 @@ public actual interface Socket<I: ConnectionInfo> : Selectable, Closeable {
         public actual fun udp(family: AddressFamily): Socket<UdpConnectionInfo> {
             return LinuxSocket.open(
                 family,
-                StandardSocketTypes.SOCK_DGRAM, StandardIPProtocols.IPPROTO_UDP,
+                SocketType.SOCK_DGRAM, IPProtocol.IPPROTO_UDP,
                 ::UdpConnectionInfo
             )
         }

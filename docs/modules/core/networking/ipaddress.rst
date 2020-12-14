@@ -3,7 +3,7 @@
 Networking - IP Addresses
 =========================
 
-Copperchain provides high-level immutable wrappers for IPv4 and IPv6 addresses, which can be used
+Tinlok provides high-level immutable wrappers for IPv4 and IPv6 addresses, which can be used
 everywhere an IP address is used.
 
 Al IP addresses inherit from the ``IPAddress`` class, which provides a ``version`` and a

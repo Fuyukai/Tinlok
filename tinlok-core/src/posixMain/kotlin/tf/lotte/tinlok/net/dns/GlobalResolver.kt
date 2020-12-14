@@ -34,17 +34,17 @@ public actual object GlobalResolver : AddressResolver {
         val addresses = ArrayList<ConnectionInfo>(result.size)
         for (info in result) {
             // lookup the values in our enum
-            val type = StandardSocketTypes.values()
+            val type = SocketType.values()
                 .find { it.number == info.type } ?: continue
 
             // addresses with a nullptr IP are skipped because ???
             val (ip, port) = info.toIpPort() ?: continue
 
             val finalAddr = when (type) {
-                StandardSocketTypes.SOCK_STREAM -> {
+                SocketType.SOCK_STREAM -> {
                     TcpConnectionInfo(ip, port)
                 }
-                StandardSocketTypes.SOCK_DGRAM -> {
+                SocketType.SOCK_DGRAM -> {
                     UdpConnectionInfo(ip, port)
                 }
                 else -> continue  // raw sockets

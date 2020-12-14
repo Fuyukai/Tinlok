@@ -56,11 +56,7 @@ being passed directly:
 .. code-block:: kotlin
 
     val tcp = TcpSocketAddress.resolve("toaru-project.com")
-    val udp = UdpSocketAddress.resolve("some-udp-service-i-couldnt-think-of-any.arpa")
-
-.. note::
-
-    These methods come from Tinlok-Core. DNS resolution is not provided in Copperchain.
+    val udp = UdpSocketAddress.resolve("some-udp-service-i-couldnt-think-of-any.arpa").
 
 .. note::
 

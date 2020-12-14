@@ -11,8 +11,8 @@ package tf.lotte.tinlok.net.socket
 
 import tf.lotte.tinlok.Unsafe
 import tf.lotte.tinlok.io.NetworkUnreachableException
+import tf.lotte.tinlok.net.AddressFamily
 import tf.lotte.tinlok.net.AllConnectionsFailedException
-import tf.lotte.tinlok.net.StandardAddressFamilies
 import tf.lotte.tinlok.net.tcp.TcpConnectionInfo
 import tf.lotte.tinlok.net.tcp.TcpSocketAddress
 
@@ -32,7 +32,7 @@ public fun happyEyeballsTcpConnect(
         } catch (e: NetworkUnreachableException) {
             // ENETUNREACH is raised when ipv6 is requested but the network doesn't support ipv6
             // so silently eat the error
-            if (info.family == StandardAddressFamilies.AF_INET6) continue
+            if (info.family == AddressFamily.AF_INET6) continue
             else {
                 // an actual unreachable network erro
                 sock.close()

@@ -28,9 +28,9 @@ public fun TcpSocketAddress.Companion.resolve(
 ): TcpSocketAddress {
     val connections = resolver.getaddrinfo(
         host = host, service = port,
-        family = StandardAddressFamilies.AF_UNSPEC,
-        type = StandardSocketTypes.SOCK_STREAM,
-        protocol = StandardIPProtocols.IPPROTO_TCP
+        family = AddressFamily.AF_UNSPEC,
+        type = SocketType.SOCK_STREAM,
+        protocol = IPProtocol.IPPROTO_TCP
     ).filterIsInstance<TcpConnectionInfo>()
     return TcpSocketAddress(connections.toSet(), host)
 }
@@ -46,9 +46,9 @@ public fun UdpSocketAddress.Companion.resolve(
 ): UdpSocketAddress {
     val connections = resolver.getaddrinfo(
         host = host, service = port,
-        family = StandardAddressFamilies.AF_UNSPEC,
-        type = StandardSocketTypes.SOCK_DGRAM,
-        protocol = StandardIPProtocols.IPPROTO_UDP
+        family = AddressFamily.AF_UNSPEC,
+        type = SocketType.SOCK_DGRAM,
+        protocol = IPProtocol.IPPROTO_UDP
     ).filterIsInstance<UdpConnectionInfo>()
     return UdpSocketAddress(connections.toSet(), host)
 }

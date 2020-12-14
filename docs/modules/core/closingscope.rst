@@ -13,7 +13,7 @@ In the native world, many things need to be opened, used, then closed. The openi
 but the closing part is hard; it can be forgotten or exceptions can occur, and then you have a
 memory leak or a file descriptor leak or other similarly vile issues.
 
-Copperchain solves this with a combination of the ``Unsafe`` annotation, and the
+Tinlok solves this with a combination of the ``Unsafe`` annotation, and the
 ``Closeable`` interface.
 
 Closing safely

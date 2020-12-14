@@ -184,9 +184,9 @@ public actual object Syscall {
     @Unsafe
     public fun throwErrnoPath(code: Int, path: String): Nothing {
         throw when (code) {
-            ERROR_FILE_NOT_FOUND, ERROR_PATH_NOT_FOUND -> FileNotFoundException(path)
-            ERROR_FILE_EXISTS -> FileAlreadyExistsException(path)
-            ERROR_DIR_NOT_EMPTY -> DirectoryNotEmptyException(path)
+            ERROR_FILE_NOT_FOUND, ERROR_PATH_NOT_FOUND -> FileNotFoundException(path.toByteString())
+            ERROR_FILE_EXISTS -> FileAlreadyExistsException(path.toByteString())
+            ERROR_DIR_NOT_EMPTY -> DirectoryNotEmptyException(path.toByteString())
 
             ERROR_INVALID_NAME -> IllegalArgumentException("Invalid name: $path")
 
@@ -987,12 +987,12 @@ public actual object Syscall {
         val size: UInt
 
         when (address.family) {
-            StandardAddressFamilies.AF_INET6 -> {
+            AddressFamily.AF_INET6 -> {
                 val info = (address as InetConnectionInfo)
                 struct = __ipv6_to_sockaddr(this, info.ip as IPv6Address, info.port)
                 size = sizeOf<sockaddr_in6>().toUInt()
             }
-            StandardAddressFamilies.AF_INET -> {
+            AddressFamily.AF_INET -> {
                 val info = (address as InetConnectionInfo)
                 struct = __ipv4_to_sockaddr(this, info.ip as IPv4Address, info.port)
                 size = sizeOf<sockaddr_in>().toUInt()
@@ -1083,12 +1083,12 @@ public actual object Syscall {
             val size: Long
 
             when (address.family) {
-                StandardAddressFamilies.AF_INET6 -> {
+                AddressFamily.AF_INET6 -> {
                     val info = (address as InetConnectionInfo)
                     struct = __ipv6_to_sockaddr(this, info.ip as IPv6Address, info.port)
                     size = sizeOf<sockaddr_in6>()
                 }
-                StandardAddressFamilies.AF_INET -> {
+                AddressFamily.AF_INET -> {
                     val info = (address as InetConnectionInfo)
                     struct = __ipv4_to_sockaddr(this, info.ip as IPv4Address, info.port)
                     size = sizeOf<sockaddr_in>()

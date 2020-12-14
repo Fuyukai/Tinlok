@@ -39,13 +39,13 @@ public class TcpConnectionInfo(ip: IPAddress, port: Int) : InetConnectionInfo(ip
     override val family: AddressFamily
         get() {
             return when (ip) {
-                is IPv4Address -> StandardAddressFamilies.AF_INET
-                is IPv6Address -> StandardAddressFamilies.AF_INET6
+                is IPv4Address -> AddressFamily.AF_INET
+                is IPv6Address -> AddressFamily.AF_INET6
             }
         }
 
-    override val protocol: IPProtocol get() = StandardIPProtocols.IPPROTO_TCP
-    override val type: SocketType get() = StandardSocketTypes.SOCK_STREAM
+    override val protocol: IPProtocol get() = IPProtocol.IPPROTO_TCP
+    override val type: SocketType get() = SocketType.SOCK_STREAM
 
     override fun toString(): String {
         return "TcpConnectionInfo($ip, $port)"

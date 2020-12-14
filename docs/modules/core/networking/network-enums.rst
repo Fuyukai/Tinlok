@@ -3,19 +3,14 @@
 Networking - Enums
 ==================
 
-.. versionchanged:: 1.3.0
-
-    An interface was extracted from each enumeration, making these more forwards-compatible.
-
-
-Copperchain provides several interfaces defining the socket creation constant, and enumerations
+Tinlok provides several interfaces defining the socket creation constant, and enumerations
 containing a set of possible values that are known to be supported by all platforms.
 
 AddressFamily
 -----------------
 
-The ``AddressFamily`` interface corresponds to ``AF_`` constants on the BSD socket API. The
-``StandardAddressFamilies`` enumeration has the following members:
+The ``AddressFamily`` enumeration corresponds to ``AF_`` constants on the BSD socket API, with the
+specified members:
 
 +---------------+-----------------------------------------------------------------------+
 | Name          | Description                                                           |
@@ -32,8 +27,8 @@ The ``AddressFamily`` interface corresponds to ``AF_`` constants on the BSD sock
 SocketType
 --------------
 
-The ``SocketType`` interface corresponds to SOCK\_ constants on the BSD socket API. The
-``StandardSocketTypes`` enumeration has the following members:
+The ``SocketType`` enumeration corresponds to SOCK\_ constants on the BSD socket API, with the
+specified members:
 
 +-----------------+--------------------------------------------+
 | Name            | Description                                |
@@ -48,8 +43,8 @@ The ``SocketType`` interface corresponds to SOCK\_ constants on the BSD socket A
 IPProtocol
 --------------
 
-The ``IPProtocol`` interface corresponds to ``IPROTO_`` constants on the BSD socket API. The
-``StandardIPProtocols`` enumeration has the following members:
+The ``IPProtocol`` enumeration corresponds to ``IPROTO_`` constants on the BSD socket API, with the
+specified members:
 
 +------------------+--------------------------------------------------+
 | Name             | Description                                      |

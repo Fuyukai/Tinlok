@@ -35,9 +35,9 @@ public interface AddressResolver {
     @Unsafe
     public fun getaddrinfo(
         host: String?, service: Int = 0,
-        family: AddressFamily = StandardAddressFamilies.AF_UNSPEC,
-        type: SocketType = StandardSocketTypes.SOCK_STREAM,
-        protocol: IPProtocol = StandardIPProtocols.IPPROTO_IP,
+        family: AddressFamily = AddressFamily.AF_UNSPEC,
+        type: SocketType = SocketType.SOCK_STREAM,
+        protocol: IPProtocol = IPProtocol.IPPROTO_IP,
         flags: Int = 0,
     ): List<ConnectionInfo>
 }

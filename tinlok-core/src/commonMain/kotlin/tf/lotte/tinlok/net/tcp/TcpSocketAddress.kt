@@ -11,7 +11,6 @@ package tf.lotte.tinlok.net.tcp
 
 import tf.lotte.tinlok.net.IPProtocol
 import tf.lotte.tinlok.net.SocketAddress
-import tf.lotte.tinlok.net.StandardIPProtocols
 
 /**
  * A socket address for TCP sockets.
@@ -29,7 +28,7 @@ public class TcpSocketAddress(
         }
     }
 
-    override val protocol: IPProtocol get() = StandardIPProtocols.IPPROTO_TCP
+    override val protocol: IPProtocol get() = IPProtocol.IPPROTO_TCP
 
     override fun hashCode(): Int {
         return connections.hashCode()

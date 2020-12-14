@@ -12,7 +12,7 @@ package tf.lotte.tinlok.net.socket
 import tf.lotte.tinlok.Unsafe
 import tf.lotte.tinlok.io.Listener
 import tf.lotte.tinlok.net.ConnectionInfo
-import tf.lotte.tinlok.net.StandardSocketTypes
+import tf.lotte.tinlok.net.SocketType
 import tf.lotte.tinlok.util.Closeable
 
 /**
@@ -24,7 +24,7 @@ public class SynchronousSocketListener<I: ConnectionInfo>(
     init {
         require(!socket.nonBlocking) { "Socket must be blocking" }
         require(socket.isOpen.value) { "Socket must be open" }
-        require(socket.type == StandardSocketTypes.SOCK_STREAM) {
+        require(socket.type == SocketType.SOCK_STREAM) {
             "Can only listen on stream-based sockets"
         }
     }

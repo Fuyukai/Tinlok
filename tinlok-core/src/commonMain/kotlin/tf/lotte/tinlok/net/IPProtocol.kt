@@ -10,17 +10,9 @@
 package tf.lotte.tinlok.net
 
 /**
- * Defines a single IP protocol for usage in socket creation.
+ * Enumeration of valid IP protocols.
  */
-public interface IPProtocol {
-    /** The socket number for the IP protocol. */
-    public val number: Int
-}
-
-/**
- * Enumerations of valid IP protocols.
- */
-public enum class StandardIPProtocols(override val number: Int) : IPProtocol {
+public enum class IPProtocol(public val number: Int) {
     /** Kernel's choice */
     IPPROTO_IP(tf.lotte.tinlok.net.socket.IPPROTO_IP),
 

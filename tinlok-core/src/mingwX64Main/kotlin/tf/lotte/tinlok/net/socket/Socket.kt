@@ -36,8 +36,8 @@ public actual interface Socket<I: ConnectionInfo> : Selectable, Closeable {
         public actual fun tcp(
             family: AddressFamily,
         ): Socket<TcpConnectionInfo> {
-            val type = StandardSocketTypes.SOCK_STREAM
-            val proto = StandardIPProtocols.IPPROTO_TCP
+            val type = SocketType.SOCK_STREAM
+            val proto = IPProtocol.IPPROTO_TCP
             val sock = Syscall.socket(family, type, proto)
 
             return WindowsSocket(family, type, proto, sock, ::TcpConnectionInfo)
@@ -50,8 +50,8 @@ public actual interface Socket<I: ConnectionInfo> : Selectable, Closeable {
         public actual fun udp(
             family: AddressFamily,
         ): Socket<UdpConnectionInfo> {
-            val type = StandardSocketTypes.SOCK_DGRAM
-            val proto = StandardIPProtocols.IPPROTO_UDP
+            val type = SocketType.SOCK_DGRAM
+            val proto = IPProtocol.IPPROTO_UDP
             val sock = Syscall.socket(family, type, proto)
 
             return WindowsSocket(family, type, proto, sock, ::UdpConnectionInfo)

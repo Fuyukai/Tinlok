@@ -3,6 +3,14 @@
 Changelog
 =========
 
+1.4.0
+-----
+
+ - Add TLS support using OpenSSL.
+
+ - Unrefactor socket enumerations from interfaces. It's not like we would've supported custom socket
+   types properly anyway.
+
 1.3.0
 -----
 
@@ -43,11 +51,6 @@ Changelog
  - ``LinuxPath`` is now a ``PosixPurePath``.
 
  - Add compiled versions of the two static libraries for mingwX64.
-
- - Refactor out various APIs into a new ``Copperchain`` project.
-
-   - This may eventually be part of the basis for a truly multiplatform standard library, with
-     both JVM and Native implementations. May.
 
  - Remove errno/winerror from OSException, and make them part of CC.
 

@@ -13,7 +13,7 @@ import tf.lotte.tinlok.Unsafe
 import tf.lotte.tinlok.io.Buffer
 import tf.lotte.tinlok.io.HalfCloseableStream
 import tf.lotte.tinlok.net.ConnectionInfo
-import tf.lotte.tinlok.net.StandardSocketTypes
+import tf.lotte.tinlok.net.SocketType
 import tf.lotte.tinlok.net.tcp.TcpConnectionInfo
 import tf.lotte.tinlok.net.tcp.TcpSocketAddress
 import tf.lotte.tinlok.system.ensureNonBlock
@@ -67,7 +67,7 @@ public constructor(public val socket: Socket<I>) : HalfCloseableStream, Closeabl
     }
 
     init {
-        require(socket.type == StandardSocketTypes.SOCK_STREAM) {
+        require(socket.type == SocketType.SOCK_STREAM) {
             "This class only works on streaming sockets"
         }
 

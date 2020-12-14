@@ -10,7 +10,7 @@
 package tf.lotte.tinlok.net.tcp
 
 import tf.lotte.tinlok.Unsafe
-import tf.lotte.tinlok.net.StandardIPProtocols
+import tf.lotte.tinlok.net.IPProtocol
 import tf.lotte.tinlok.net.socket.BooleanSocketOption
 import tf.lotte.tinlok.net.socket.BsdSocketOption
 
@@ -19,7 +19,7 @@ import tf.lotte.tinlok.net.socket.BsdSocketOption
  */
 @OptIn(Unsafe::class)
 public object TcpSocketOptions {
-    private val IPPROTO_TCP = StandardIPProtocols.IPPROTO_TCP.number
+    private val IPPROTO_TCP = IPProtocol.IPPROTO_TCP.number
 
     /**
      * Disables Nagle's algorithm which delays small writes.

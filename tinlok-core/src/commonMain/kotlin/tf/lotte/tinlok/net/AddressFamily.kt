@@ -10,17 +10,9 @@
 package tf.lotte.tinlok.net
 
 /**
- * Defines a single address family for usage in socket creation.
- */
-public interface AddressFamily {
-    /** The socket number for the address family. */
-    public val number: Int
-}
-
-/**
  * An enumeration of the available address families.
  */
-public enum class StandardAddressFamilies(override val number: Int) : AddressFamily {
+public enum class AddressFamily(public val number: Int) {
     // main IP
     /** Unspecified address family. */
     AF_UNSPEC(tf.lotte.tinlok.net.socket.AF_UNSPEC),

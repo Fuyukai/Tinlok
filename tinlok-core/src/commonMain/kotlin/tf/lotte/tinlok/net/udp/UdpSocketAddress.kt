@@ -11,7 +11,6 @@ package tf.lotte.tinlok.net.udp
 
 import tf.lotte.tinlok.net.IPProtocol
 import tf.lotte.tinlok.net.SocketAddress
-import tf.lotte.tinlok.net.StandardIPProtocols
 
 /**
  * A socket address for UDP sockets.
@@ -29,7 +28,7 @@ public class UdpSocketAddress(
         }
     }
 
-    override val protocol: IPProtocol = StandardIPProtocols.IPPROTO_UDP
+    override val protocol: IPProtocol = IPProtocol.IPPROTO_UDP
 
     override fun hashCode(): Int {
         return connections.hashCode()
