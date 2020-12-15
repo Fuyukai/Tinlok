@@ -231,6 +231,13 @@ public actual class TlsObject actual constructor(
      * The TLS version that was negotiated during this handshake.
      */
     public actual val version: TlsVersion
-        get() = TODO("Not yet implemented")
+        get() {
+            if (SSL_is_init_finished(ssl) != 1) error("Handshake not completed yet")
+            return when (val version = SSL_version(ssl)) {
+                TLS1_2_VERSION -> TlsVersion.TLS_V12
+                TLS1_3_VERSION -> TlsVersion.TLS_V13
+                else -> error("Unknown version from SSL_version: $version")
+            }
+        }
 
 }

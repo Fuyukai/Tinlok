@@ -62,16 +62,23 @@ public class `Test TLS` {
     }
 
     /**
-     * Tests a valid connection to a TLS server.
+     * Runs a new TLS connection,
      */
-    @Test
-    public fun `Test valid connection`() = ClosingScope {
-        val addr = TcpSocketAddress.resolve("sha512.badssl.com", 443)
+    private fun runTlsConnection(hostname: String) = ClosingScope {
+        val addr = TcpSocketAddress.resolve(hostname, 443)
         val tlsStream = SynchronousTlsStream.unsafeConnect(CLIENT_CONTEXT, addr)
         it.add(tlsStream)
-        tlsStream.writeAll(b("GET / HTTP/1.1\r\nhost:sha512.badssl.com\r\n\r\n"))
+        tlsStream.writeAll(b("GET / HTTP/1.1\r\nhost:$hostname\r\n\r\n"))
         val result = tlsStream.readUpTo(2048)
         assertNotNull(result)
         assertTrue(result.startsWith(b("HTTP/1.1 200 OK")))
+    }
+
+    /**
+     * Tests a valid connection to a TLS server.
+     */
+    @Test
+    public fun `Test valid connection`() {
+        runTlsConnection("sha256.badssl.com")
     }
 }
