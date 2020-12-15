@@ -156,7 +156,7 @@ public class WindowsPath(
         val path = WindowsPath(letter, volume, rest)
 
         if (strict && !path.exists()) {
-            throw FileNotFoundException(path.unsafeToString())
+            throw FileNotFoundException(path.toByteString())
         } else {
             return path
         }
@@ -275,7 +275,7 @@ public class WindowsPath(
     @Unsafe
     override fun unsafeOpen(vararg modes: FileOpenMode): SynchronousFile {
         if (isDirectory(followSymlinks = true)) {
-            throw IsADirectoryException(unsafeToString())
+            throw IsADirectoryException(toByteString())
         }
 
         val openModes = modes.toSet()

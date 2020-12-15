@@ -33,7 +33,7 @@ import tf.lotte.tinlok.util.Closeable
  *  - incoming(data) -> SSL decryption -> decrypted application data -> read(data)
  *
  * Sometimes, the TLS object either needs more data than has been provided, or needs to write to the
- * underlying stream. When this happens, the appropriate method will return a [TlsBlockingResult]
+ * underlying stream. When this happens, the appropriate method will return a [BlockingResult]
  * with either the -1 or the -2 special constants (needs read and needs write, respectively).
  *
  * This object contains several properties to access certain attributes of the TLS connection. Doing
@@ -212,8 +212,6 @@ public actual class TlsObject actual constructor(
                 when (SSL_get_error(ssl, res)) {
                     SSL_ERROR_WANT_WRITE, SSL_ERROR_WANT_READ -> false
                     else -> {
-                        val ver = SSL_get_verify_result(ssl)
-                        println("verifiy: $ver")
                         tlsError()
                     }
                 }
