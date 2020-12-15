@@ -58,7 +58,7 @@ public actual class X509CertificateChain internal constructor(
     }
 
     /** The list of certificates that this chain has. */
-    public actual val certificates: List<X509Certificate> = ptrs.map { X509Certificate(it) }
+    public actual val certificates: List<X509Certificate> = ptrs.map { X509Certificate(it, true) }
 
     override fun closeImpl() {
         certificates.map { it.close() }

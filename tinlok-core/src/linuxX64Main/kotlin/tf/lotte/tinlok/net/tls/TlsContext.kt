@@ -13,9 +13,8 @@ import external.openssl.*
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.convert
 import tf.lotte.tinlok.Unsafe
-import tf.lotte.tinlok.util.AtomicBoolean
-import tf.lotte.tinlok.util.Closeable
-import tf.lotte.tinlok.util.flags
+import tf.lotte.tinlok.net.tls.x509.X509Certificate
+import tf.lotte.tinlok.util.*
 
 /**
  * A [TlsContext] wraps an OpenSSL SSL_CTX, and produces new [TlsObject] instances with the
@@ -23,8 +22,10 @@ import tf.lotte.tinlok.util.flags
  */
 @Unsafe
 public actual class TlsContext actual constructor(
-    public actual val config: TlsConnectionConfig,
+    public actual val config: TlsContextConfiguration,
 ) : Closeable {
+    private val scope = ClosingScopeImpl()
+
     /** Boolean to prevent double-frees. */
     private val isOpen = AtomicBoolean(true)
 
@@ -32,10 +33,9 @@ public actual class TlsContext actual constructor(
      * The OpenSSL context held by this class.
      */
     private val ctx = run {
-        if (config.side == TlsSide.CLIENT) {
-            SSL_CTX_new(TLS_client_method())
-        } else {
-            TODO("Server-side context")
+        when (config) {
+            is TlsClientConfig -> SSL_CTX_new(TLS_client_method())
+            is TlsServerConfig -> SSL_CTX_new(TLS_server_method())
         } ?: error("Failed to create SSL_CTX")
     }
 
@@ -48,17 +48,38 @@ public actual class TlsContext actual constructor(
         // 3) Disable compression. This is a security hole.
         SSL_CTX_set_options(ctx, SSL_OP_NO_COMPRESSION.convert())
         // 4a) Enable certification verification, if we're on the client side.
-        if (config.side == TlsSide.CLIENT) {
+        if (config is TlsClientConfig) {
             // This enables server-side verification.
             val bits = flags(SSL_VERIFY_PEER, SSL_VERIFY_FAIL_IF_NO_PEER_CERT)
             SSL_CTX_set_verify(ctx, bits, null)
 
             // TODO: Allow customising CA locations.
-            ctxerr("loading CA certs") { SSL_CTX_set_default_verify_paths(ctx) }
+            ctxerr("loading CA certs") {
+                SSL_CTX_set_default_verify_paths(ctx)
+            }
+
+            // load any custom certificates
+            val store = SSL_CTX_get_cert_store(ctx)
+                ?: error("Failed to get context's certificate store")
+
+            for (cert in config.extraCertificates) {
+                val x509Cert = X509Certificate.fromPEM(cert)
+                scope.add(x509Cert)
+                ctxerr("adding extra certificates") {
+                    X509_STORE_add_cert(store, x509Cert.handle)
+                }
+            }
         }
         // 4b) Load server-side certificates.
-        if (config.side == TlsSide.SERVER) {
-            TODO()
+        else if (config is TlsServerConfig) {
+            TODO("TLS servers are currently unsupported. Sorry!")
+
+            val cert = X509Certificate.fromPEM(config.certificatePem)
+            scope.add(cert)
+            ctxerr("setting server certificate") { SSL_CTX_use_certificate(ctx, cert.handle) }
+            ctxerr("setting server private key") { SSL_CTX_use_privatekey_pem(ctx, config.privateKeyPem) }
+
+            // TODO: Extra chain certificates
         }
         // 5) Enable release_buffers. Python does this for newer OpenSSL versions
         // (which we require), and apparently it provides decent memory savings.
@@ -83,6 +104,23 @@ public actual class TlsContext actual constructor(
     override fun close() {
         if (!isOpen.compareAndSet(expected = true, new = false)) return
         SSL_CTX_free(ctx)
+        scope.close()
+    }
+
+    /**
+     * Creates a new [TlsObject] from this client context.
+     * (This will fail if this is a server context).
+     */
+    public actual fun clientObject(hostname: String): TlsObject {
+        return TlsObject(this, hostname)
+    }
+
+    /**
+     * Creates a new [TlsObject] from this server context.
+     * (This will fail if this is a client context).
+     */
+    public actual fun serverObject(): TlsObject {
+        return TlsObject(this, "")
     }
 
     /**

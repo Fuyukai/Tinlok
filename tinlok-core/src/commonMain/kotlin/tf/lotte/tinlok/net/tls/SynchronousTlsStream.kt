@@ -43,7 +43,7 @@ public class SynchronousTlsStream
             tls: TlsObject,
             sock: Socket<TcpConnectionInfo>
         ): SynchronousTlsStream {
-            require(tls.context.config.side == TlsSide.CLIENT) {
+            require(tls.context.config is TlsClientConfig) {
                 "This method requires a client-sided socket"
             }
 

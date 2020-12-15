@@ -12,7 +12,7 @@ package tf.lotte.tinlok.net.tls
 import tf.lotte.tinlok.io.OSException
 
 /**
- * Thrown when a exception happpens relating to TLS code.
+ * Thrown when a exception happens relating to TLS code.
  */
 public class TlsException
 public constructor(

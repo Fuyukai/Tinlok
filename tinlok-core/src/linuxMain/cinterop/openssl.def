@@ -32,10 +32,9 @@ static inline int K_SSL_CTX_set_max_proto_version(SSL_CTX *ctx, int version) {
     return SSL_CTX_set_max_proto_version(ctx, version);
 }
 
-static inline int K_SSL_set_mode(SSL *ssl, long mode) {
-    return SSL_set_mode(ssl, mode);
+static inline int K_SSL_set_tlsext_host_name(const SSL *s, const char *name) {
+    return SSL_set_tlsext_host_name(s, name);
 }
 
-static inline void K_OPENSSL_free(void* ptr) {
-    OPENSSL_free(ptr);
-}
+static inline int K_SSL_set_mode(SSL *ssl, long mode) { return SSL_set_mode(ssl, mode); }
+static inline void K_OPENSSL_free(void* ptr) { OPENSSL_free(ptr); }

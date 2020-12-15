@@ -31,36 +31,47 @@ import tf.lotte.tinlok.util.Closeable
  */
 public actual class X509Certificate internal constructor(
     /** Underlying handle to the OpenSSL X509 struct. */
-    private val handle: CPointer<X509>
+    internal val handle: CPointer<X509>,
+    /** if we own the handle */
+    private val weOwnHandle: Boolean,
 ) : Closeable, AtomicSafeCloseable() {
 
     public actual companion object {
         /**
-         * Creates an [X509Certificate] from a PEM-encoded certificate.
+         * Actual routine to loadd a certificate from a PEM file. Used variously.
          */
         @Unsafe
-        public actual fun fromPEM(pem: String): X509Certificate = memScoped {
+        internal fun loadFromPEM(pem: String): CPointer<X509> = memScoped {
             val bio = BIO_new(BIO_s_mem())
             defer { BIO_free(bio) }
             val pemStr = pem.cstr
             BIO_write(bio, pemStr, pemStr.size)
-            val x509 = PEM_read_bio_X509(bio, null, null, null)
-                ?: error("Failed to create X509 certificate")
 
-            return X509Certificate(x509)
+            return PEM_read_bio_X509(bio, null, null, null)
+                ?: error("Failed to create X509 certificate")
+        }
+
+        /**
+         * Creates an [X509Certificate] from a PEM-encoded certificate.
+         */
+        @Unsafe
+        public actual fun fromPEM(pem: String): X509Certificate {
+            val x509 = loadFromPEM(pem)
+            return X509Certificate(x509, true)
         }
 
         /**
          * Gets the [X509Certificate] from an [SSL] struct.
          */
+        @Unsafe
         public fun fromSSL(ssl: CPointer<SSL>): X509Certificate {
             val cert = SSL_get_peer_certificate(ssl) ?: error("SSL object has no peer certificate")
-            return X509Certificate(cert)
+            return X509Certificate(cert, true)
         }
     }
 
     override fun closeImpl() {
-        X509_free(handle)
+        if (weOwnHandle) X509_free(handle)
     }
 
     /**

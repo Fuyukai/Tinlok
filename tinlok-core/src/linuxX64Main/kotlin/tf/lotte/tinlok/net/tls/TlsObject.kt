@@ -68,6 +68,7 @@ public actual class TlsObject actual constructor(
 
             // both BIOs are set to BIO_CLOSE to ensure they free their underlying memory
             incomingBio = BIO_new(BIO_s_mem()) ?: error("Failed to open incoming BIO")
+
             K_BIO_set_close(incomingBio, BIO_CLOSE.convert())
 
             outgoingBio = BIO_new(BIO_s_mem()) ?: error("Failed to open outgoing BIO")
@@ -80,26 +81,29 @@ public actual class TlsObject actual constructor(
         // configure the new SSL object now that we've allocated it
         // 1) openssl will use our in-memory BIOs
         SSL_set_bio(ssl, incomingBio, outgoingBio)
-        // 2) tell openssl what side socket we are
-        if (context.config.side == TlsSide.CLIENT) {
-            SSL_set_connect_state(ssl)
-        } else {
-            SSL_set_accept_state(ssl)
-        }
-        // 3) set SSL_MODE_ENABLE_PARTIAL_WRITE. this makes SSL_write behave more like we expect.
+        // 2) set SSL_MODE_ENABLE_PARTIAL_WRITE. this makes SSL_write behave more like we expect.
         //    This imitates the behaviour of write().
         K_SSL_set_mode(ssl, SSL_MODE_ENABLE_PARTIAL_WRITE.convert())
-        // 4) Set hostname for verification.
-        SSL_set_hostflags(ssl, X509_CHECK_FLAG_NO_PARTIAL_WILDCARDS)
-        sslerr("SSL_set1_host") { SSL_set1_host(ssl, hostname) }
 
+        // 3) tell openssl what side socket we are, and configure appropriately
+        if (context.config is TlsClientConfig) {
+            SSL_set_connect_state(ssl)
+            // 3a) Set hostname for verification.
+            SSL_set_hostflags(ssl, X509_CHECK_FLAG_NO_PARTIAL_WILDCARDS)
+            sslerr("SSL_set1_host") { SSL_set1_host(ssl, hostname) }
+
+            sslerr("SSL_set_tlsext_host_name") {
+                K_SSL_set_tlsext_host_name(ssl, hostname)
+            }
+        } else if (context.config is TlsServerConfig) {
+            SSL_set_accept_state(ssl)
+        }
     }
 
     override fun close() {
         if (!isOpen.compareAndSet(expected = true, new = false)) return
+        // Also frees the BIO!
         if (::ssl.isInitialized) SSL_free(ssl)
-        if (::incomingBio.isInitialized) BIO_free(incomingBio)
-        if (::outgoingBio.isInitialized) BIO_free(outgoingBio)
     }
 
     /**
@@ -203,13 +207,15 @@ public actual class TlsObject actual constructor(
             // 1 is handshake complete
             res >= 1 -> true
             // 0 is handshake failed successfully (this makes sense!)
-            res == 0 -> {
-                TODO("Handshake failed")
-            }
+            res == 0 -> tlsError()
             res <= -1 -> {
                 when (SSL_get_error(ssl, res)) {
                     SSL_ERROR_WANT_WRITE, SSL_ERROR_WANT_READ -> false
-                    else -> TODO("Handshake failed badly")
+                    else -> {
+                        val ver = SSL_get_verify_result(ssl)
+                        println("verifiy: $ver")
+                        tlsError()
+                    }
                 }
             }
             else -> throw Throwable("This never happens, please file a compiler bug!")
