@@ -63,10 +63,9 @@ public actual class X509Certificate internal constructor(
         /**
          * Gets the [X509Certificate] from an [SSL] struct.
          */
-        @Unsafe
-        public fun fromSSL(ssl: CPointer<SSL>): X509Certificate {
-            val cert = SSL_get_peer_certificate(ssl) ?: error("SSL object has no peer certificate")
-            return X509Certificate(cert, true)
+        public fun fromSSL(ssl: CPointer<SSL>): X509Certificate? {
+            val cert = SSL_get0_peer_certificate(ssl) ?: return null
+            return X509Certificate(cert, false)
         }
     }
 

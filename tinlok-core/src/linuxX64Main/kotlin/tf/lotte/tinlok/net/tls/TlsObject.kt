@@ -12,9 +12,11 @@ package tf.lotte.tinlok.net.tls
 import external.openssl.*
 import kotlinx.cinterop.*
 import tf.lotte.tinlok.Unsafe
+import tf.lotte.tinlok.net.tls.x509.X509Certificate
 import tf.lotte.tinlok.system.BlockingResult
 import tf.lotte.tinlok.util.AtomicBoolean
 import tf.lotte.tinlok.util.Closeable
+import tf.lotte.tinlok.util.ClosedException
 
 // Notes, in the order I discovered them:
 // 1) OpenSSL 1.1 and 3.0 (the ones we use) does initialisation automatically. So we don't call
@@ -53,6 +55,9 @@ public actual class TlsObject actual constructor(
     /** Boolean to prevent double-frees. */
     private val isOpen = AtomicBoolean(true)
 
+    // cached peer certificate, retreived from the context at handshake conclusion
+    private var _peerCertificate: X509Certificate? = null
+
     // actual ssl object
     private lateinit var ssl: CPointer<SSL>
 
@@ -90,11 +95,9 @@ public actual class TlsObject actual constructor(
             SSL_set_connect_state(ssl)
             // 3a) Set hostname for verification.
             SSL_set_hostflags(ssl, X509_CHECK_FLAG_NO_PARTIAL_WILDCARDS)
-            sslerr("SSL_set1_host") { SSL_set1_host(ssl, hostname) }
+            tlsError { SSL_set1_host(ssl, hostname) }
 
-            sslerr("SSL_set_tlsext_host_name") {
-                K_SSL_set_tlsext_host_name(ssl, hostname)
-            }
+            tlsError { K_SSL_set_tlsext_host_name(ssl, hostname) }
         } else if (context.config is TlsServerConfig) {
             SSL_set_accept_state(ssl)
         }
@@ -104,6 +107,9 @@ public actual class TlsObject actual constructor(
         if (!isOpen.compareAndSet(expected = true, new = false)) return
         // Also frees the BIO!
         if (::ssl.isInitialized) SSL_free(ssl)
+        // this won't actually free the certificate, but it sets the boolean to prevent it from
+        // trying to do operations on the closed handle.
+        _peerCertificate?.close()
     }
 
     /**
@@ -112,6 +118,8 @@ public actual class TlsObject actual constructor(
      */
     @OptIn(ExperimentalUnsignedTypes::class)
     public actual fun incomingPending(): Long {
+        if (!isOpen) throw ClosedException("this object is closed")
+
         return BIO_ctrl_pending(incomingBio).toLong()
     }
 
@@ -121,6 +129,8 @@ public actual class TlsObject actual constructor(
      */
     @OptIn(ExperimentalUnsignedTypes::class)
     public actual fun outgoingPending(): Long {
+        if (!isOpen) throw ClosedException("this object is closed")
+
         return BIO_ctrl_pending(outgoingBio).toLong()
     }
 
@@ -129,6 +139,7 @@ public actual class TlsObject actual constructor(
      * subsequent [read] call. This method should never fail.
      */
     public actual fun incoming(buf: ByteArray, count: Int, offset: Int) {
+        if (!isOpen) throw ClosedException("this object is closed")
         require(count + offset <= buf.size) { "count + offset > data.size" }
 
         buf.usePinned {
@@ -143,6 +154,7 @@ public actual class TlsObject actual constructor(
     public actual fun read(
         buf: ByteArray, count: Int, offset: Int,
     ): BlockingResult {
+        if (!isOpen) throw ClosedException("this object is closed")
         require(count + offset <= buf.size) { "count + offset > buf.size" }
 
         val res = buf.usePinned {
@@ -165,6 +177,7 @@ public actual class TlsObject actual constructor(
     public actual fun write(
         buf: ByteArray, count: Int, offset: Int,
     ): BlockingResult {
+        if (!isOpen) throw ClosedException("this object is closed")
         require(count + offset <= buf.size) { "count + offset > buf.size" }
 
         val res = buf.usePinned {
@@ -185,11 +198,22 @@ public actual class TlsObject actual constructor(
      * never fail.
      */
     public actual fun outgoing(buf: ByteArray, count: Int, offset: Int): Int {
+        if (!isOpen) throw ClosedException("this object is closed")
         require(count + offset <= buf.size) { "count + offset > data.size" }
 
         return buf.usePinned {
             BIO_read(outgoingBio, it.addressOf(offset), count)
         }
+    }
+
+    private val donePostHandshake = AtomicBoolean(false)
+
+    /**
+     * Performs some post-handshake operations.
+     */
+    private fun postHandshake() {
+        if (donePostHandshake.compareAndSet(expected = true, new = true)) return
+        _peerCertificate = X509Certificate.fromSSL(ssl)
     }
 
     /**
@@ -200,7 +224,12 @@ public actual class TlsObject actual constructor(
      * the handshake is complete.
      */
     public actual fun handshake(): Boolean {
-        if (SSL_is_init_finished(ssl) == 1) return true
+        if (!isOpen) throw ClosedException("this object is closed")
+
+        if (SSL_is_init_finished(ssl) == 1) {
+            postHandshake()
+            return true
+        }
 
         val res = SSL_do_handshake(ssl)
         return when {
@@ -232,6 +261,8 @@ public actual class TlsObject actual constructor(
      */
     public actual val version: TlsVersion
         get() {
+            if (!isOpen) throw ClosedException("this object is closed")
+
             if (SSL_is_init_finished(ssl) != 1) error("Handshake not completed yet")
             return when (val version = SSL_version(ssl)) {
                 TLS1_2_VERSION -> TlsVersion.TLS_V12
@@ -240,4 +271,9 @@ public actual class TlsObject actual constructor(
             }
         }
 
+    public actual val peerCertificate: X509Certificate?
+        get() {
+            if (!isOpen) throw ClosedException("this object is closed")
+            return _peerCertificate
+        }
 }

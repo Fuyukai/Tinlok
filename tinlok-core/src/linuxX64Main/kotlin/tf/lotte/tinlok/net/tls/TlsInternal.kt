@@ -13,49 +13,6 @@ import external.openssl.*
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.cstr
 import kotlinx.cinterop.memScoped
-import tf.lotte.tinlok.Unsafe
-import kotlin.experimental.ExperimentalTypeInference
-
-@Unsafe
-internal inline fun TlsContext.ctxerr(name: String, block: () -> Int) {
-    val res = block()
-    if (res == 0) {
-        close()
-        throw IllegalStateException("context call failed at $name")
-    }
-}
-
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-@Unsafe
-internal inline fun TlsContext.ctxerr(name: String, block: () -> Long) {
-    val res = block()
-    if (res == 0L) {
-        close()
-        throw IllegalStateException("context call failed at $name")
-    }
-}
-
-@Unsafe
-internal inline fun TlsObject.sslerr(name: String, block: () -> Int) {
-    val res = block()
-    if (res == 0) {
-        close()
-        throw IllegalStateException("ssl call failed at $name")
-    }
-}
-
-
-@OptIn(ExperimentalTypeInference::class)
-@OverloadResolutionByLambdaReturnType
-@Unsafe
-internal inline fun TlsObject.sslerr(name: String, block: () -> Long) {
-    val res = block()
-    if (res == 0L) {
-        close()
-        throw IllegalStateException("ssl call failed at $name")
-    }
-}
 
 /**
  * Loads a private key from a PEM-encoded string.

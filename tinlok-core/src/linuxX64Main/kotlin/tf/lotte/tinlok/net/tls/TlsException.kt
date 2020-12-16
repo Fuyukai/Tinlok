@@ -13,18 +13,29 @@ import external.openssl.ERR_error_string_n
 import external.openssl.ERR_get_error
 import kotlinx.cinterop.*
 
+@OptIn(ExperimentalUnsignedTypes::class)
+internal fun getErrorChain(): TlsException? {
+    var lastError: TlsException? = null
+    while (true) {
+        val err = ERR_get_error()
+        if (err == 0UL) return lastError
+        val buf = ByteArray(256)
+        buf.usePinned {
+            ERR_error_string_n(err, it.addressOf(0), buf.size.convert())
+        }
+        val exc = TlsException(buf.toKString(), lastError)
+        lastError = exc
+    }
+}
+
 /**
  * Throws a new TLS exception from the error queue.
  */
 @OptIn(ExperimentalUnsignedTypes::class)
 internal fun tlsError(): Nothing {
-    val err = ERR_get_error()
-    if (err == 0UL) throw IllegalArgumentException("No TLS error was on the queue!")
+    throw getErrorChain() ?: throw IllegalArgumentException("No TLS error was on the queue!")
+}
 
-    val buf = ByteArray(256)
-    buf.usePinned {
-        ERR_error_string_n(err, it.addressOf(0), buf.size.convert())
-    }
-
-    throw TlsException(buf.toKString())
+internal inline fun tlsError(block: () -> Int) {
+    if (block() != 1) tlsError()
 }

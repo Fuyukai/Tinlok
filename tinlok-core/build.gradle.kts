@@ -14,10 +14,10 @@ import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 import java.nio.file.Files
 import java.nio.file.Path
 
-
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
     id("maven-publish")
+    id("de.undercouch.download")
 }
 
 
@@ -69,14 +69,11 @@ kotlin {
         sourceSets["linuxX64Main"].apply {
             dependencies {
                 implementation(project(":tinlok-static-monocypher"))
+                implementation(project(":tinlok-static-openssl"))
             }
         }
 
         val main = compilations.getByName("main")
-        main.cinterops.create("openssl") {
-            defFile(project.file("src/linuxMain/cinterop/openssl.def"))
-        }
-
         main.cinterops.create("uuid") {
             defFile(project.file("src/linuxMain/cinterop/uuid.def"))
         }
@@ -90,14 +87,11 @@ kotlin {
         sourceSets["linuxArm64Main"].apply {
             dependencies {
                 implementation(project(":tinlok-static-monocypher"))
+                implementation(project(":tinlok-static-openssl"))
             }
         }
 
         val main = compilations.getByName("main")
-        main.cinterops.create("openssl") {
-            defFile(project.file("src/linuxMain/cinterop/openssl.def"))
-        }
-
         main.cinterops.create("uuid") {
             defFile(project.file("src/linuxMain/cinterop/uuid.def"))
         }

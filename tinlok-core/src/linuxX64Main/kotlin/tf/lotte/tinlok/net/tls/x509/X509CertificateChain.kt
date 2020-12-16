@@ -14,6 +14,7 @@ import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.cstr
 import kotlinx.cinterop.memScoped
 import tf.lotte.tinlok.Unsafe
+import tf.lotte.tinlok.net.tls.tlsError
 import tf.lotte.tinlok.util.AtomicSafeCloseable
 import tf.lotte.tinlok.util.Closeable
 
@@ -32,7 +33,7 @@ public actual class X509CertificateChain internal constructor(
          */
         @Unsafe
         public actual fun fromPEM(s: String): X509CertificateChain = memScoped {
-            val bio = BIO_new(BIO_s_mem())
+            val bio = BIO_new(BIO_s_mem()) ?: tlsError()
             defer { BIO_free(bio) }
             val pemStr = s.cstr
             BIO_write(bio, pemStr, pemStr.size)

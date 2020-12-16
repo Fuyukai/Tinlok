@@ -10,6 +10,7 @@
 package tf.lotte.tinlok.net.tls
 
 import tf.lotte.tinlok.Unsafe
+import tf.lotte.tinlok.net.tls.x509.X509Certificate
 import tf.lotte.tinlok.system.BlockingResult
 import tf.lotte.tinlok.util.Closeable
 
@@ -105,5 +106,13 @@ public expect class TlsObject(
      * The TLS version that was negotiated during this handshake.
      */
     public val version: TlsVersion
+
+    /**
+     * The peer certificate that was sent for this connection. Will be null if this is a server-side
+     * context but the client has not sent a certificate.
+     *
+     * This method is safe because the handle will
+     */
+    public val peerCertificate: X509Certificate?
 
 }

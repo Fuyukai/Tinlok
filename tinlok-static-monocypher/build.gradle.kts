@@ -53,7 +53,7 @@ publishing {
     publications.withType<MavenPublication> {
         pom {
             name.set(project.name)
-            description.set("A statically provided copy of the ipv6-parse library.")
+            description.set("A statically provided copy of the Monocypher library.")
             url.set("https://github.com/LoupVaillant/Monocypher")
 
             licenses {
