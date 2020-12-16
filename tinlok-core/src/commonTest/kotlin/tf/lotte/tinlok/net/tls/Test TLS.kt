@@ -16,9 +16,7 @@ import tf.lotte.tinlok.net.resolve
 import tf.lotte.tinlok.net.tcp.TcpSocketAddress
 import tf.lotte.tinlok.util.ClosingScope
 import tf.lotte.tinlok.util.b
-import kotlin.test.Test
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 private const val CERT = """-----BEGIN CERTIFICATE-----
 MIIC0TCCAlagAwIBAgIUMh0kWgXIMA3Dw1n6Y6huCl9rzl0wCgYIKoZIzj0EAwIw
@@ -46,6 +44,44 @@ wprhOvDytT3xhGzm2AT/kyu4qRuJ00pIUrikKbdNODDj5SIvBKTMU3H+yffgy04N
 1Q8ylxu8qM+AmCu4GGEVwnMTEgqUPwnBr+ABb0ar3UEVl2ZXY2ATitc=
 -----END PRIVATE KEY-----"""
 
+private const val BADSSL_UNTRUSTED = """-----BEGIN CERTIFICATE-----
+MIIGfjCCBGagAwIBAgIJAJeg/PrX5Sj9MA0GCSqGSIb3DQEBCwUAMIGBMQswCQYD
+VQQGEwJVUzETMBEGA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5j
+aXNjbzEPMA0GA1UECgwGQmFkU1NMMTQwMgYDVQQDDCtCYWRTU0wgVW50cnVzdGVk
+IFJvb3QgQ2VydGlmaWNhdGUgQXV0aG9yaXR5MB4XDTE2MDcwNzA2MzEzNVoXDTM2
+MDcwMjA2MzEzNVowgYExCzAJBgNVBAYTAlVTMRMwEQYDVQQIDApDYWxpZm9ybmlh
+MRYwFAYDVQQHDA1TYW4gRnJhbmNpc2NvMQ8wDQYDVQQKDAZCYWRTU0wxNDAyBgNV
+BAMMK0JhZFNTTCBVbnRydXN0ZWQgUm9vdCBDZXJ0aWZpY2F0ZSBBdXRob3JpdHkw
+ggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIKAoICAQDKQtPMhEH073gis/HISWAi
+bOEpCtOsatA3JmeVbaWal8O/5ZO5GAn9dFVsGn0CXAHR6eUKYDAFJLa/3AhjBvWa
+tnQLoXaYlCvBjodjLEaFi8ckcJHrAYG9qZqioRQ16Yr8wUTkbgZf+er/Z55zi1yn
+CnhWth7kekvrwVDGP1rApeLqbhYCSLeZf5W/zsjLlvJni9OrU7U3a9msvz8mcCOX
+fJX9e3VbkD/uonIbK2SvmAGMaOj/1k0dASkZtMws0Bk7m1pTQL+qXDM/h3BQZJa5
+DwTcATaa/Qnk6YHbj/MaS5nzCSmR0Xmvs/3CulQYiZJ3kypns1KdqlGuwkfiCCgD
+yWJy7NE9qdj6xxLdqzne2DCyuPrjFPS0mmYimpykgbPnirEPBF1LW3GJc9yfhVXE
+Cc8OY8lWzxazDNNbeSRDpAGbBeGSQXGjAbliFJxwLyGzZ+cG+G8lc+zSvWjQu4Xp
+GJ+dOREhQhl+9U8oyPX34gfKo63muSgo539hGylqgQyzj+SX8OgK1FXXb2LS1gxt
+VIR5Qc4MmiEG2LKwPwfU8Yi+t5TYjGh8gaFv6NnksoX4hU42gP5KvjYggDpR+NSN
+CGQSWHfZASAYDpxjrOo+rk4xnO+sbuuMk7gORsrl+jgRT8F2VqoR9Z3CEdQxcCjR
+5FsfTymZCk3GfIbWKkaeLQIDAQABo4H2MIHzMB0GA1UdDgQWBBRvx4NzSbWnY/91
+3m1u/u37l6MsADCBtgYDVR0jBIGuMIGrgBRvx4NzSbWnY/913m1u/u37l6MsAKGB
+h6SBhDCBgTELMAkGA1UEBhMCVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNV
+BAcMDVNhbiBGcmFuY2lzY28xDzANBgNVBAoMBkJhZFNTTDE0MDIGA1UEAwwrQmFk
+U1NMIFVudHJ1c3RlZCBSb290IENlcnRpZmljYXRlIEF1dGhvcml0eYIJAJeg/PrX
+5Sj9MAwGA1UdEwQFMAMBAf8wCwYDVR0PBAQDAgEGMA0GCSqGSIb3DQEBCwUAA4IC
+AQBQU9U8+jTRT6H9AIFm6y50tXTg/ySxRNmeP1Ey9Zf4jUE6yr3Q8xBv9gTFLiY1
+qW2qfkDSmXVdBkl/OU3+xb5QOG5hW7wVolWQyKREV5EvUZXZxoH7LVEMdkCsRJDK
+wYEKnEErFls5WPXY3bOglBOQqAIiuLQ0f77a2HXULDdQTn5SueW/vrA4RJEKuWxU
+iD9XPnVZ9tPtky2Du7wcL9qhgTddpS/NgAuLO4PXh2TQ0EMCll5reZ5AEr0NSLDF
+c/koDv/EZqB7VYhcPzr1bhQgbv1dl9NZU0dWKIMkRE/T7vZ97I3aPZqIapC2ulrf
+KrlqjXidwrGFg8xbiGYQHPx3tHPZxoM5WG2voI6G3s1/iD+B4V6lUEvivd3f6tq7
+d1V/3q1sL5DNv7TvaKGsq8g5un0TAkqaewJQ5fXLigF/yYu5a24/GUD783MdAPFv
+gWz8F81evOyRfpf9CAqIswMF+T6Dwv3aw5L9hSniMrblkg+ai0K22JfoBcGOzMtB
+Ke/Ps2Za56dTRoY/a4r62hrcGxufXd0mTdPaJLw3sJeHYjLxVAYWQq4QKJQWDgTS
+dAEWyN2WXaBFPx5c8KIW95Eu8ShWE00VVC3oA4emoZ2nrzBXLrUScifY6VaYYkkR
+2O2tSqU8Ri3XRdgpNPDWp8ZL49KhYGYo3R/k98gnMHiY5g==
+-----END CERTIFICATE-----"""
+
 /**
  * Tests TLS functionality.
  */
@@ -62,12 +98,15 @@ public class `Test TLS` {
     }
 
     /**
-     * Runs a new TLS connection,
+     * Tests a valid connection to a TLS server.
      */
-    private fun runTlsConnection(hostname: String) = ClosingScope {
+    @Test
+    public fun `Test valid connection`() = ClosingScope {
+        val hostname = "sha256.badssl.com"
+
         val addr = TcpSocketAddress.resolve(hostname, 443)
-        val tlsStream = SynchronousTlsStream.unsafeConnect(CLIENT_CONTEXT, addr)
-        it.add(tlsStream)
+        val tlsStream = SynchronousTlsStream.connect(it, CLIENT_CONTEXT, addr)
+
         tlsStream.writeAll(b("GET / HTTP/1.1\r\nhost:$hostname\r\n\r\n"))
         val result = tlsStream.readUpTo(2048)
         assertNotNull(result)
@@ -75,10 +114,74 @@ public class `Test TLS` {
     }
 
     /**
-     * Tests a valid connection to a TLS server.
+     * Tests getting the subject for a peer certificate.
      */
     @Test
-    public fun `Test valid connection`() {
-        runTlsConnection("sha256.badssl.com")
+    public fun `Test getpeercert`() = ClosingScope {
+        val hostname = "sha256.badssl.com"
+
+        val addr = TcpSocketAddress.resolve(hostname, 443)
+        val tlsStream = SynchronousTlsStream.connect(it, CLIENT_CONTEXT, addr)
+        val cert = tlsStream.tls.peerCertificate
+        assertNotNull(cert)
+        val subj = cert.subject.toMap()
+        assertEquals("*.badssl.com", subj["commonName"])
+    }
+
+    /**
+     * Ensures an invalid TLS version is not connected to.
+     */
+    @Test
+    public fun `Test invalid version`() {
+        val addr = TcpSocketAddress.resolve("tls-v1-1.badssl.com", 1011)
+         assertFailsWith<TlsException>("didn't fail to connect to TLS 1.1") {
+            SynchronousTlsStream.connect(CLIENT_CONTEXT, addr) {}
+        }
+    }
+
+    /**
+     * Ensures a bad CA is not connected to.
+     */
+    @Test
+    public fun `Test bad CA`() {
+        val addr = TcpSocketAddress.resolve("untrusted-root.badssl.com", 443)
+        assertFailsWith<TlsException>("didn't fail to connect to an untrusted root") {
+            SynchronousTlsStream.connect(CLIENT_CONTEXT, addr) {}
+        }
+    }
+
+    /**
+     * Ensures that a bad CA that is explicitly added to the trust store is connected to.
+     */
+    @Test
+    public fun `Test adding CA as trusted`() = ClosingScope {
+        val config = TlsClientConfig()
+        config.addTrustedCertificate(BADSSL_UNTRUSTED)
+        val context = TlsContext(config)
+
+        val addr = TcpSocketAddress.resolve("untrusted-root.badssl.com", 443)
+        val conn = SynchronousTlsStream.connect(it, context, addr)
+        val cert = conn.tls.peerCertificate
+        assertNotNull(cert)
+        val subj = cert.subject.toMap()
+        assertEquals("*.badssl.com", subj["commonName"])
+    }
+
+    /**
+     * Ensures insecure cipher connections fail.
+     */
+    @Test
+    public fun `Test insecure connection fails`() = ClosingScope {
+        val badSites = listOf(
+            "cbc", "rc4-md5", "rc4", "3des", "null",
+            "dh480", "dh512"
+        )
+        for (bad in badSites) {
+            val addr = TcpSocketAddress.resolve("$bad.badssl.com", 443)
+            val failure = assertFailsWith<TlsException>("didn't fail to connect to $bad") {
+                SynchronousTlsStream.connect(CLIENT_CONTEXT, addr) {}
+            }
+            println(failure.message)
+        }
     }
 }

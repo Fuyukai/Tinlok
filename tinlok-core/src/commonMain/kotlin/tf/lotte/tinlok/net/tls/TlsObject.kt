@@ -111,7 +111,8 @@ public expect class TlsObject(
      * The peer certificate that was sent for this connection. Will be null if this is a server-side
      * context but the client has not sent a certificate.
      *
-     * This method is safe because the handle will
+     * This method is safe because the underlying handle to the certificate is owned by the TLS
+     * object, not the certificate object, and will be closed when the TLS object closes.
      */
     public val peerCertificate: X509Certificate?
 

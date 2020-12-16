@@ -24,7 +24,12 @@ public sealed class TlsContextConfiguration(
     /**
      * The set of ALPN protocols to use. See RFC 8447 for more information.
      */
-    public val alpnProtocols: MutableSet<String>
+    public val alpnProtocols: MutableSet<String>,
+
+    /**
+     * If compatibility ciphers should be used over the most secure ciphers.
+     */
+    public val compatibilityCiphers: Boolean
 )
 
 /**
@@ -32,8 +37,9 @@ public sealed class TlsContextConfiguration(
  */
 public class TlsClientConfig(
     versions: Set<TlsVersion> = setOf(TlsVersion.TLS_V12, TlsVersion.TLS_V13),
-    alpnProtocols: MutableSet<String> = mutableSetOf()
-) : TlsContextConfiguration(versions, alpnProtocols) {
+    alpnProtocols: MutableSet<String> = mutableSetOf(),
+    compatibilityCiphers: Boolean = false,
+) : TlsContextConfiguration(versions, alpnProtocols, compatibilityCiphers) {
     /** The list of extra certificates to be added to the X509_STORE. */
     internal val extraCertificates = mutableListOf<String>()
 
@@ -53,7 +59,8 @@ public class TlsServerConfig(
     public val privateKeyPem: String,
     public val chain: List<X509Certificate> = listOf(),
     versions: Set<TlsVersion> = setOf(TlsVersion.TLS_V12, TlsVersion.TLS_V13),
-    alpnProtocols: MutableSet<String> = mutableSetOf()
-) : TlsContextConfiguration(versions, alpnProtocols) {
+    alpnProtocols: MutableSet<String> = mutableSetOf(),
+    compatibilityCiphers: Boolean = false,
+) : TlsContextConfiguration(versions, alpnProtocols, compatibilityCiphers, ) {
 
 }

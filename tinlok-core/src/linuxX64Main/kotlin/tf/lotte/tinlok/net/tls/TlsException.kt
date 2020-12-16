@@ -13,6 +13,7 @@ import external.openssl.ERR_error_string_n
 import external.openssl.ERR_get_error
 import kotlinx.cinterop.*
 
+// TODO: Not sure if this should be a thing.
 @OptIn(ExperimentalUnsignedTypes::class)
 internal fun getErrorChain(): TlsException? {
     var lastError: TlsException? = null

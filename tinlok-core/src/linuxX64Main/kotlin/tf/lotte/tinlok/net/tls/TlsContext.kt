@@ -19,6 +19,21 @@ import tf.lotte.tinlok.net.tls.x509.X509CertificateChain
 import tf.lotte.tinlok.util.*
 
 /**
+ * OWASP Cipher List A. The default list.
+ */
+private const val CIPHER_LIST_A = "TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:" +
+    "TLS_AES_128_GCM_SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:" +
+    "ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256"
+
+/**
+ * OWASP Cipher List B. Used if compatibility mode is absolutely desired.
+ */
+private const val CIPHER_LIST_B = "TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:" +
+    "TLS_AES_128_GCM_SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:" +
+    "ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-SHA256:" +
+    "DHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256"
+
+/**
  * A [TlsContext] wraps an OpenSSL SSL_CTX, and produces new [TlsObject] instances with the
  * default config.
  */
@@ -87,7 +102,14 @@ public actual class TlsContext actual constructor(
         // (which we require), and apparently it provides decent memory savings.
         K_SSL_CTX_set_mode(ctx, SSL_MODE_RELEASE_BUFFERS.convert())
 
-        // Set the application properties, which are configurable.
+        // 6) Set a good set of secure ciphers.
+        if (config.compatibilityCiphers) {
+            tlsError { SSL_CTX_set_cipher_list(ctx, CIPHER_LIST_B) }
+        } else {
+            tlsError { SSL_CTX_set_cipher_list(ctx, CIPHER_LIST_A) }
+        }
+
+        // 7) Set the application properties, which are configurable.
         val sorted = TlsVersion.values().sorted().map { it.number }
 
         // Minimum protocol version supported, usually TLS 1.2

@@ -31,7 +31,7 @@ import tf.lotte.tinlok.util.use
 public class SynchronousTlsStream
 @Unsafe public constructor(
     private val sock: Socket<TcpConnectionInfo>,
-    private val tls: TlsObject
+    public val tls: TlsObject
 ) : BidirectionalStream {
     public companion object {
         /**
@@ -108,7 +108,7 @@ public class SynchronousTlsStream
          * to the specified [scope], and returning it.
          */
         @OptIn(Unsafe::class)
-        public fun <R> connect(
+        public fun connect(
             scope: ClosingScope, context: TlsContext, address: TcpSocketAddress
         ): SynchronousTlsStream {
             val stream = unsafeConnect(context, address)

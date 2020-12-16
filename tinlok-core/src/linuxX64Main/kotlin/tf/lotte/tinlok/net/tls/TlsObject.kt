@@ -165,7 +165,7 @@ public actual class TlsObject actual constructor(
             when (SSL_get_error(ssl, res)) {
                 SSL_ERROR_WANT_READ -> BlockingResult.WOULD_BLOCK
                 SSL_ERROR_WANT_WRITE -> BlockingResult.WOULD_BLOCK_2
-                else -> TODO("SSL error")
+                else -> tlsError()
             }
         } else BlockingResult(res.toLong())
     }
@@ -188,7 +188,7 @@ public actual class TlsObject actual constructor(
             when (SSL_get_error(ssl, res)) {
                 SSL_ERROR_WANT_READ -> BlockingResult.WOULD_BLOCK
                 SSL_ERROR_WANT_WRITE -> BlockingResult.WOULD_BLOCK_2
-                else -> TODO("SSL error")
+                else -> tlsError()
             }
         } else BlockingResult(res.toLong())
     }
@@ -234,7 +234,10 @@ public actual class TlsObject actual constructor(
         val res = SSL_do_handshake(ssl)
         return when {
             // 1 is handshake complete
-            res >= 1 -> true
+            res >= 1 -> {
+                postHandshake()
+                true
+            }
             // 0 is handshake failed successfully (this makes sense!)
             res == 0 -> tlsError()
             res <= -1 -> {
@@ -271,6 +274,13 @@ public actual class TlsObject actual constructor(
             }
         }
 
+    /**
+     * The peer certificate that was sent for this connection. Will be null if this is a server-side
+     * context but the client has not sent a certificate.
+     *
+     * This method is safe because the underlying handle to the certificate is owned by the TLS
+     * object, not the certificate object, and will be closed when the TLS object closes.
+     */
     public actual val peerCertificate: X509Certificate?
         get() {
             if (!isOpen) throw ClosedException("this object is closed")
