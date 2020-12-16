@@ -11,11 +11,9 @@ package tf.lotte.tinlok.util
 
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.memScoped
-import kotlinx.cinterop.ptr
 import platform.posix.GUID
 import platform.windows.*
 import tf.lotte.tinlok.Unsafe
-import tf.lotte.tinlok.system.readBytesFast
 
 /**
  * Generates a Version 1 (MAC + Time) UUID.

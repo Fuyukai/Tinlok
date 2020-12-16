@@ -8,6 +8,7 @@
  */
 
 @file:OptIn(ExperimentalUnsignedTypes::class)
+
 package tf.lotte.tinlok.system
 
 import kotlinx.cinterop.ByteVar
@@ -69,7 +70,7 @@ internal expect fun __unlink(path: CPointer<ByteVar>): Int
  */
 internal expect fun __realpath(
     path: CPointer<ByteVar>,
-    resolved_path: CPointer<ByteVar>
+    resolved_path: CPointer<ByteVar>,
 ): CPointer<ByteVar>?
 
 /**
@@ -78,7 +79,7 @@ internal expect fun __realpath(
 internal expect fun __readlink(
     path: CPointer<ByteVar>,
     buf: CPointer<ByteVar>,
-    bufsize: size_t
+    bufsize: size_t,
 ): ssize_t
 
 /**

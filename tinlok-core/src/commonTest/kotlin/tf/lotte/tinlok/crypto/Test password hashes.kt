@@ -10,10 +10,7 @@
 package tf.lotte.tinlok.crypto
 
 import kotlin.random.nextUBytes
-import kotlin.test.Test
-import kotlin.test.assertFails
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 /**
  * Ensures password hashes verify properly.

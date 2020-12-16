@@ -63,7 +63,7 @@ internal actual fun __unlink(path: CPointer<ByteVar>): Int {
 
 internal actual fun __realpath(
     path: CPointer<ByteVar>,
-    resolved_path: CPointer<ByteVar>
+    resolved_path: CPointer<ByteVar>,
 ): CPointer<ByteVar>? {
     return platform.linux.extra.realpath(path, resolved_path)
 }
@@ -71,7 +71,7 @@ internal actual fun __realpath(
 internal actual fun __readlink(
     path: CPointer<ByteVar>,
     buf: CPointer<ByteVar>,
-    bufsize: size_t
+    bufsize: size_t,
 ): ssize_t {
     return platform.linux.extra.readlink(path, buf, bufsize).convert()
 }

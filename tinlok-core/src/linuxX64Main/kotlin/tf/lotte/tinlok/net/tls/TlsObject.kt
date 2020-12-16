@@ -64,6 +64,7 @@ public actual class TlsObject actual constructor(
     // BIOs
     // Incoming data, written to by incoming() and read from with SSL_read()
     private lateinit var incomingBio: CPointer<BIO>
+
     // Outgoing data, written to by SSL_write() and read from with outgoing()
     private lateinit var outgoingBio: CPointer<BIO>
 

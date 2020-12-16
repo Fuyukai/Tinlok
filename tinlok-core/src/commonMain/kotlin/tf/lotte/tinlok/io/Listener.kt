@@ -20,7 +20,7 @@ import kotlin.contracts.contract
 /**
  * Listens for incoming connections.
  */
-public interface Listener<T: Any> : Closeable {
+public interface Listener<T : Any> : Closeable {
     /**
      * Accepts a new incoming connection.
      */
@@ -33,8 +33,8 @@ public interface Listener<T: Any> : Closeable {
  * Accepts a new incoming connection, and passes it to the specified [block].
  */
 @OptIn(Unsafe::class, ExperimentalContracts::class)
-public inline fun <T: Closeable, R> Listener<T>.accept(
-    block: (T) -> R
+public inline fun <T : Closeable, R> Listener<T>.accept(
+    block: (T) -> R,
 ): R {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
@@ -48,8 +48,8 @@ public inline fun <T: Closeable, R> Listener<T>.accept(
  * Accepts a new incoming connection, and adds it to the specified [scope].
  */
 @OptIn(Unsafe::class)
-public fun <T: Closeable> Listener<T>.accept(
-    scope: ClosingScope
+public fun <T : Closeable> Listener<T>.accept(
+    scope: ClosingScope,
 ): T {
     val item = unsafeAccept()
     scope.add(item)

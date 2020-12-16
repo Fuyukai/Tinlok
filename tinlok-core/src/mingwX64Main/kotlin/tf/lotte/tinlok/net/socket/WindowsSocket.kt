@@ -24,7 +24,7 @@ import tf.lotte.tinlok.util.AtomicSafeCloseable
 /**
  * A Winsock-based socket.
  */
-public class WindowsSocket<I: ConnectionInfo>
+public class WindowsSocket<I : ConnectionInfo>
 public constructor(
     override val family: AddressFamily,
     override val type: SocketType,

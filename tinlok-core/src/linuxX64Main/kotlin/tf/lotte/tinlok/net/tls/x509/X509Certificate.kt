@@ -76,57 +76,62 @@ public actual class X509Certificate internal constructor(
     /**
      * The X.509 version of this certificate. See 4.1.2.1.
      */
-    public actual val version: Long get () {
-        checkOpen()
+    public actual val version: Long
+        get() {
+            checkOpen()
 
-        return X509_get_version(handle)
-    }
+            return X509_get_version(handle)
+        }
 
     /**
      * The serial number of this certificate. This can be any arbitrary number, so this is a String
      * (at least for now).
      */
     @OptIn(Unsafe::class)
-    public actual val serial: String get() = memScoped {
-        checkOpen()
+    public actual val serial: String
+        get() = memScoped {
+            checkOpen()
 
-        // Ew, yuck, gross!
-        val i = X509_get_serialNumber(handle) ?: error("Failed to get serial number?")
-        val bn = ASN1_INTEGER_to_BN(i, null) ?: error("Failed to convert serial to bignum")
-        defer { BN_free(bn) }
-        // temporary char array returned
-        val tmp = BN_bn2dec(bn) ?: error("Failed to convert bignum to decimal")
-        defer { K_OPENSSL_free(tmp) }
-        return tmp.toKStringUtf8Fast()
-    }
+            // Ew, yuck, gross!
+            val i = X509_get_serialNumber(handle) ?: error("Failed to get serial number?")
+            val bn = ASN1_INTEGER_to_BN(i, null) ?: error("Failed to convert serial to bignum")
+            defer { BN_free(bn) }
+            // temporary char array returned
+            val tmp = BN_bn2dec(bn) ?: error("Failed to convert bignum to decimal")
+            defer { K_OPENSSL_free(tmp) }
+            return tmp.toKStringUtf8Fast()
+        }
 
 
     /** The entity that has signed and issued this certificate. */
     @OptIn(ExperimentalUnsignedTypes::class, Unsafe::class)
-    public actual val issuer: List<Pair<String, String>> get() {
-        checkOpen()
+    public actual val issuer: List<Pair<String, String>>
+        get() {
+            checkOpen()
 
-        // an X509_name has multiple entries, which we iterate over and return a "mapping" of
-        val name = X509_get_issuer_name(handle) ?: error("Failed to get issuer name")
-        return name.toPairs()
-    }
+            // an X509_name has multiple entries, which we iterate over and return a "mapping" of
+            val name = X509_get_issuer_name(handle) ?: error("Failed to get issuer name")
+            return name.toPairs()
+        }
 
     /** The entity this certificate was issued for. */
     @OptIn(Unsafe::class)
-    public actual val subject: List<Pair<String, String>> get() {
-        checkOpen()
+    public actual val subject: List<Pair<String, String>>
+        get() {
+            checkOpen()
 
-        // similar deal here.
-        val name = X509_get_subject_name(handle) ?: error("Failed to get subject name")
-        return name.toPairs()
-    }
+            // similar deal here.
+            val name = X509_get_subject_name(handle) ?: error("Failed to get subject name")
+            return name.toPairs()
+        }
 
     /** If this certificate is a CA. */
-    public actual val isCertificateAuthority: Boolean get() {
-        checkOpen()
+    public actual val isCertificateAuthority: Boolean
+        get() {
+            checkOpen()
 
-        return X509_check_ca(handle) != 0
-    }
+            return X509_check_ca(handle) != 0
+        }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

@@ -21,21 +21,21 @@ import tf.lotte.tinlok.util.*
 /**
  * The Linux-specific implementation of the [Socket] interface.
  */
-public class LinuxSocket<I: ConnectionInfo>
+public class LinuxSocket<I : ConnectionInfo>
 public constructor(
     override val family: AddressFamily,
     override val type: SocketType,
     override val protocol: IPProtocol,
     public override val fd: FD,
     /** A connection info creator for going from sockaddr -> ConnectionInfo. */
-    private val creator: ConnectionInfoCreator<I>
+    private val creator: ConnectionInfoCreator<I>,
 ) : Socket<I>, EasyFdCloseable() {
     public companion object {
         /**
          * Opens a new unconnected socket, using the specified [family], [type], and [protocol]
          */
         @Unsafe
-        public fun <I: ConnectionInfo> open(
+        public fun <I : ConnectionInfo> open(
             family: AddressFamily, type: SocketType, protocol: IPProtocol,
             creator: ConnectionInfoCreator<I>,
         ): LinuxSocket<I> {

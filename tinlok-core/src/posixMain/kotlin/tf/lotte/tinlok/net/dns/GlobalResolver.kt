@@ -23,7 +23,7 @@ public actual object GlobalResolver : AddressResolver {
     @Unsafe
     override fun getaddrinfo(
         host: String?, service: Int, family: AddressFamily, type: SocketType, protocol: IPProtocol,
-        flags: Int
+        flags: Int,
     ): List<ConnectionInfo> {
         val result = Syscall.getaddrinfo(
             host, service.toString(),

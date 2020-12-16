@@ -27,7 +27,7 @@ import tf.lotte.tinlok.util.AtomicSafeCloseable
  */
 public class SynchronousFilesystemFile(
     override val path: Path,
-    public val handle: FILE
+    public val handle: FILE,
 ) : SynchronousFile, AtomicSafeCloseable() {
     /** If this file is still open. */
     override val isOpen: AtomicBoolean get() = _isOpen

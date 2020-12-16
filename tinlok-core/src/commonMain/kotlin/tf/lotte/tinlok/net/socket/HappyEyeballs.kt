@@ -22,7 +22,7 @@ import tf.lotte.tinlok.net.tcp.TcpSocketAddress
  */
 @Unsafe
 public fun happyEyeballsTcpConnect(
-    address: TcpSocketAddress, timeout: Int = 30_000
+    address: TcpSocketAddress, timeout: Int = 30_000,
 ): Socket<TcpConnectionInfo> {
     for (info in address) {
         val sock = Socket.tcp(info.family)

@@ -23,7 +23,9 @@ import tf.lotte.tinlok.system.readBytesFast
 @Unsafe
 private fun CPointer<ASN1_OBJECT>.toKString(): String {
     var buflen = OBJ_obj2txt(null, 0, this, 0 /* Use short/long names */)
-    if (buflen == NID_undef) { error("OBJ_obj2txt size call failed") }
+    if (buflen == NID_undef) {
+        error("OBJ_obj2txt size call failed")
+    }
 
     // +1 for trailing null? idk.
     buflen += 1
@@ -32,7 +34,9 @@ private fun CPointer<ASN1_OBJECT>.toKString(): String {
     val res = buffer.usePinned {
         OBJ_obj2txt(it.addressOf(0), buflen, this, 0)
     }
-    if (res == NID_undef) { error("OBJ_obj2txt failed") }
+    if (res == NID_undef) {
+        error("OBJ_obj2txt failed")
+    }
     return buffer.toKString(endIndex = buffer.size - 1)
 }
 

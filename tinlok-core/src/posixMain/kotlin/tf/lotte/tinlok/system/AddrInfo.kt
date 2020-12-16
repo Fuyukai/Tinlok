@@ -28,7 +28,7 @@ public data class AddrInfo(
     /** The protocol. */
     public val protocol: Int,
     /** The socket type. */
-    public val type: Int
+    public val type: Int,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

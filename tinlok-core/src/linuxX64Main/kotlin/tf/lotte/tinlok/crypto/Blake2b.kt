@@ -20,7 +20,9 @@ import tf.lotte.tinlok.util.*
  * A class that takes in data and will eventually produce a hash using the Blake2b algorithm.
  */
 @OptIn(ExperimentalUnsignedTypes::class)
-public actual class Blake2b internal actual constructor(key: UByteArray) : Closeable, AtomicSafeCloseable() {
+public actual class Blake2b internal actual constructor(
+    key: UByteArray,
+) : Closeable, AtomicSafeCloseable() {
     public actual companion object {
         // output blake2b hash size
         public const val HASH_SIZE: Int = 64

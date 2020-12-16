@@ -29,7 +29,7 @@ public sealed class TlsContextConfiguration(
     /**
      * If compatibility ciphers should be used over the most secure ciphers.
      */
-    public val compatibilityCiphers: Boolean
+    public val compatibilityCiphers: Boolean,
 )
 
 /**
@@ -61,6 +61,6 @@ public class TlsServerConfig(
     versions: Set<TlsVersion> = setOf(TlsVersion.TLS_V12, TlsVersion.TLS_V13),
     alpnProtocols: MutableSet<String> = mutableSetOf(),
     compatibilityCiphers: Boolean = false,
-) : TlsContextConfiguration(versions, alpnProtocols, compatibilityCiphers, ) {
+) : TlsContextConfiguration(versions, alpnProtocols, compatibilityCiphers) {
 
 }

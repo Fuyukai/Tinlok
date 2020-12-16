@@ -18,7 +18,7 @@ import tf.lotte.tinlok.Unsafe
 public actual class BooleanSocketOption actual constructor(
     actual override val bsdOptionValue: Int,
     actual override val level: Int,
-    override val name: String
+    override val name: String,
 ) : BsdSocketOption<Boolean> {
 
     @Unsafe
@@ -60,7 +60,7 @@ public actual class BooleanSocketOption actual constructor(
 public actual class ULongSocketOption actual constructor(
     actual override val bsdOptionValue: Int,
     actual override val level: Int,
-    override val name: String
+    override val name: String,
 ) : BsdSocketOption<ULong> {
     @Unsafe
     override fun allocateNativeStructure(allocator: NativePlacement): CPointer<*> {

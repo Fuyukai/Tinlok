@@ -27,7 +27,7 @@ import tf.lotte.tinlok.util.ClosedException
  * A BSD socket, an abstraction used for inter-process communication. Sockets can be either local or
  * over a network.
  */
-public actual interface Socket<I: ConnectionInfo> : Selectable, Closeable {
+public actual interface Socket<I : ConnectionInfo> : Selectable, Closeable {
     public actual companion object {
         /**
          * Creates a new unconnected TCP socket.
@@ -186,7 +186,7 @@ public actual interface Socket<I: ConnectionInfo> : Selectable, Closeable {
      */
     @Throws(ClosedException::class, OSException::class)
     public actual fun sendto(
-        buf: ByteArray, size: Int, offset: Int, flags: Int, addr: I
+        buf: ByteArray, size: Int, offset: Int, flags: Int, addr: I,
     ): BlockingResult
 
     /**

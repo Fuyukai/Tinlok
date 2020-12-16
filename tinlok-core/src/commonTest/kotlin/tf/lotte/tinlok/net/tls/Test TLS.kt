@@ -134,7 +134,7 @@ public class `Test TLS` {
     @Test
     public fun `Test invalid version`() {
         val addr = TcpSocketAddress.resolve("tls-v1-1.badssl.com", 1011)
-         assertFailsWith<TlsException>("didn't fail to connect to TLS 1.1") {
+        assertFailsWith<TlsException>("didn't fail to connect to TLS 1.1") {
             SynchronousTlsStream.connect(CLIENT_CONTEXT, addr) {}
         }
     }

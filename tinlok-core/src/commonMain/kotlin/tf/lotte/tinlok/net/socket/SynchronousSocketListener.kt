@@ -18,8 +18,8 @@ import tf.lotte.tinlok.util.Closeable
 /**
  * A [Listener] that wraps a synchronous streaming socket.
  */
-public class SynchronousSocketListener<I: ConnectionInfo>(
-    public val socket: Socket<I>
+public class SynchronousSocketListener<I : ConnectionInfo>(
+    public val socket: Socket<I>,
 ) : Listener<Socket<I>>, Closeable by socket {
     init {
         require(!socket.nonBlocking) { "Socket must be blocking" }

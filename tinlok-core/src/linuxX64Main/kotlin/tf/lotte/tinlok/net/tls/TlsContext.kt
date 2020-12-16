@@ -61,7 +61,7 @@ public actual class TlsContext actual constructor(
         // 1) Disable SSL re-negotiation. This adds extra complexity and isn't part of TLS 1.3.
         SSL_CTX_set_options(ctx, SSL_OP_NO_RENEGOTIATION.convert())
         // 2) Disable tickets. These are broken, see: https://github.com/openssl/openssl/issues/7948
-        tlsError {  SSL_CTX_set_num_tickets(ctx, 0) }
+        tlsError { SSL_CTX_set_num_tickets(ctx, 0) }
         // 3) Disable compression. This is a security hole.
         SSL_CTX_set_options(ctx, SSL_OP_NO_COMPRESSION.convert())
         // 4a) Enable certification verification, if we're on the client side.

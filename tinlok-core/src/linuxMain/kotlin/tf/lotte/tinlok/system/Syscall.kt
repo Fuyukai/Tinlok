@@ -360,7 +360,7 @@ public actual object Syscall {
      */
     @Unsafe
     public actual fun __write_file(
-        fd: FILE, address: CPointer<ByteVar>, size: Int
+        fd: FILE, address: CPointer<ByteVar>, size: Int,
     ): BlockingResult {
         return this.write(fd, address, size)
     }
@@ -373,7 +373,7 @@ public actual object Syscall {
      */
     @Unsafe
     public actual fun __write_file_with_retry(
-        fd: FILE, address: CPointer<ByteVar>, size: Int
+        fd: FILE, address: CPointer<ByteVar>, size: Int,
     ): BlockingResult {
         var lastOffset = 0
 
@@ -474,7 +474,7 @@ public actual object Syscall {
     public fun __stat_safer(
         alloc: NativePlacement,
         path: ByteString,
-        followSymlinks: Boolean
+        followSymlinks: Boolean,
     ): stat? {
         val pathStat = alloc.alloc<stat>()
         val ba = path.toNullTerminated()
@@ -994,7 +994,7 @@ public actual object Syscall {
      */
     @Unsafe
     public fun recv(
-        fd: FD, buf: CPointer<ByteVar>, size: Int, flags: Int
+        fd: FD, buf: CPointer<ByteVar>, size: Int, flags: Int,
     ): BlockingResult {
         val read = retry { recv(fd, buf, size.toULong(), flags) }
         if (read.isError) {
@@ -1034,7 +1034,7 @@ public actual object Syscall {
      */
     @Unsafe
     public fun __write_socket_with_retry(
-        socket: SOCKET, address: CPointer<ByteVar>, size: Int, flags: Int
+        socket: SOCKET, address: CPointer<ByteVar>, size: Int, flags: Int,
     ): BlockingResult {
         var lastOffset = 0
 
@@ -1065,14 +1065,14 @@ public actual object Syscall {
      * well as the address of the sender.
      */
     @Unsafe
-    public fun <I: ConnectionInfo> recvfrom(
+    public fun <I : ConnectionInfo> recvfrom(
         fd: FD,
         buffer: ByteArray,
         size: Int = buffer.size, offset: Int = 0,
         flags: Int = 0,
 
         /* extra flags for address creation */
-        creator: ConnectionInfoCreator<I>
+        creator: ConnectionInfoCreator<I>,
     ): RecvFrom<I>? = memScoped {
         require(size <= IO_MAX) { "$size is more than IO_MAX" }
         require(buffer.size >= size) { "$size is more than buffer size (${buffer.size})" }

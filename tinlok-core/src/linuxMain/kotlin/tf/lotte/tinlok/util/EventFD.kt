@@ -24,8 +24,10 @@ public class EventFD @Unsafe public constructor(vararg flag: Flag) : EasyFdClose
     public enum class Flag(public val number: Int) {
         /** Close-on-exec. */
         EFD_CLOEXEC(platform.linux.EFD_CLOEXEC),
+
         /** Non-blocking. (See: O_NONBLOCK). */
         EFD_NONBLOCK(platform.linux.EFD_NONBLOCK),
+
         /** Provides semaphore-like semantics for reads. */
         EFD_SEMAPHORE(platform.linux.EFD_SEMAPHORE)
     }

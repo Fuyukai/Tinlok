@@ -15,7 +15,7 @@ package tf.lotte.tinlok.net.socket
 public expect class BooleanSocketOption(
     bsdOptionValue: Int,
     level: Int,
-    name: String
+    name: String,
 ) : BsdSocketOption<Boolean> {
     override val bsdOptionValue: Int
     override val level: Int
@@ -28,7 +28,7 @@ public expect class BooleanSocketOption(
 public expect class ULongSocketOption(
     bsdOptionValue: Int,
     level: Int,
-    name: String
+    name: String,
 ) : BsdSocketOption<ULong> {
     override val bsdOptionValue: Int
     override val level: Int

@@ -38,7 +38,7 @@ public constructor(public val socket: Socket<I>) : HalfCloseableStream, Closeabl
         public inline fun <R> tcpConnect(
             address: TcpSocketAddress,
             timeout: Int = 30_000,
-            block: (SynchronousSocketStream<TcpConnectionInfo>) -> R
+            block: (SynchronousSocketStream<TcpConnectionInfo>) -> R,
         ): R {
             contract {
                 callsInPlace(block, InvocationKind.EXACTLY_ONCE)
@@ -57,7 +57,7 @@ public constructor(public val socket: Socket<I>) : HalfCloseableStream, Closeabl
         public fun <R> tcpConnect(
             scope: ClosingScope,
             address: TcpSocketAddress,
-            timeout: Int = 30_000
+            timeout: Int = 30_000,
         ): SynchronousSocketStream<TcpConnectionInfo> {
             val socket = happyEyeballsTcpConnect(address, timeout)
             val stream = SynchronousSocketStream(socket)

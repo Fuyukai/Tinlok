@@ -31,7 +31,7 @@ import tf.lotte.tinlok.util.use
 public class SynchronousTlsStream
 @Unsafe public constructor(
     private val sock: Socket<TcpConnectionInfo>,
-    public val tls: TlsObject
+    public val tls: TlsObject,
 ) : BidirectionalStream {
     public companion object {
         /**
@@ -41,7 +41,7 @@ public class SynchronousTlsStream
         @Unsafe
         public fun openClientHandshake(
             tls: TlsObject,
-            sock: Socket<TcpConnectionInfo>
+            sock: Socket<TcpConnectionInfo>,
         ): SynchronousTlsStream {
             require(tls.context.config is TlsClientConfig) {
                 "This method requires a client-sided socket"
@@ -68,7 +68,7 @@ public class SynchronousTlsStream
         @Unsafe
         public fun unsafeConnect(
             context: TlsContext,
-            address: TcpSocketAddress
+            address: TcpSocketAddress,
         ): SynchronousTlsStream {
             require(address.hostname != null) { "Address must have a hostname" }
 
@@ -97,7 +97,7 @@ public class SynchronousTlsStream
         @OptIn(Unsafe::class)
         public inline fun <R> connect(
             context: TlsContext,
-            address: TcpSocketAddress, block: (SynchronousTlsStream) -> R
+            address: TcpSocketAddress, block: (SynchronousTlsStream) -> R,
         ): R {
             val stream = unsafeConnect(context, address)
             return stream.use(block)
@@ -109,7 +109,7 @@ public class SynchronousTlsStream
          */
         @OptIn(Unsafe::class)
         public fun connect(
-            scope: ClosingScope, context: TlsContext, address: TcpSocketAddress
+            scope: ClosingScope, context: TlsContext, address: TcpSocketAddress,
         ): SynchronousTlsStream {
             val stream = unsafeConnect(context, address)
             scope.add(stream)

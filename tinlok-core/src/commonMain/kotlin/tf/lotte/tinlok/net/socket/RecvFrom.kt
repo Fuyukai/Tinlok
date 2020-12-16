@@ -16,7 +16,7 @@ import tf.lotte.tinlok.system.BlockingResult
  * Wraps the result of a recvfrom() socket call. This is a data class to prevent boxing with
  * [BlockingResult].
  */
-public data class RecvFrom<I: ConnectionInfo>(
+public data class RecvFrom<I : ConnectionInfo>(
     public val result: BlockingResult,
-    public val address: I
+    public val address: I,
 )

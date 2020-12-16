@@ -19,7 +19,7 @@ import tf.lotte.tinlok.util.Closeable
 @Suppress("NO_ACTUAL_FOR_EXPECT")
 @Unsafe
 public expect class TlsContext(
-    config: TlsContextConfiguration
+    config: TlsContextConfiguration,
 ) : Closeable {
     /** The [TlsContextConfiguration] this context was created with. */
     public val config: TlsContextConfiguration

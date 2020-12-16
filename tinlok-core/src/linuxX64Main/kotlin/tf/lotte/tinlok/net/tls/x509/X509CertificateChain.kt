@@ -25,7 +25,7 @@ import tf.lotte.tinlok.util.Closeable
  * This class is designed to be passed to a TlsContext, rather than used directly.
  */
 public actual class X509CertificateChain internal constructor(
-    ptrs: List<CPointer<X509>>
+    ptrs: List<CPointer<X509>>,
 ) : Closeable, AtomicSafeCloseable(), Iterable<X509Certificate> {
     public actual companion object {
         /**

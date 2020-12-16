@@ -119,6 +119,6 @@ constructor(ba: ByteArray) : Buffer {
  * Creates a new [ByteArrayBuffer] of the specified [size], initialised to zero.
  */
 public fun ByteArrayBuffer.Companion.ofSize(size: Int): ByteArrayBuffer {
-    val ba = ByteArray(size){ 0 }
+    val ba = ByteArray(size) { 0 }
     return ByteArrayBuffer(ba)
 }

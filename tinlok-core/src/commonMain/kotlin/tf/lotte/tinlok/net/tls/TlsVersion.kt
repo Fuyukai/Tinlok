@@ -15,6 +15,7 @@ package tf.lotte.tinlok.net.tls
 public enum class TlsVersion(public val number: Int) {
     /** TLS version 1.2. */
     TLS_V12(0x0303),
+
     /** TLS version 1.3. */
     TLS_V13(0x0304),
     ;

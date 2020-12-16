@@ -77,7 +77,7 @@ public expect object Syscall {
      */
     @Unsafe
     public fun __write_file_with_retry(
-        fd: FILE, address: CPointer<ByteVar>, size: Int
+        fd: FILE, address: CPointer<ByteVar>, size: Int,
     ): BlockingResult
 
     /**

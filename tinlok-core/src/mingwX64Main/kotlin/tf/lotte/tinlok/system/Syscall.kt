@@ -647,7 +647,7 @@ public actual object Syscall {
      */
     @Unsafe
     public fun ReadFile(
-        handle: HANDLE, address: CPointer<ByteVar>, size: Int
+        handle: HANDLE, address: CPointer<ByteVar>, size: Int,
     ): BlockingResult = memScoped {
         val readCnt = alloc<UIntVar>()
 
@@ -699,7 +699,7 @@ public actual object Syscall {
     @Unsafe
     public fun WriteFile(
         handle: HANDLE, buf: CPointer<ByteVar>,
-        count: Int
+        count: Int,
     ): BlockingResult = memScoped {
         val writtenCnt = alloc<UIntVar>()
         val res = WriteFile(
@@ -742,7 +742,7 @@ public actual object Syscall {
      */
     @Unsafe
     public actual fun __write_file(
-        fd: FILE, address: CPointer<ByteVar>, size: Int
+        fd: FILE, address: CPointer<ByteVar>, size: Int,
     ): BlockingResult {
         return this.WriteFile(fd.handle, address, size)
     }
@@ -756,7 +756,7 @@ public actual object Syscall {
      */
     @Unsafe
     public actual fun __write_file_with_retry(
-        fd: FILE, address: CPointer<ByteVar>, size: Int
+        fd: FILE, address: CPointer<ByteVar>, size: Int,
     ): BlockingResult {
         var lastOffset = 0
 
@@ -940,11 +940,14 @@ public actual object Syscall {
 
         return sock.toLong()
     }
+
     /**
      * Sets the socket [option] to the [value] provided.
      */
     @Unsafe
-    public fun <T> setsockopt(sock: SOCKET, option: BsdSocketOption<T>, value: T): Unit = memScoped {
+    public fun <T> setsockopt(
+        sock: SOCKET, option: BsdSocketOption<T>, value: T,
+    ): Unit = memScoped {
         val native = option.toNativeStructure(this, value)
         val size = option.nativeSize()
         val res = posix_setsockopt(
@@ -1005,7 +1008,8 @@ public actual object Syscall {
             SOCKET_ERROR -> {
                 when (val err = platform.windows.WSAGetLastError()) {
                     platform.windows.WSAEINPROGRESS,
-                    platform.windows.WSAEWOULDBLOCK -> BlockingResult.WOULD_BLOCK
+                    platform.windows.WSAEWOULDBLOCK,
+                    -> BlockingResult.WOULD_BLOCK
                     else -> throwErrnoWSA(err)
                 }
             }
@@ -1135,7 +1139,7 @@ public actual object Syscall {
      */
     @Unsafe
     public fun recv(
-        sock: SOCKET, address: CPointer<ByteVar>, size: Int, flags: Int
+        sock: SOCKET, address: CPointer<ByteVar>, size: Int, flags: Int,
     ): BlockingResult {
         val res = platform.windows.recv(sock.toULong(), address, size, flags)
         if (res == SOCKET_ERROR) {
@@ -1153,7 +1157,7 @@ public actual object Syscall {
     @Unsafe
     @Suppress("RemoveRedundantQualifierName")
     public fun recv(
-        sock: SOCKET, buf: ByteArray, size: Int, offset: Int, flags: Int
+        sock: SOCKET, buf: ByteArray, size: Int, offset: Int, flags: Int,
     ): BlockingResult {
         // TODO: Use WSARecv always?
         require(size + offset <= buf.size) {
@@ -1171,14 +1175,14 @@ public actual object Syscall {
      * well as the address of the sender.
      */
     @Unsafe
-    public fun <I: ConnectionInfo> recvfrom(
+    public fun <I : ConnectionInfo> recvfrom(
         sock: SOCKET,
         buf: ByteArray,
         size: Int = buf.size, offset: Int = 0,
         flags: Int = 0,
 
         /* extra flags for address creation */
-        creator: ConnectionInfoCreator<I>
+        creator: ConnectionInfoCreator<I>,
     ): RecvFrom<I>? = memScoped {
         require(offset + size <= buf.size) {
             "offset ($offset) + size ($size) > buf.size (${buf.size})"
@@ -1215,7 +1219,7 @@ public actual object Syscall {
      */
     @Unsafe
     public fun send(
-        sock: SOCKET, address: CPointer<ByteVar>, size: Int, flags: Int
+        sock: SOCKET, address: CPointer<ByteVar>, size: Int, flags: Int,
     ): BlockingResult {
         val res = platform.posix.send(sock.toULong(), address, size, flags)
         if (res == SOCKET_ERROR) {
@@ -1232,7 +1236,7 @@ public actual object Syscall {
      */
     @Unsafe
     public fun send(
-        sock: SOCKET, buf: ByteArray, size: Int, offset: Int, flags: Int
+        sock: SOCKET, buf: ByteArray, size: Int, offset: Int, flags: Int,
     ): BlockingResult {
         require(size + offset <= buf.size) {
             "offset ($offset) + size ($size) > buf.size (${buf.size})"
@@ -1253,7 +1257,7 @@ public actual object Syscall {
      */
     @Unsafe
     public fun __write_socket_with_retry(
-        socket: SOCKET, address: CPointer<ByteVar>, size: Int, flags: Int
+        socket: SOCKET, address: CPointer<ByteVar>, size: Int, flags: Int,
     ): BlockingResult {
         var lastOffset = 0
 
