@@ -19,6 +19,11 @@ p, li, strong, em, a {
     font-family: "Cabin" !important;
 }
 
+/* get rid of annoying list margins */
+.rst-content .section ol li > *, .rst-content .section ul li > * {
+    margin-top: 0 !important;
+}
+
 
 /* Borrowed from the trio RTD */
 

@@ -14,7 +14,7 @@ The high-level API in Tinlok consists of two parts:
 
 
 Listeners
-=========
+---------
 
 .. versionadded:: 1.3.0
 
@@ -35,7 +35,7 @@ extension functions:
     }
 
 Streams
-=======
+-------
 
 Streams are objects that perform actual I/O, e.g. a file stream or a socket stream. Streams use a
 set of base interfaces:
