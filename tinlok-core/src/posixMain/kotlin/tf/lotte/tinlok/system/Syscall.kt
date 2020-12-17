@@ -14,12 +14,6 @@ import kotlinx.cinterop.COpaquePointer
 import kotlinx.cinterop.CPointer
 import tf.lotte.tinlok.Unsafe
 
-/** The type of a native file handle. */
-public expect class FILE
-
-/** The type of a native socket handle. */
-public expect class SOCKET
-
 /**
  * Namespace object for all libc bindings.
  *

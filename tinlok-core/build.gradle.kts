@@ -70,14 +70,11 @@ kotlin {
             dependencies {
                 implementation(project(":tinlok-static-monocypher"))
                 implementation(project(":tinlok-static-openssl"))
+                implementation(project(":tinlok-static-libuuid"))
             }
         }
 
         val main = compilations.getByName("main")
-        main.cinterops.create("uuid") {
-            defFile(project.file("src/linuxMain/cinterop/uuid.def"))
-        }
-
         main.cinterops.create("extra") {
             defFile(project.file("src/linuxMain/cinterop/linux_extra.def"))
         }
@@ -88,14 +85,11 @@ kotlin {
             dependencies {
                 implementation(project(":tinlok-static-monocypher"))
                 implementation(project(":tinlok-static-openssl"))
+                implementation(project(":tinlok-static-libuuid"))
             }
         }
 
         val main = compilations.getByName("main")
-        main.cinterops.create("uuid") {
-            defFile(project.file("src/linuxMain/cinterop/uuid.def"))
-        }
-
         main.cinterops.create("extra") {
             defFile(project.file("src/linuxMain/cinterop/linux_extra.def"))
             compilerOpts += "-I/usr/include"

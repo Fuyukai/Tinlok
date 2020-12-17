@@ -21,3 +21,4 @@ include("tinlok-core")
 // static libraries
 include("tinlok-static-monocypher")
 include("tinlok-static-openssl")
+include("tinlok-static-libuuid")

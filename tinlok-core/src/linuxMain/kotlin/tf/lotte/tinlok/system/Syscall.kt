@@ -384,8 +384,6 @@ public actual object Syscall {
             // and last offset is always incremented from the amount we've actually written
 
             val ptr = (address + lastOffset) ?: error("pointer arithmetic returned null?")
-
-            //
             val amount = this.write(fd, ptr, size - lastOffset)
             if (!amount.isSuccess) break
 
