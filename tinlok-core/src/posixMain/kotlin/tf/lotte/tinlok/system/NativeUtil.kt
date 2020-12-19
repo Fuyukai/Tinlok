@@ -10,6 +10,7 @@
 package tf.lotte.tinlok.system
 
 import kotlinx.cinterop.*
+import platform.posix.memcpy
 import tf.lotte.tinlok.Unsafe
 
 /**
@@ -22,7 +23,9 @@ public fun CArrayPointer<ByteVar>.readZeroTerminated(): ByteArray {
     require(length < UInt.MAX_VALUE) { "Size $length is too big" }
 
     val buf = ByteArray(length.toInt())
-    Syscall.__fast_ptr_to_bytearray(this, buf, buf.size)
+    buf.usePinned {
+        memcpy(it.addressOf(0), this, buf.size.toULong())
+    }
     return buf
 }
 
@@ -37,7 +40,9 @@ public fun CArrayPointer<ByteVar>.readZeroTerminated(maxSize: Int): ByteArray {
     require(length < UInt.MAX_VALUE) { "Size $length is too big" }
 
     val buf = ByteArray(length.toInt())
-    Syscall.__fast_ptr_to_bytearray(this, buf, buf.size)
+    buf.usePinned {
+        memcpy(it.addressOf(0), this, buf.size.toULong())
+    }
     return buf
 }
 
@@ -51,13 +56,16 @@ public fun CPointer<ByteVar>.toKStringUtf8Fast(): String {
 }
 
 /**
- * Reads bytes from a [COpaquePointer] using __fast_ptr_to_bytearray instead of the naiive Kotlin
+ * Reads bytes from a [COpaquePointer] using memcpy() instead of the naiive Kotlin
  * byte-by-byte copy.
  */
+@OptIn(ExperimentalUnsignedTypes::class)
 @Unsafe
 public fun COpaquePointer.readBytesFast(count: Int): ByteArray {
     val buf = ByteArray(count)
-    Syscall.__fast_ptr_to_bytearray(this, buf, count)
+    buf.usePinned {
+        memcpy(it.addressOf(0), this, buf.size.toULong())
+    }
     return buf
 }
 

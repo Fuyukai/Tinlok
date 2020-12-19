@@ -153,21 +153,6 @@ public actual object Syscall {
         return res?.readZeroTerminated()?.toKString() ?: "Unknown error!"
     }
 
-    /**
-     * Copies [size] bytes from the pointer at [pointer] to [buf].
-     *
-     * This uses memcpy() which is faster than the naiive Kotlin method. This will buffer
-     * overflow if [pointer] is smaller than size!
-     */
-    @Unsafe
-    public actual fun __fast_ptr_to_bytearray(pointer: COpaquePointer, buf: ByteArray, size: Int) {
-        assert(buf.size <= size) { "Size is too big!" }
-
-        buf.usePinned {
-            memcpy(it.addressOf(0), pointer, size.toULong())
-        }
-    }
-
     // == File opening/closing == //
     // region File opening/closing
 
