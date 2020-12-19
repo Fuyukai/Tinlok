@@ -2,6 +2,7 @@
 package = platform.linux.extra
 noStringConversion = open opendir access mkdir rmdir unlink realpath readlink rename symlink stat lstat strlen strnlen
 ---
+#include <sys/select.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <dirent.h>
@@ -31,3 +32,20 @@ extern char *realpath(const char *path, char *resolved_path);
 extern ssize_t readlink(const char *path, char *buf, size_t bufsize);
 extern int rename(const char *old, const char *new);
 extern int symlink(const char *path1, const char *path2);
+
+// macro definitions
+static void K_FD_CLR(int fd, fd_set *set) {
+    FD_CLEAR(fd, set);
+}
+
+static int K_FD_ISSET(int fd, fd_set *set) {
+    return FD_ISSET(fd, set);
+}
+
+static void K_FD_SET(int fd, fd_set *set) {
+    FD_SET(fd, set);
+}
+
+static void K_FD_ZERO(fd_set *set) {
+    FD_ZERO(set);
+}

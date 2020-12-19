@@ -10,13 +10,16 @@
 package tf.lotte.tinlok.util
 
 import tf.lotte.tinlok.Unsafe
-import tf.lotte.tinlok.io.async.Selectable
+import tf.lotte.tinlok.system.FD
 import tf.lotte.tinlok.system.Syscall
 
 /**
  * Automatically implements good [Closeable] behaviour.
  */
-public abstract class EasyFdCloseable : AtomicSafeCloseable(), Selectable {
+public abstract class EasyFdCloseable : AtomicSafeCloseable() {
+    /** The file descriptor associated with this resource. */
+    public abstract val fd: FD
+
     @OptIn(Unsafe::class)
     override fun closeImpl() {
         Syscall.close(fd)

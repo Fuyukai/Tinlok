@@ -12,7 +12,6 @@ package tf.lotte.tinlok.net.socket
 import tf.lotte.tinlok.Unsafe
 import tf.lotte.tinlok.io.Buffer
 import tf.lotte.tinlok.io.OSException
-import tf.lotte.tinlok.io.async.Selectable
 import tf.lotte.tinlok.net.*
 import tf.lotte.tinlok.net.tcp.TcpConnectionInfo
 import tf.lotte.tinlok.net.udp.UdpConnectionInfo
@@ -27,7 +26,7 @@ import tf.lotte.tinlok.util.ClosedException
  * A BSD socket, an abstraction used for inter-process communication. Sockets can be either local or
  * over a network.
  */
-public actual interface Socket<I : ConnectionInfo> : Selectable, Closeable {
+public actual interface Socket<I : ConnectionInfo> : Closeable {
     public actual companion object {
         /**
          * Creates a new unconnected TCP socket.
