@@ -16,7 +16,7 @@ import kotlin.contracts.contract
 /**
  * Represents any object that is closeable.
  */
-public interface Closeable {
+public fun interface Closeable {
     /**
      * Closes this resource.
      *
