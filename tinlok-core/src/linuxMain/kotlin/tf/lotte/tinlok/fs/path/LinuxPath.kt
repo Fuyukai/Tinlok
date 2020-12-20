@@ -97,7 +97,6 @@ public class LinuxPath(rawParts: List<ByteString>) : Path, PosixPurePath(rawPart
      */
     @OptIn(Unsafe::class)
     override fun owner(followSymlinks: Boolean): String? = memScoped {
-        val strPath = unsafeToString()
         val stat = Syscall.stat(this, toByteString(), followSymlinks)
         val uid = stat.st_uid
         val passwd = Syscall.getpwuid_r(this, uid)
@@ -189,7 +188,6 @@ public class LinuxPath(rawParts: List<ByteString>) : Path, PosixPurePath(rawPart
 
     @OptIn(Unsafe::class)
     override fun scanDir(block: (DirEntry) -> Unit) {
-        val path = unsafeToString()
         val dir = Syscall.opendir(toByteString())
         try {
             val dot = b(".")

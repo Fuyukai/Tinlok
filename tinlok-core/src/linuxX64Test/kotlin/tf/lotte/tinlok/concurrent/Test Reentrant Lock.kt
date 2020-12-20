@@ -27,6 +27,22 @@ class `Test Reentrant Lock` {
         val lock = ReentrantLock()
         it.add(lock)
 
+        val res = lock.withLocked {
+            lock.withLocked {
+                1
+            }
+        }
+
+        assertEquals(1, res)
+    }
+
+    /**
+     * Ensures a lock is unlocked on an exception.
+     */
+    public fun `Test unlocking on exception`(): Unit = ClosingScope {
+        val lock = ReentrantLock()
+        it.add(lock)
+
         assertFailsWith<IllegalStateException> {
             lock.withLocked {
                 lock.withLocked {
@@ -34,6 +50,8 @@ class `Test Reentrant Lock` {
                 }
             }
         }
+
+
     }
 
     /**
