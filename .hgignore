@@ -21,3 +21,8 @@ docs/_external
 
 # misc personal files
 TODO
+
+# Hacks
+tinlok-core/src/linuxArm64Main/kotlin/tf/lotte/tinlok/crypto
+tinlok-core/src/mingwX64Main/kotlin/tf/lotte/tinlok/crypto
+tinlok-core/src/linuxArm64Main/kotlin/tf/lotte/tinlok/util

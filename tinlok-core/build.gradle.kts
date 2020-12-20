@@ -9,60 +9,12 @@
 
 @file:Suppress("PropertyName")
 
-import org.gradle.nativeplatform.platform.internal.ArchitectureInternal
-import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
-import java.nio.file.Files
-import java.nio.file.Path
-
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
     id("maven-publish")
     id("de.undercouch.download")
 }
 
-
-// == Architecture detection == //
-val ARCH: ArchitectureInternal = DefaultNativePlatform.getCurrentArchitecture()
-val DEFAULT_SEARCH_PATHS = listOf("/usr/lib", "/lib").map { Path.of(it) }
-
-/**
- * Gets the AArch64 library paths for linking.
- */
-fun getAarch64LibraryPaths(): List<Path> {
-    // native ARM library path
-    if (ARCH.isArm) return DEFAULT_SEARCH_PATHS
-
-    // dpkg multiplatform path, debian cross-compiler lib path
-    val tryPaths = listOf(
-        "/usr/lib/aarch64-linux-gnu",
-        "/lib/aarch64-linux-gnu",
-        "/usr/aarch64-linux-gnu/lib"
-    )
-    return tryPaths.map { Path.of(it) }.filter { Files.exists(it) }
-}
-
-/**
- * Gets the AMD64 library paths for linking.
- */
-fun getAMD64LibraryPaths(): List<Path> {
-    // our own native paths
-    if (ARCH.isAmd64) return DEFAULT_SEARCH_PATHS
-
-    // this can be a few paths...
-    val tryPaths = listOf(
-        "/usr/x86_64-pc-linux-gnu",  // Arch convention
-        "/usr/lib/x86_64-pc-linux-gnu",
-
-        "/usr/x86_64-linux-gnu/lib",  // dpkg cross-compile convention
-        "/usr/lib/x86_64-linux-gnu",
-        "/lib/x86_64-linux-gnu"
-    )
-
-    // dpkg multiplatform path, debian cross-compiler lib path
-    return tryPaths.map { Path.of(it) }.filter { Files.exists(it) }
-}
-
-// == End architecture detection == //
 
 kotlin {
     linuxX64 {
@@ -111,38 +63,52 @@ kotlin {
     }
 }
 
+/**
+ * Copies from linuxX64Main to the specified sourceset.
+ */
+fun Task.copyLinuxMain(dir: String, file: String, setTo: String) = copy {
+    from("src/linuxX64Main/kotlin/tf/lotte/tinlok/$dir/${file}.kt")
+    into("src/${setTo}Main/kotlin/tf/lotte/tinlok/$dir")
+}
+
+/**
+ * Copies from linuxX64Test to the specified sourceset.
+ */
+fun Task.copyLinuxTest(dir: String, file: String, setTo: String) = copy {
+    from("src/linuxX64Test/kotlin/tf/lotte/tinlok/$dir/${file}.kt")
+    into("src/${setTo}Test/kotlin/tf/lotte/tinlok/$dir")
+}
+
 // commonizer or expect/actual hacks
 tasks.register("copyCommonCBindings") {
     group = "interop"
 
     // cryptography
-    copy {
-        from(
-            "src/linuxX64Main/kotlin/tf/lotte/tinlok/crypto/Blake2b.kt",
-            "src/linuxX64Main/kotlin/tf/lotte/tinlok/crypto/Argon2i.kt",
-            "src/linuxX64Main/kotlin/tf/lotte/tinlok/crypto/CryptoLLA.kt"
-        )
-        into("src/linuxArm64Main/kotlin/tf/lotte/tinlok/crypto")
-    }
-
-    copy {
-        from(
-            "src/linuxX64Main/kotlin/tf/lotte/tinlok/crypto/Blake2b.kt",
-            "src/linuxX64Main/kotlin/tf/lotte/tinlok/crypto/Argon2i.kt",
-            "src/linuxX64Main/kotlin/tf/lotte/tinlok/crypto/CryptoLLA.kt"
-        )
-        into("src/mingwX64Main/kotlin/tf/lotte/tinlok/crypto")
-    }
+    copyLinuxMain("crypto", "Blake2b", "linuxArm64")
+    copyLinuxMain("crypto", "Argon2i", "linuxArm64")
+    copyLinuxMain("crypto", "CryptoLLA", "linuxArm64")
+    copyLinuxMain("crypto", "Blake2b", "mingwX64")
+    copyLinuxMain("crypto", "Argon2i", "mingwX64")
+    copyLinuxMain("crypto", "CryptoLLA", "mingwX64")
 
     // common libuuid binding
-    copy {
-        from("src/linuxX64Main/kotlin/tf/lotte/tinlok/util/UuidPlatform.kt")
-        into("src/linuxArm64Main/kotlin/tf/lotte/tinlok/util")
-    }
+    copyLinuxMain("util", "UuidPlatform", "linuxArm64")
+}
+
+// Fuck! I hate this!
+tasks.register("copyCommonTests") {
+    group = "verification"
+
+    copyLinuxTest("concurrent", "Test Reentrant Lock", "linuxArm64")
+    copyLinuxTest("concurrent", "Test Reentrant Lock", "mingwX64")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile> {
     dependsOn(tasks.named("copyCommonCBindings"))
+}
+
+tasks.filter { it.name.startsWith("compileTest") }.forEach {
+    it.dependsOn(tasks.named("copyCommonTests"))
 }
 
 publishing {
