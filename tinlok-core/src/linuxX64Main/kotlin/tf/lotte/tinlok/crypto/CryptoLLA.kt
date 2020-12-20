@@ -9,9 +9,9 @@
 
 package tf.lotte.tinlok.crypto
 
+import external.monocypher.crypto_verify64
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
-import tf.lotte.tinlok.interop.libmonocypher.crypto_verify64
 
 /**
  * Verifies if two UByteArray's with a length of 64 are the same.

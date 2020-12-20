@@ -7,8 +7,7 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
-package tf.lotte.tinlok.crypto
+package tf.lotte.tinlok.concurrent
 
-internal fun __getrandom() {
-
+class `Test Reentrant Lock` {
 }

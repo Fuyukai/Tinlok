@@ -11,9 +11,9 @@
 
 package tf.lotte.tinlok.crypto
 
+import external.monocypher.crypto_argon2i
 import kotlinx.cinterop.*
 import tf.lotte.tinlok.Unsafe
-import tf.lotte.tinlok.interop.libmonocypher.crypto_argon2i
 import tf.lotte.tinlok.util.ByteString
 import kotlin.random.nextUBytes
 

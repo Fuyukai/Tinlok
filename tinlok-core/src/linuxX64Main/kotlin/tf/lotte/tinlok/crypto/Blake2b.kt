@@ -11,9 +11,9 @@
 
 package tf.lotte.tinlok.crypto
 
+import external.monocypher.*
 import kotlinx.cinterop.*
 import tf.lotte.tinlok.Unsafe
-import tf.lotte.tinlok.interop.libmonocypher.*
 import tf.lotte.tinlok.util.*
 
 /**

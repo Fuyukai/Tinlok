@@ -50,7 +50,7 @@ In binary form, Tinlok can be found on Bintray:
     }
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :caption: Important info
 
    notes/note-safety.rst
@@ -59,6 +59,7 @@ In binary form, Tinlok can be found on Bintray:
    notes/note-issues.rst
    notes/note-licenses.rst
    notes/note-contributing.rst
+   notes/note-static-libraries.rst
    notes/changelog.rst
 
 .. toctree::

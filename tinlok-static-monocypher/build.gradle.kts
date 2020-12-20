@@ -35,7 +35,7 @@ kotlin {
         val interop by main.cinterops.creating {
             defFile("src/cinterop/$LIB_NAME.def")
             includeDirs("src/cinterop")
-            packageName = "tf.lotte.tinlok.interop.$LIB_NAME"
+            packageName = "external.monocypher"
         }
     }
 

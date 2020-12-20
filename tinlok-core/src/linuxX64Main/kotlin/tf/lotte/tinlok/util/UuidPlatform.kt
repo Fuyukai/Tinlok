@@ -11,10 +11,10 @@
 
 package tf.lotte.tinlok.util
 
+import external.libuuid.uuid_generate_random
+import external.libuuid.uuid_generate_time_safe
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
-import platform.linux.util.uuid_generate_random
-import platform.linux.util.uuid_generate_time_safe
 
 /**
  * Generates a version 1 UUID.

@@ -34,10 +34,9 @@ kotlin {
         val interop by main.cinterops.creating {
             defFile("src/cinterop/$LIB_NAME.def")
             includeDirs("src/cinterop")
-            packageName = "platform.linux.util"
+            packageName = "external.libuuid"
         }
     }
-
 
     sourceSets {
         commonMain {
