@@ -53,17 +53,13 @@ class `Test Reentrant Lock` {
         // (which should have been updated the worker thread)
         // and ensure it grabbed the lock, and is now at 1.
 
-        // In order to properly share between this thread and the worker, we need to use an
-        // AtomicReference.
         val atomic = AtomicInt(0)
-        val reference: AtomicReference<Pair<ReentrantLock, AtomicInt>?> = AtomicReference(
-            Pair(lock, atomic).also { it.freeze() }
-        )
-        it.add { reference.value = null }
+        // The pair needs to be frozen to be safely shared between threads.
+        val pair = Pair(lock, atomic).also { it.freeze() }
 
         val fut = lock.withLocked {
-            val fut = worker.execute(TransferMode.SAFE, { reference }) {
-                val (lock, atomic) = it.value!!
+            val fut = worker.execute(TransferMode.SAFE, { pair }) {
+                val (lock, atomic) = it
                 lock.withLocked {
                     atomic.increment()
                 }
