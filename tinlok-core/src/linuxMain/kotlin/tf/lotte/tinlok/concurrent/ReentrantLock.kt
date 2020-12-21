@@ -12,8 +12,9 @@ package tf.lotte.tinlok.concurrent
 import kotlinx.cinterop.*
 import platform.posix.*
 import tf.lotte.tinlok.system.Syscall
+import tf.lotte.tinlok.util.AtomicBoolean
 import tf.lotte.tinlok.util.AtomicSafeCloseable
-import tf.lotte.tinlok.util.Closeable
+import tf.lotte.tinlok.util.ClosingScope
 
 /**
  * A simple re-entrant lock that can be used to synchronise resources concurrently. This lock is
@@ -27,11 +28,16 @@ import tf.lotte.tinlok.util.Closeable
  *
  * To obtain the lock, use the [withLocked] function.
  */
-public actual class ReentrantLock public actual constructor() : Closeable, AtomicSafeCloseable() {
+public actual class ReentrantLock
+public actual constructor(scope: ClosingScope) : SynchronousLock, AtomicSafeCloseable() {
     private val arena = Arena()
-    private val mutex = arena.alloc<pthread_mutex_t>()
+    internal val mutex = arena.alloc<pthread_mutex_t>()
+
+    internal val isOpen: AtomicBoolean get() = _isOpen
 
     init {
+        scope.add(this)
+
         val attr = arena.alloc<pthread_mutexattr_t>()
         if (pthread_mutexattr_settype(attr.ptr, PTHREAD_MUTEX_RECURSIVE.convert()) != 0) {
             Syscall.throwErrno(errno)
@@ -43,15 +49,17 @@ public actual class ReentrantLock public actual constructor() : Closeable, Atomi
     }
 
     public override fun closeImpl() {
-        arena.clear()
         pthread_mutex_destroy(mutex.ptr)
+        arena.clear()
     }
 
     /**
      * Obtains this lock, runs [block], releases the lock (if possible), then returns the result of
      * [block].
      */
-    public actual fun <R> withLocked(block: () -> R): R {
+    public override fun <R> withLocked(block: () -> R): R {
+        checkOpen()
+
         if (pthread_mutex_lock(mutex.ptr) != 0) {
             Syscall.throwErrno(errno)
         }
@@ -65,5 +73,17 @@ public actual class ReentrantLock public actual constructor() : Closeable, Atomi
         }
     }
 
+    /**
+     * Creates a new [Condition] associated with this lock.
+     *
+     * This method will acquire the lock, create the condition, then release it.
+     */
+    public actual fun condition(scope: ClosingScope): Condition {
+        checkOpen()
+
+        val cond = Condition(this)
+        scope.add(cond)
+        return cond
+    }
 
 }

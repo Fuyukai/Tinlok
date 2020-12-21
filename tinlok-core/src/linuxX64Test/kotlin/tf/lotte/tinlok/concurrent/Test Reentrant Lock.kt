@@ -24,8 +24,7 @@ class `Test Reentrant Lock` {
      */
     @Test
     public fun `Test recursive locking`(): Unit = ClosingScope {
-        val lock = ReentrantLock()
-        it.add(lock)
+        val lock = ReentrantLock(it)
 
         val res = lock.withLocked {
             lock.withLocked {
@@ -39,9 +38,9 @@ class `Test Reentrant Lock` {
     /**
      * Ensures a lock is unlocked on an exception.
      */
+    @Test
     public fun `Test unlocking on exception`(): Unit = ClosingScope {
-        val lock = ReentrantLock()
-        it.add(lock)
+        val lock = ReentrantLock(it)
 
         assertFailsWith<IllegalStateException> {
             lock.withLocked {
@@ -50,8 +49,6 @@ class `Test Reentrant Lock` {
                 }
             }
         }
-
-
     }
 
     /**
@@ -59,8 +56,7 @@ class `Test Reentrant Lock` {
      */
     @Test
     public fun `Test concurrent lock acquiring`(): Unit = ClosingScope {
-        val lock = ReentrantLock()
-        it.add(lock)
+        val lock = ReentrantLock(it)
 
         val worker = Worker.start()
         it.add { worker.requestTermination(false) }

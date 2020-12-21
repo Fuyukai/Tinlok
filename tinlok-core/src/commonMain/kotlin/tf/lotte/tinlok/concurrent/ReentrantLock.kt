@@ -9,7 +9,7 @@
 
 package tf.lotte.tinlok.concurrent
 
-import tf.lotte.tinlok.util.Closeable
+import tf.lotte.tinlok.util.ClosingScope
 
 /**
  * A simple re-entrant lock that can be used to synchronise resources concurrently. This lock is
@@ -23,10 +23,9 @@ import tf.lotte.tinlok.util.Closeable
  *
  * To obtain the lock, use the [withLocked] function.
  */
-public expect class ReentrantLock() : Closeable {
+public expect class ReentrantLock public constructor(scope: ClosingScope) : SynchronousLock {
     /**
-     * Obtains this lock, runs [block], releases the lock (if possible), then returns the result of
-     * [block].
+     * Creates a new [Condition] associated with this lock.
      */
-    public fun <R> withLocked(block: () -> R): R
+    public fun condition(scope: ClosingScope): Condition
 }

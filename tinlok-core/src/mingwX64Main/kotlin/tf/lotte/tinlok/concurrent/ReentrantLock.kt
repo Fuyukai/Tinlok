@@ -11,10 +11,10 @@ package tf.lotte.tinlok.concurrent
 
 import kotlinx.cinterop.Arena
 import kotlinx.cinterop.alloc
-import kotlinx.cinterop.ptr
 import platform.windows.*
+import tf.lotte.tinlok.Unsafe
 import tf.lotte.tinlok.util.AtomicSafeCloseable
-import tf.lotte.tinlok.util.Closeable
+import tf.lotte.tinlok.util.ClosingScope
 
 /**
  * A simple re-entrant lock that can be used to synchronise resources concurrently. This lock is
@@ -28,9 +28,10 @@ import tf.lotte.tinlok.util.Closeable
  *
  * To obtain the lock, use the [withLocked] function.
  */
-public actual class ReentrantLock : Closeable, AtomicSafeCloseable() {
+public actual class ReentrantLock
+public actual constructor(scope: ClosingScope) : SynchronousLock, AtomicSafeCloseable() {
     private val arena = Arena()
-    private val section = arena.alloc<CRITICAL_SECTION>()
+    internal val section = arena.alloc<CRITICAL_SECTION>()
 
     init {
         InitializeCriticalSection(section.ptr)
@@ -40,7 +41,7 @@ public actual class ReentrantLock : Closeable, AtomicSafeCloseable() {
      * Obtains this lock, runs [block], releases the lock (if possible), then returns the result of
      * [block].
      */
-    public actual fun <R> withLocked(block: () -> R): R {
+    public override fun <R> withLocked(block: () -> R): R {
         EnterCriticalSection(section.ptr)
 
         try {
@@ -58,5 +59,15 @@ public actual class ReentrantLock : Closeable, AtomicSafeCloseable() {
     override fun closeImpl() {
         arena.clear()
         DeleteCriticalSection(section.ptr)
+    }
+
+    /**
+     * Creates a new [Condition] associated with this lock.
+     */
+    @OptIn(Unsafe::class)
+    public actual fun condition(scope: ClosingScope): Condition {
+        val cond = Condition(this)
+        scope.add(cond)
+        return cond
     }
 }
