@@ -31,12 +31,6 @@ In binary form, Tinlok can be found on Bintray:
 
 .. code-block:: kotlin
 
-    allprojects {
-        repositories {
-            maven { url = uri("https://dl.bintray.com/constellarise/tinlok") }
-        }
-    }
-
     subprojects {
         apply(plugin = "org.jetbrains.kotlin.multiplatform")
 

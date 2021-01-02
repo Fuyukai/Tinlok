@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Charlotte Skye.
+ * Copyright (C) 2020-2021 Lura Skye Revuwution.
  *
  * This file is part of Tinlok.
  *
@@ -11,7 +11,6 @@ package tf.lotte.tinlok.concurrent
 
 import kotlinx.cinterop.Arena
 import kotlinx.cinterop.alloc
-import kotlinx.cinterop.ptr
 import platform.posix.*
 import tf.lotte.tinlok.util.*
 

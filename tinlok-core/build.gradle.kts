@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Charlotte Skye.
+ * Copyright (C) 2020-2021 Lura Skye Revuwution.
  *
  * This file is part of Tinlok.
  *
@@ -116,7 +116,7 @@ publishing {
         pom {
             name.set(project.name)
             description.set("The core Tinlok module.")
-            url.set("https://tinlok.lotte.tf")
+            url.set("https://tinlok.veriny.tf")
 
             licenses {
                 license {
@@ -131,17 +131,17 @@ publishing {
 
             developers {
                 developer {
-                    id.set("Constellarise")
-                    name.set("Charlotte Skye")
-                    url.set("https://lotte.tf")
+                    id.set("Fuyukai")
+                    name.set("Lura Skye Revuwution")
+                    url.set("https://veriny.tf")
                 }
             }
         }
     }
 
-    repositories {
+    /*repositories {
         maven {
-            val ROOT = "https://api.bintray.com/maven/constellarise/tinlok"
+            val ROOT = "https://api.bintray.com/maven//tinlok"
             url = uri("$ROOT/tinlok-core/;publish=1;override=1")
 
             credentials {
@@ -149,5 +149,5 @@ publishing {
                 password = System.getenv("BINTRAY_KEY")
             }
         }
-    }
+    }*/
 }

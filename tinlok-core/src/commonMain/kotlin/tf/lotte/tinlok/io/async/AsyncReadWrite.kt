@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Charlotte Skye.
+ * Copyright (C) 2020-2021 Lura Skye Revuwution.
  *
  * This file is part of Tinlok.
  *

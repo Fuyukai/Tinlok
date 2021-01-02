@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Charlotte Skye.
+ * Copyright (C) 2020-2021 Lura Skye Revuwution.
  *
  * This file is part of Tinlok.
  *
@@ -15,7 +15,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import java.nio.file.Path
 
 plugins {
-    id("org.jetbrains.kotlin.multiplatform").version("1.4.20").apply(false)
+    id("org.jetbrains.kotlin.multiplatform").version("1.4.21").apply(false)
     /*id("org.jetbrains.dokka").version("1.4.0").apply(true)*/
     id("maven-publish")
 }

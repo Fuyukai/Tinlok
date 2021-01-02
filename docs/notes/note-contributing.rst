@@ -33,5 +33,5 @@ Style
   resource management.
 
 
-.. _GitHub: https://github.com/Constellarise/Tinlok
+.. _GitHub: https://github.com/Fuyukai/Tinlok
 .. _Heptapod: https://foss.heptapod.net/

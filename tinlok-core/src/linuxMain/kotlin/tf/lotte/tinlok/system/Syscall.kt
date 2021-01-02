@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Charlotte Skye.
+ * Copyright (C) 2020-2021 Lura Skye Revuwution.
  *
  * This file is part of Tinlok.
  *
@@ -22,7 +22,6 @@ import tf.lotte.tinlok.net.socket.BsdSocketOption
 import tf.lotte.tinlok.net.socket.RecvFrom
 import tf.lotte.tinlok.net.socket.ShutdownOption
 import tf.lotte.tinlok.util.ByteString
-import tf.lotte.tinlok.util.toKotlin
 import tf.lotte.tinlok.util.toUInt
 import kotlin.experimental.ExperimentalTypeInference
 

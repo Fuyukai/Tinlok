@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Charlotte Skye.
+ * Copyright (C) 2020-2021 Lura Skye Revuwution.
  *
  * This file is part of Tinlok.
  *
@@ -11,14 +11,12 @@ package tf.lotte.tinlok.fs.path
 
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.pointed
-import kotlinx.cinterop.toKString
 import platform.posix.*
 import tf.lotte.tinlok.Unsafe
 import tf.lotte.tinlok.fs.*
 import tf.lotte.tinlok.io.FileNotFoundException
 import tf.lotte.tinlok.io.IsADirectoryException
 import tf.lotte.tinlok.system.Syscall
-import tf.lotte.tinlok.system.readZeroTerminated
 import tf.lotte.tinlok.util.ByteString
 import tf.lotte.tinlok.util.b
 

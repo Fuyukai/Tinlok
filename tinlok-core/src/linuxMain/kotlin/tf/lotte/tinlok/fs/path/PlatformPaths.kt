@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Charlotte Skye.
+ * Copyright (C) 2020-2021 Lura Skye Revuwution.
  *
  * This file is part of Tinlok.
  *
@@ -17,7 +17,6 @@ import platform.posix.getenv
 import platform.posix.mkdtemp
 import tf.lotte.tinlok.Unsafe
 import tf.lotte.tinlok.system.Syscall
-import tf.lotte.tinlok.system.readZeroTerminated
 import tf.lotte.tinlok.util.ByteString
 import tf.lotte.tinlok.util.b
 

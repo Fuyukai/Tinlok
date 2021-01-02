@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Charlotte Skye.
+ * Copyright (C) 2020-2021 Lura Skye Revuwution.
  *
  * This file is part of Tinlok.
  *
@@ -13,7 +13,6 @@ import kotlinx.cinterop.*
 import platform.posix.sockaddr
 import tf.lotte.tinlok.Unsafe
 import tf.lotte.tinlok.net.IPAddress
-import tf.lotte.tinlok.util.toKotlin
 
 /**
  * Converts the [AddrInfo.addr] inside this [AddrInfo] to an IP/Port combo.

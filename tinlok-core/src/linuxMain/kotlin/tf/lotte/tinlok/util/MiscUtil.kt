@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Charlotte Skye.
+ * Copyright (C) 2020-2021 Lura Skye Revuwution.
  *
  * This file is part of Tinlok.
  *
@@ -10,12 +10,9 @@
 package tf.lotte.tinlok.util
 
 import kotlinx.cinterop.ByteVar
-import kotlinx.cinterop.arrayMemberAt
-import kotlinx.cinterop.reinterpret
 import platform.posix.*
 import tf.lotte.tinlok.Unsafe
 import tf.lotte.tinlok.net.*
-import tf.lotte.tinlok.system.readBytesFast
 
 /**
  * Decodes a C socket address into a Pair<IPAddress, Int>, or null if this address family is

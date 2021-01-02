@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Charlotte Skye.
+ * Copyright (C) 2020-2021 Lura Skye Revuwution.
  *
  * This file is part of Tinlok.
  *
@@ -107,9 +107,9 @@ publishing {
         }
     }
 
-    repositories {
+    /*repositories {
         maven {
-            val ROOT = "https://api.bintray.com/maven/constellarise/tinlok"
+            val ROOT = "https://api.bintray.com/maven//tinlok"
             url = uri("$ROOT/tinlok-static-monocypher/;publish=1;override=1")
 
             credentials {
@@ -117,5 +117,5 @@ publishing {
                 password = System.getenv("BINTRAY_KEY")
             }
         }
-    }
+    }*/
 }

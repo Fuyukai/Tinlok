@@ -18,8 +18,8 @@
 # -- Project information -----------------------------------------------------
 
 project = "Tinlok"
-copyright = "2020, Charlotte Skye"
-author = "Charlotte Skye"
+copyright = "2020, Lura Skye Revuwution"
+author = "Lura Skye Revuwution"
 
 # The full version, including alpha/beta/rc tags
 release = "1.3.0"
