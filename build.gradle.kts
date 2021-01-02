@@ -62,7 +62,7 @@ subprojects {
     // ALL projects get the appropriately tracked version
     version = "1.4.0"
     // all projects get the group
-    group = "tf.lotte.tinlok"
+    group = "tf.veriny.tinlok"
 
     // ignore all -static projects, we configure K/N ourselves
     if (this.name.startsWith("tinlok-static")) return@subprojects

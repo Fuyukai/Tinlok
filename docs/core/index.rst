@@ -25,7 +25,7 @@ Add the ``tinlok-core`` module to your ``commonMain`` sourceset:
             val commonMain by getting {
                 dependencies {
                     implementation(kotlin("stdlib"))
-                    api("tf.lotte.tinlok:tinlok-core:VERSION")
+                    api("tf.veriny.tinlok:tinlok-core:VERSION")
                 }
             }
         }
@@ -37,7 +37,7 @@ Add the specific sub-platforms to your other sourcesets:
 
     val linuxX64Main by getting {
         dependencies {
-            api("tf.lotte.tinlok:tinlok-core-linuxx64:VERSION")
+            api("tf.veriny.tinlok:tinlok-core-linuxx64:VERSION")
         }
     }
 

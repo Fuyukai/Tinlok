@@ -20,7 +20,7 @@ Monocypher bindings are available using the ``tinlok-static-monocypher`` library
 .. code-block:: kotlin
 
     dependencies {
-        implementation("tf.lotte.tinlok:tinlok-static-monocypher:TINLOK-VERSION")
+        implementation("tf.veriny.tinlok:tinlok-static-monocypher:TINLOK-VERSION")
     }
 
 OpenSSL
@@ -39,7 +39,7 @@ OpenSSL bindings are available using the ``tinlok-static-openssl`` library, like
 .. code-block:: kotlin
 
     dependencies {
-        implementation("tf.lotte.tinlok:tinlok-static-openssl:TINLOK-VERSION")
+        implementation("tf.veriny.tinlok:tinlok-static-openssl:TINLOK-VERSION")
     }
 
 libuuid
@@ -53,7 +53,7 @@ libuuid bindings are available using the ``tinlok-static-libuid`` library, like 
 .. code-block:: kotlin
 
     dependencies {
-        implementation("tf.lotte.tinlok:tinlok-static-libuuid:TINLOK-VERSION")
+        implementation("tf.veriny.tinlok:tinlok-static-libuuid:TINLOK-VERSION")
     }
 
 Various Other Sources

@@ -37,7 +37,7 @@ In binary form, Tinlok can be found on Bintray:
         configure<KotlinMultiplatformExtension> {
             sourceSets {
                 val commonMain by getting {
-                    api("tf.lotte.tinlok:tinlok-core:1.4.0")
+                    api("tf.veriny.tinlok:tinlok-core:1.4.0")
                 }
             }
         }
