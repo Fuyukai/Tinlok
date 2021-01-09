@@ -67,16 +67,16 @@ kotlin {
  * Copies from linuxX64Main to the specified sourceset.
  */
 fun Task.copyLinuxMain(dir: String, file: String, setTo: String) = copy {
-    from("src/linuxX64Main/kotlin/tf/lotte/tinlok/$dir/${file}.kt")
-    into("src/${setTo}Main/kotlin/tf/lotte/tinlok/$dir")
+    from("src/linuxX64Main/kotlin/tf/veriny/tinlok/$dir/${file}.kt")
+    into("src/${setTo}Main/kotlin/tf/veriny/tinlok/$dir")
 }
 
 /**
  * Copies from linuxX64Test to the specified sourceset.
  */
 fun Task.copyLinuxTest(dir: String, file: String, setTo: String) = copy {
-    from("src/linuxX64Test/kotlin/tf/lotte/tinlok/$dir/${file}.kt")
-    into("src/${setTo}Test/kotlin/tf/lotte/tinlok/$dir")
+    from("src/linuxX64Test/kotlin/tf/veriny/tinlok/$dir/${file}.kt")
+    into("src/${setTo}Test/kotlin/tf/veriny/tinlok/$dir")
 }
 
 // commonizer or expect/actual hacks
@@ -139,15 +139,14 @@ publishing {
         }
     }
 
-    /*repositories {
+    repositories {
         maven {
-            val ROOT = "https://api.bintray.com/maven//tinlok"
-            url = uri("$ROOT/tinlok-core/;publish=1;override=1")
+            url = uri("https://maven.veriny.tf/releases")
 
             credentials {
-                username = System.getenv("BINTRAY_USERNAME")
-                password = System.getenv("BINTRAY_KEY")
+                username = project.properties["verinyUsername"] as? String
+                password = project.properties["verinyPassword"] as? String
             }
         }
-    }*/
+    }
 }

@@ -73,15 +73,14 @@ publishing {
         }
     }
 
-    /*repositories {
+    repositories {
         maven {
-            val ROOT = "https://api.bintray.com/maven//tinlok"
-            url = uri("$ROOT/tinlok-static-monocypher/;publish=1;override=1")
+            url = uri("https://maven.veriny.tf/releases")
 
             credentials {
-                username = System.getenv("BINTRAY_USERNAME")
-                password = System.getenv("BINTRAY_KEY")
+                username = project.properties["verinyUsername"] as? String
+                password = project.properties["verinyPassword"] as? String
             }
         }
-    }*/
+    }
 }

@@ -2,12 +2,6 @@ package = external.openssl
 headers = openssl/bio.h openssl/err.h openssl/pem.h openssl/ssl.h openssl/x509.h openssl/x509v3.h openssl/pem.h openssl/asn1.h openssl/bn.h
 headerFilter = openssl/*
 
-# Not good, according to JB, but their glibc is outdated so fuck JB.
-compilerOpts.linux_arm64 = -I/usr/include
-linkerOpts.linux_arm64 = -L/usr/lib/aarch64-linux-gnu -L/lib/aarch64-linux-gnu \
-    -L/usr/aarch64-linux-gnu/lib -L/usr/lib \
-    -lssl -lcrypto
-
 ---
 // Macro re-exports
 static inline int K_BIO_set_close(BIO *b, long flag) {

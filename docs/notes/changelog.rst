@@ -8,8 +8,15 @@ Changelog
 
  - Add TLS support using OpenSSL.
 
+  - OpenSSL 3.0 is statically linked into the final library.
+
  - Unrefactor socket enumerations from interfaces. It's not like we would've supported custom socket
    types properly anyway.
+
+ - ``libuuid`` is now statically linked into the final library.
+
+ - Disable mingwX64 support. Trying to statically link things is a hell of linker errors. Get your
+   shit together, JetBrains.
 
 1.3.0
 -----
