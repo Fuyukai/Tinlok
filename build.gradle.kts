@@ -60,7 +60,7 @@ fun hasWindows(): Boolean {
 
 subprojects {
     // ALL projects get the appropriately tracked version
-    version = "1.4.0"
+    version = "1.4.1"
     // all projects get the group
     group = "tf.veriny.tinlok"
 

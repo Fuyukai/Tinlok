@@ -12,4 +12,5 @@ package tf.veriny.tinlok.util
 /**
  * Sleeps for the specified number of microseconds.
  */
+@OptIn(ExperimentalUnsignedTypes::class)
 public expect fun microsleep(micros: UInt)
