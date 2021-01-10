@@ -148,10 +148,6 @@ subprojects {
                 task.enabled = hasAarch64()
             }
             task.name.endsWith("MingwX64") -> {
-                // Inspired by my attempt to get
-                project.logger.log(LogLevel.WARN,
-                    "disabling mingw task, it's completely broken"
-                )
                 task.enabled = false
             }
             task.name.endsWith("X64") -> {
