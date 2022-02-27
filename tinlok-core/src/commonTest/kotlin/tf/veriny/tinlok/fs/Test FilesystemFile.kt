@@ -25,7 +25,7 @@ class `Test FilesystemFile` {
      * Tests basic WRITE mode reading and writing.
      */
     @Test
-    fun `Test basic read/write`() = Path.makeTempDirectory("Tinlok-test-") {
+    fun `Test basic read slash write`() = Path.makeTempDirectory("Tinlok-test-") {
         val path = it.resolveChild("test.txt")
         val toWrite = b("abcdefghi")
 

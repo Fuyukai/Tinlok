@@ -75,7 +75,7 @@ public fun ByteString.substring(start: Int, end: Int = size): ByteString {
  */
 @OptIn(Unsafe::class)
 public fun Collection<ByteString>.join(delim: ByteString): ByteString {
-    val size = (delim.size * (this.size - 1)) + this.sumBy { it.size }
+    val size = (delim.size * (this.size - 1)) + this.sumOf { it.size }
     val final = ByteArray(size)
     var cursor = 0
 
@@ -135,11 +135,11 @@ public fun ByteString.hexlify(): String {
 @Suppress("ConvertTwoComparisonsToRangeCheck")
 public fun Char.toIntHex(): Int {
     return if (this >= 'a' && this <= 'f') {
-        this.toInt() - 87  // 'a' is ordinal 97
+        code - 87  // 'a' is ordinal 97
     } else if (this >= 'A' && this <= 'F') {
-        toInt() - 55  // 'f' is ordinal 65
+        code - 55  // 'f' is ordinal 65
     } else if (this >= '0' && this <= '9') {
-        toInt() - 48  // '0' is ordinal 48
+        code - 48  // '0' is ordinal 48
     } else {
         throw IllegalArgumentException("Not a hexadecimal digit: $this")
     }

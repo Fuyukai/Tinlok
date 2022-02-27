@@ -16,7 +16,7 @@ import tf.veriny.tinlok.util.hexlify
 /**
  * Wraps the raw bytes of an outgoing Blake2b hash. This is a 64-byte hash (i.e. a BLAKE2-512 hash).
  */
-public inline class Blake2bHash(public val bytes: ByteString) {
+public value class Blake2bHash(public val bytes: ByteString) {
     /**
      * Creates a hex digest for this hash.
      */

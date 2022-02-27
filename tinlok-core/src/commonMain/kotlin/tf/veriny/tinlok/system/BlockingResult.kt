@@ -15,7 +15,7 @@ package tf.veriny.tinlok.system
  * If [count] is -1, the result of the platform call was EAGAIN/EWOULDBLOCK/EINPROGRESS. Otherwise, it
  * is usually a number that makes sense in context of the platform call.
  */
-public inline class BlockingResult(public val count: Long) {
+public value class BlockingResult(public val count: Long) {
     public companion object {
         /** Singleton failure result. */
         public val WOULD_BLOCK: BlockingResult = BlockingResult(-1L)

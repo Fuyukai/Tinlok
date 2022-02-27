@@ -121,10 +121,17 @@ subprojects {
 
             all {
                 languageSettings.apply {
+
                     enableLanguageFeature("InlineClasses")
                     optIn("kotlin.RequiresOptIn")
                 }
             }
+        }
+    }
+
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompileCommon>().configureEach {
+        kotlinOptions {
+            freeCompilerArgs = freeCompilerArgs + "-Xcontext-receivers"
         }
     }
 

@@ -121,7 +121,7 @@ public open class PosixPurePath(rawParts: List<ByteString>) : PurePath {
     }
 
     override fun withName(name: ByteString): PosixPurePath {
-        require(!name.contains('/'.toByte())) { "Invalid name: $name" }
+        require(!name.contains('/'.code.toByte())) { "Invalid name: $name" }
 
         return if (rawComponents.size == 1) {
             PosixPurePath(listOf(SLASH, name))

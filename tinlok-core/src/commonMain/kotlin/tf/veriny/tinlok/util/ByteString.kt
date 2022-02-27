@@ -175,14 +175,14 @@ private constructor(
      */
     public fun escapedString(): String {
         return joinToString("") {
-            if (it in 32..126) it.toChar().toString()
+            if (it in 32..126) it.toInt().toChar().toString()
             else "\\x" + it.toUByte().toString(16).padStart(2, '0')
         }
     }
 
     override fun toString(): String {
         val s = this.joinToString("") {
-            if (it in 32..126) it.toChar().toString()
+            if (it in 32..126) it.toInt().toChar().toString()
             else "\\x" + it.toUByte().toString(16).padStart(2, '0')
         }
         return "b(\"$s\")"

@@ -21,14 +21,14 @@ public open class WindowsPurePath protected constructor(
     internal val rest: List<ByteString>,
 ) : PurePath {
     public companion object {
-        protected const val SEP: Byte = '\\'.toByte()
-        protected const val ALTSEP: Byte = '/'.toByte()
+        protected const val SEP: Byte = '\\'.code.toByte()
+        protected const val ALTSEP: Byte = '/'.code.toByte()
         protected val DRIVE_SEP: ByteString = b(":\\")
         protected val UNC_SEP: ByteString = b("\\\\")
         protected val LONGPATH: ByteString = b("\\\\?\\")
         protected val ILLEGAL: Set<Byte> = listOf(
             '<', '>', ':', '"', '|', '?', '*', '\\', '/'
-        ).mapTo(mutableSetOf()) { it.toByte() }
+        ).mapTo(mutableSetOf()) { it.code.toByte() }
         protected val DOT: ByteString = b(".")
 
         @OptIn(ExperimentalStdlibApi::class)
@@ -154,7 +154,7 @@ public open class WindowsPurePath protected constructor(
                 // some weird paths may use the C:\\ form, even though that hasn't been needed in
                 // years
 
-                val sub = if (realPath.size >= 4 && realPath[3] == '\\'.toByte()) {
+                val sub = if (realPath.size >= 4 && realPath[3] == '\\'.code.toByte()) {
                     realPath.substring(4, realPath.size)
                 } else realPath.substring(3, realPath.size)
 

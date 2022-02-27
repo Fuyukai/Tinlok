@@ -158,8 +158,8 @@ private fun realValueb64(char: Char): UInt {
     return when (char) {
         '+', '-' -> 62u
         '/', '_' -> 63u
-        in 'A'..'Z' -> (char.toInt() - 65).toUInt()
-        in 'a'..'z' -> (char.toInt() - 97 + 26).toUInt()
+        in 'A'..'Z' -> (char.code - 65).toUInt()
+        in 'a'..'z' -> (char.code - 97 + 26).toUInt()
         else -> throw IllegalArgumentException("invalid char: $char")
     }
 }

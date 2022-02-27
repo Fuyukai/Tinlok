@@ -18,7 +18,7 @@ import kotlin.random.Random
 public fun ShortArray.utf16ToString(count: Int = this.size): String {
     val ca = CharArray(count)
     for (idx in 0 until count) {
-        ca[idx] = this[idx].toChar()
+        ca[idx] = this[idx].toInt().toChar()
     }
     return ca.concatToString()
 }
@@ -30,7 +30,7 @@ public fun ShortArray.utf16ToString(count: Int = this.size): String {
 public fun UShortArray.utf16ToString(count: Int = this.size): String {
     val ca = CharArray(count)
     for (idx in 0 until count) {
-        ca[idx] = this[idx].toShort().toChar()
+        ca[idx] = this[idx].toShort().toInt().toChar()
     }
     return ca.concatToString()
 }

@@ -152,7 +152,7 @@ class `Test Path Operations` {
      */
     @OptIn(Unsafe::class)
     @Test
-    fun `Test scandir/listdir`(): Unit = Path.makeTempDirectory("Tinlok-test-") { parent ->
+    fun `Test scandir slash listdir`(): Unit = Path.makeTempDirectory("Tinlok-test-") { parent ->
         // this is implicitly done with the recursiveDelete used all up here
         // but given my struggles with it on Win32, I figured I should add its own test too.
         parent.resolveChild("one.txt").touch()
