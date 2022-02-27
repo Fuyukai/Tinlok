@@ -192,7 +192,7 @@ public open class PosixPurePath(rawParts: List<ByteString>) : PurePath {
         return toByteString().decode()
     }
 
-    @Unsafe
+    @OptIn(Unsafe::class)
     override fun escapedString(): String {
         return toByteString().escapedString()
     }

@@ -17,15 +17,14 @@ plugins {
 
 
 kotlin {
-    linuxX64 {
-        sourceSets["linuxX64Main"].apply {
-            dependencies {
-                implementation(project(":tinlok-static-monocypher"))
-                implementation(project(":tinlok-static-openssl"))
-                implementation(project(":tinlok-static-libuuid"))
-            }
+    val linuxMain by sourceSets.getting {
+        dependencies {
+            implementation(project(":tinlok-static-monocypher"))
+            implementation(project(":tinlok-static-libuuid"))
         }
+    }
 
+    linuxX64 {
         val main = compilations.getByName("main")
         main.cinterops.create("extra") {
             defFile(project.file("src/linuxMain/cinterop/linux_extra.def"))
@@ -33,18 +32,9 @@ kotlin {
     }
 
     linuxArm64 {
-        sourceSets["linuxArm64Main"].apply {
-            dependencies {
-                implementation(project(":tinlok-static-monocypher"))
-                implementation(project(":tinlok-static-openssl"))
-                implementation(project(":tinlok-static-libuuid"))
-            }
-        }
-
         val main = compilations.getByName("main")
         main.cinterops.create("extra") {
             defFile(project.file("src/linuxMain/cinterop/linux_extra.def"))
-            compilerOpts += "-I/usr/include"
         }
     }
 
@@ -58,6 +48,11 @@ kotlin {
         val main = compilations.getByName("main")
         main.cinterops.create("ddk") {
             val path = project.file("src/mingwX64Main/cinterop/ddk.def")
+            defFile(path)
+        }
+
+        main.cinterops.create("winsock2") {
+            val path = project.file("src/mingwX64Main/cinterop/sockwrapper.def")
             defFile(path)
         }
     }
@@ -79,22 +74,6 @@ fun Task.copyLinuxTest(dir: String, file: String, setTo: String) = copy {
     into("src/${setTo}Test/kotlin/tf/veriny/tinlok/$dir")
 }
 
-// commonizer or expect/actual hacks
-tasks.register("copyCommonCBindings") {
-    group = "interop"
-
-    // cryptography
-    copyLinuxMain("crypto", "Blake2b", "linuxArm64")
-    copyLinuxMain("crypto", "Argon2i", "linuxArm64")
-    copyLinuxMain("crypto", "CryptoLLA", "linuxArm64")
-    copyLinuxMain("crypto", "Blake2b", "mingwX64")
-    copyLinuxMain("crypto", "Argon2i", "mingwX64")
-    copyLinuxMain("crypto", "CryptoLLA", "mingwX64")
-
-    // common libuuid binding
-    copyLinuxMain("util", "UuidPlatform", "linuxArm64")
-}
-
 // Fuck! I hate this!
 tasks.register("copyCommonTests") {
     group = "verification"
@@ -103,9 +82,6 @@ tasks.register("copyCommonTests") {
     copyLinuxTest("concurrent", "Test Reentrant Lock", "mingwX64")
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile> {
-    dependsOn(tasks.named("copyCommonCBindings"))
-}
 
 tasks.filter { it.name.startsWith("compileTest") }.forEach {
     it.dependsOn(tasks.named("copyCommonTests"))
@@ -132,7 +108,7 @@ publishing {
             developers {
                 developer {
                     id.set("Fuyukai")
-                    name.set("Lura Skye Revuwution")
+                    name.set("Lura Skye")
                     url.set("https://veriny.tf")
                 }
             }

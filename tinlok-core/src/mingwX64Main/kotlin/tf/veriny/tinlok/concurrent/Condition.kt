@@ -11,6 +11,7 @@ package tf.veriny.tinlok.concurrent
 
 import kotlinx.cinterop.Arena
 import kotlinx.cinterop.alloc
+import kotlinx.cinterop.ptr
 import platform.windows.*
 import tf.veriny.tinlok.util.AtomicSafeCloseable
 import tf.veriny.tinlok.util.Closeable
@@ -34,7 +35,7 @@ internal constructor(private val parent: ReentrantLock) : Closeable, AtomicSafeC
     /**
      * Waits for this condition to be signalled by another thread.
      */
-    actual fun wait() {
+    public actual fun wait() {
         parent.withLocked {
             SleepConditionVariableCS(cond.ptr, parent.section.ptr, INFINITE)
         }
@@ -44,7 +45,7 @@ internal constructor(private val parent: ReentrantLock) : Closeable, AtomicSafeC
      * Wakes up a single thread waiting on this condition. The order that threads will be woken up
      * in is unspecified.
      */
-    actual fun wakeupOne() {
+    public actual fun wakeupOne() {
         parent.withLocked {
             WakeConditionVariable(cond.ptr)
         }
@@ -54,7 +55,7 @@ internal constructor(private val parent: ReentrantLock) : Closeable, AtomicSafeC
      * Wakes up all threads waiting on this condition. The order that threads will be woken up
      * in is unspecified.
      */
-    actual fun wakeupAll() {
+    public actual fun wakeupAll() {
         parent.withLocked {
             WakeAllConditionVariable(cond.ptr)
         }

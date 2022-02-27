@@ -13,81 +13,76 @@ package tf.veriny.tinlok.system
 
 import kotlinx.cinterop.ByteVar
 import kotlinx.cinterop.CPointer
+import kotlinx.cinterop.convert
 import platform.posix.*
 
-/**
- * Common bridge function for eventfd.
- */
-internal expect fun __eventfd(count: UInt, flags: Int): Int
+internal actual fun __strlen(s: CPointer<ByteVar>): size_t {
+    return platform.linux.extra.strlen(s)
+}
 
-/**
- * Common bridge function for open() using a ByteVar.
- */
-internal expect fun __open(path: CPointer<ByteVar>, oflag: Int): Int
+internal actual fun __strnlen(s: CPointer<ByteVar>, max_size: size_t): size_t {
+    return platform.linux.extra.strnlen(s, max_size)
+}
 
-/**
- * Common bridge function for open() using a ByteVar, and extra permissions.
- */
-internal expect fun __open(path: CPointer<ByteVar>, oflag: Int, perms: Int): Int
+internal fun __eventfd(count: UInt, flags: Int): Int {
+    return platform.linux.extra.eventfd(count, flags)
+}
 
-/**
- * Common bridge function for stat() using a ByteVar.
- */
-internal expect fun __stat(pathname: CPointer<ByteVar>, statbuf: CPointer<stat>): Int
+internal fun __open(path: CPointer<ByteVar>, oflag: Int): Int {
+    return platform.linux.extra.open(path, oflag)
+}
 
-/**
- * Common bridge function for lstat() using a ByteVar.
- */
-internal expect fun __lstat(pathname: CPointer<ByteVar>, statbuf: CPointer<stat>): Int
+internal fun __open(path: CPointer<ByteVar>, oflag: Int, perms: Int): Int {
+    return platform.linux.extra.open(path, oflag, perms)
+}
 
-/**
- * Common bridge function for access() using a ByteVar.
- */
-internal expect fun __access(path: CPointer<ByteVar>, amode: Int): Int
+internal fun __stat(pathname: CPointer<ByteVar>, statbuf: CPointer<stat>): Int {
+    return platform.linux.extra.stat(pathname, statbuf)
+}
 
-/**
- * Common bridge function for opendir() using a ByteVar.
- */
-internal expect fun __opendir(path: CPointer<ByteVar>): CPointer<DIR>?
+internal fun __lstat(pathname: CPointer<ByteVar>, statbuf: CPointer<stat>): Int {
+    return platform.linux.extra.lstat(pathname, statbuf)
+}
 
-/**
- * Common bridge function for mkdir() using a ByteVar.
- */
-internal expect fun __mkdir(path: CPointer<ByteVar>, mode: mode_t): Int
+internal fun __access(path: CPointer<ByteVar>, amode: Int): Int {
+    return platform.linux.extra.access(path, amode)
+}
 
-/**
- * Common bridge function for rmdir() using a ByteVar.
- */
-internal expect fun __rmdir(path: CPointer<ByteVar>): Int
+internal fun __opendir(path: CPointer<ByteVar>): CPointer<DIR>? {
+    return platform.linux.extra.opendir(path)
+}
 
-/**
- * Common bridge function for unlink() using a ByteVar.
- */
-internal expect fun __unlink(path: CPointer<ByteVar>): Int
+internal fun __mkdir(path: CPointer<ByteVar>, mode: mode_t): Int {
+    return platform.linux.extra.mkdir(path, mode)
+}
 
-/**
- * Common bridge function for realpath() using a ByteVar.
- */
-internal expect fun __realpath(
+internal fun __rmdir(path: CPointer<ByteVar>): Int {
+    return platform.linux.extra.rmdir(path)
+}
+
+internal fun __unlink(path: CPointer<ByteVar>): Int {
+    return platform.linux.extra.unlink(path)
+}
+
+internal fun __realpath(
     path: CPointer<ByteVar>,
     resolved_path: CPointer<ByteVar>,
-): CPointer<ByteVar>?
+): CPointer<ByteVar>? {
+    return platform.linux.extra.realpath(path, resolved_path)
+}
 
-/**
- * Common bridge function for readlink() using a ByteVar.
- */
-internal expect fun __readlink(
+internal fun __readlink(
     path: CPointer<ByteVar>,
     buf: CPointer<ByteVar>,
     bufsize: size_t,
-): ssize_t
+): ssize_t {
+    return platform.linux.extra.readlink(path, buf, bufsize).convert()
+}
 
-/**
- * Common bridge function for rename() using a ByteVar.
- */
-internal expect fun __rename(old: CPointer<ByteVar>, new: CPointer<ByteVar>): Int
+internal fun __rename(old: CPointer<ByteVar>, new: CPointer<ByteVar>): Int {
+    return platform.linux.extra.rename(old, new)
+}
 
-/**
- * Common bridge function for symlink() using a ByteVar.
- */
-internal expect fun __symlink(path1: CPointer<ByteVar>, path2: CPointer<ByteVar>): Int
+internal fun __symlink(path1: CPointer<ByteVar>, path2: CPointer<ByteVar>): Int {
+    return platform.linux.extra.symlink(path1, path2)
+}

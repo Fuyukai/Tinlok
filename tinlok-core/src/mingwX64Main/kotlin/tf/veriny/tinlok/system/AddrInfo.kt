@@ -13,6 +13,7 @@ import kotlinx.cinterop.*
 import platform.posix.sockaddr
 import tf.veriny.tinlok.Unsafe
 import tf.veriny.tinlok.net.IPAddress
+import tf.veriny.tinlok.util.toKotlin
 
 /**
  * Converts the [addr] inside this [AddrInfo] to an IP/Port combo.

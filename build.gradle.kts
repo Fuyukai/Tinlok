@@ -15,7 +15,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import java.nio.file.Path
 
 plugins {
-    id("org.jetbrains.kotlin.multiplatform").version("1.4.21").apply(false)
+    id("org.jetbrains.kotlin.multiplatform").version("1.6.20-M1").apply(false)
     /*id("org.jetbrains.dokka").version("1.4.0").apply(true)*/
     id("maven-publish")
 }
@@ -24,7 +24,6 @@ allprojects {
     repositories {
         mavenCentral()
         mavenLocal()
-        jcenter()
     }
 }
 
@@ -63,9 +62,6 @@ subprojects {
     version = "1.4.1"
     // all projects get the group
     group = "tf.veriny.tinlok"
-
-    // ignore all -static projects, we configure K/N ourselves
-    if (this.name.startsWith("tinlok-static")) return@subprojects
 
     apply(plugin = "org.jetbrains.kotlin.multiplatform")
     //apply(plugin = "org.jetbrains.dokka")
@@ -113,18 +109,20 @@ subprojects {
 
             // linux sourcesets all share a sourceset
             val linuxMain by creating { dependsOn(posixMain) }
+
             val linuxMainX64 = sourceSets.getByName("linuxX64Main")
             linuxMainX64.dependsOn(linuxMain)
 
             val linuxMainArm = sourceSets.getByName("linuxArm64Main")
             linuxMainArm.dependsOn(linuxMain)
 
+
             val mingwX64Main by getting { dependsOn(posixMain) }
 
             all {
                 languageSettings.apply {
                     enableLanguageFeature("InlineClasses")
-                    useExperimentalAnnotation("kotlin.RequiresOptIn")
+                    optIn("kotlin.RequiresOptIn")
                 }
             }
         }

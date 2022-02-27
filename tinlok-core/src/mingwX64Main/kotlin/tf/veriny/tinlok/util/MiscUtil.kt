@@ -9,6 +9,7 @@
 
 package tf.veriny.tinlok.util
 
+import kotlinx.cinterop.reinterpret
 import platform.posix.sockaddr
 import platform.posix.sockaddr_in
 import platform.posix.sockaddr_storage
@@ -16,6 +17,7 @@ import platform.windows.ntohs
 import platform.windows.sockaddr_in6
 import tf.veriny.tinlok.Unsafe
 import tf.veriny.tinlok.net.*
+import tf.veriny.tinlok.system.readBytesFast
 
 /**
  * Decodes a C socket address into a Pair<IPAddress, Int>, or null if this address family is

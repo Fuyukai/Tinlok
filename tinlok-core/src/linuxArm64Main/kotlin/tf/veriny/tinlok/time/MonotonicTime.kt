@@ -9,9 +9,6 @@
 
 package tf.veriny.tinlok.time
 
-import kotlin.native.concurrent.ThreadLocal
-
-@ThreadLocal
 private var LAST_NOW = 0L
 
 /**
