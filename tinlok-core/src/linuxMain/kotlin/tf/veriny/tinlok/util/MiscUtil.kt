@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -40,7 +40,7 @@ public fun sockaddr.toKotlin(): Pair<IPAddress, Int>? {
             val port = ntohs(real.sin6_port).toInt()
             return ip to port
         }
-        else -> null  // unknown address family
+        else -> null // unknown address family
     }
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -13,5 +13,6 @@ package tf.veriny.tinlok.util
  * Thrown when something is attempted on a closed resource.
  */
 public class ClosedException(
-    message: String? = null, cause: Throwable? = null,
+    message: String? = null,
+    cause: Throwable? = null,
 ) : Exception(message, cause)

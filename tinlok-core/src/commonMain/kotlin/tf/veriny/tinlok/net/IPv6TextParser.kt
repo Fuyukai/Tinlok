@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -81,7 +81,6 @@ public class IPv6TextParser(public val incoming: String) {
 
     /** Current array of hex digits. */
     private val hexDigits = CharArray(4) { '0' }
-
 
     /**
      * Resets all values to their default.
@@ -214,8 +213,8 @@ public class IPv6TextParser(public val incoming: String) {
                         pushComponent()
                         state = State.STATE_REGULAR_COLON
                     } else if (
-                        state == State.STATE_FIRST_COLON
-                        || state == State.STATE_REGULAR_COLON
+                        state == State.STATE_FIRST_COLON ||
+                        state == State.STATE_REGULAR_COLON
                     ) {
                         // we're the double colon...
                         // complicates matters significantly
@@ -277,4 +276,3 @@ public class IPv6TextParser(public val incoming: String) {
         }
     }
 }
-

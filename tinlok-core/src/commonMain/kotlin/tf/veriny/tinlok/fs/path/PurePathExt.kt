@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -54,7 +54,6 @@ public operator fun PurePath.div(other: String): PurePath = resolveChild(other)
  * Replaces the name of this path, returning the new path.
  */
 public fun PurePath.withName(name: String): PurePath = withName(name.toByteString())
-
 
 // == PurePath extensions == //
 /**
@@ -124,4 +123,3 @@ public val PurePath.suffixes: List<String>
     get() {
         return rawSuffixes.map { it.decode() }
     }
-

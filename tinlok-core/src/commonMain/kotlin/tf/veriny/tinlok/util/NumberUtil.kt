@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -11,7 +11,6 @@
 @file:Suppress("unused", "NOTHING_TO_INLINE")
 
 package tf.veriny.tinlok.util
-
 
 /**
  * Gets the upper byte of this Int.
@@ -48,14 +47,12 @@ public inline val UInt.lowerByte: UInt
 public inline val Int.byte2: Int
     get() = (this ushr 16) and 0xFF
 
-
 /**
  * Gets the second byte of this UInt.
  */
 /* @InlineOnly */
 public inline val UInt.byte2: UInt
     get() = (this shr 16) and 0xFFu
-
 
 /**
  * Gets the third byte of this Int.
@@ -85,7 +82,6 @@ public inline val Long.upperByte: Long
 public inline val Long.lowerByte: Long
     get() = (this and 0x00000000000000FF)
 
-
 // Number --> ByteArray
 /**
  * Decodes this int into a [ByteArray] in big endian mode.
@@ -107,7 +103,7 @@ public inline fun Int.toByteArrayLE(): ByteArray {
  * Decodes this uint into a ByteArray in big endian mode.
  */
 /* @InlineOnly */
-@OptIn(ExperimentalUnsignedTypes::class)  // ?
+@OptIn(ExperimentalUnsignedTypes::class) // ?
 public inline fun UInt.toByteArray(): ByteArray {
     return byteArrayOf(upperByte.toByte(), byte2.toByte(), byte3.toByte(), lowerByte.toByte())
 }
@@ -214,10 +210,11 @@ public inline fun ByteArray.toShortLE(offset: Int = 0): Short {
  */
 /* @InlineOnly */
 public inline fun ByteArray.toInt(offset: Int = 0): Int {
-    return (((this[offset].toInt()) shl 24)
-        or ((this[offset + 1].toInt()) shl 16)
-        or ((this[offset + 2].toInt()) shl 8)
-        or (this[offset + 3].toInt())
+    return (
+        ((this[offset].toInt()) shl 24)
+            or ((this[offset + 1].toInt()) shl 16)
+            or ((this[offset + 2].toInt()) shl 8)
+            or (this[offset + 3].toInt())
         )
 }
 
@@ -226,10 +223,11 @@ public inline fun ByteArray.toInt(offset: Int = 0): Int {
  */
 /* @InlineOnly */
 public inline fun ByteArray.toIntLE(offset: Int = 0): Int {
-    return (((this[offset + 3].toInt()) shl 24)
-        or ((this[offset + 2].toInt()) shl 16)
-        or ((this[offset + 1].toInt()) shl 8)
-        or (this[offset].toInt())
+    return (
+        ((this[offset + 3].toInt()) shl 24)
+            or ((this[offset + 2].toInt()) shl 16)
+            or ((this[offset + 1].toInt()) shl 8)
+            or (this[offset].toInt())
         )
 }
 
@@ -238,14 +236,15 @@ public inline fun ByteArray.toIntLE(offset: Int = 0): Int {
  */
 /* @InlineOnly */
 public inline fun ByteArray.toLong(offset: Int = 0): Long {
-    return (((this[offset].toLong()) shl 56)
-        or ((this[offset + 1].toLong()) shl 48)
-        or ((this[offset + 2].toLong()) shl 40)
-        or ((this[offset + 3].toLong()) shl 32)
-        or ((this[offset + 4].toLong()) shl 24)
-        or ((this[offset + 5].toLong()) shl 16)
-        or ((this[offset + 6].toLong()) shl 8)
-        or (this[offset + 7].toLong())
+    return (
+        ((this[offset].toLong()) shl 56)
+            or ((this[offset + 1].toLong()) shl 48)
+            or ((this[offset + 2].toLong()) shl 40)
+            or ((this[offset + 3].toLong()) shl 32)
+            or ((this[offset + 4].toLong()) shl 24)
+            or ((this[offset + 5].toLong()) shl 16)
+            or ((this[offset + 6].toLong()) shl 8)
+            or (this[offset + 7].toLong())
         )
 }
 
@@ -254,14 +253,15 @@ public inline fun ByteArray.toLong(offset: Int = 0): Long {
  */
 /* @InlineOnly */
 public inline fun ByteArray.toLongLE(offset: Int = 0): Long {
-    return (((this[offset + 7].toLong()) shl 56)
-        or ((this[offset + 6].toLong()) shl 48)
-        or ((this[offset + 5].toLong()) shl 40)
-        or ((this[offset + 4].toLong()) shl 32)
-        or ((this[offset + 3].toLong()) shl 24)
-        or ((this[offset + 2].toLong()) shl 16)
-        or ((this[offset + 1].toLong()) shl 8)
-        or (this[0].toLong())
+    return (
+        ((this[offset + 7].toLong()) shl 56)
+            or ((this[offset + 6].toLong()) shl 48)
+            or ((this[offset + 5].toLong()) shl 40)
+            or ((this[offset + 4].toLong()) shl 32)
+            or ((this[offset + 3].toLong()) shl 24)
+            or ((this[offset + 2].toLong()) shl 16)
+            or ((this[offset + 1].toLong()) shl 8)
+            or (this[0].toLong())
         )
 }
 
@@ -272,14 +272,15 @@ public inline fun ByteArray.toLongLE(offset: Int = 0): Long {
 /* @InlineOnly */
 @OptIn(ExperimentalUnsignedTypes::class)
 public inline fun ByteArray.toULong(offset: Int = 0): ULong {
-    return (((this[offset].toULong()) shl 56)
-        or ((this[offset + 1].toULong()) shl 48)
-        or ((this[offset + 2].toULong()) shl 40)
-        or ((this[offset + 3].toULong()) shl 32)
-        or ((this[offset + 4].toULong()) shl 24)
-        or ((this[offset + 5].toULong()) shl 16)
-        or ((this[offset + 6].toULong()) shl 8)
-        or (this[offset + 7].toULong())
+    return (
+        ((this[offset].toULong()) shl 56)
+            or ((this[offset + 1].toULong()) shl 48)
+            or ((this[offset + 2].toULong()) shl 40)
+            or ((this[offset + 3].toULong()) shl 32)
+            or ((this[offset + 4].toULong()) shl 24)
+            or ((this[offset + 5].toULong()) shl 16)
+            or ((this[offset + 6].toULong()) shl 8)
+            or (this[offset + 7].toULong())
         )
 }
 
@@ -290,14 +291,15 @@ public inline fun ByteArray.toULong(offset: Int = 0): ULong {
 /* @InlineOnly */
 @OptIn(ExperimentalUnsignedTypes::class)
 public inline fun ByteArray.toULongLE(offset: Int = 0): ULong {
-    return (((this[offset + 7].toULong()) shl 56)
-        or ((this[offset + 6].toULong()) shl 48)
-        or ((this[offset + 5].toULong()) shl 40)
-        or ((this[offset + 4].toULong()) shl 32)
-        or ((this[offset + 3].toULong()) shl 24)
-        or ((this[offset + 2].toULong()) shl 16)
-        or ((this[offset + 1].toULong()) shl 8)
-        or (this[offset].toULong())
+    return (
+        ((this[offset + 7].toULong()) shl 56)
+            or ((this[offset + 6].toULong()) shl 48)
+            or ((this[offset + 5].toULong()) shl 40)
+            or ((this[offset + 4].toULong()) shl 32)
+            or ((this[offset + 3].toULong()) shl 24)
+            or ((this[offset + 2].toULong()) shl 16)
+            or ((this[offset + 1].toULong()) shl 8)
+            or (this[offset].toULong())
         )
 }
 
@@ -306,10 +308,11 @@ public inline fun ByteArray.toULongLE(offset: Int = 0): ULong {
  */
 /* @InlineOnly */
 public inline fun UByteArray.toUInt(offset: Int = 0): UInt {
-    return (((this[offset].toUInt()) shl 24)
-        or ((this[offset + 1].toUInt()) shl 16)
-        or ((this[offset + 2].toUInt()) shl 8)
-        or (this[offset + 3].toUInt())
+    return (
+        ((this[offset].toUInt()) shl 24)
+            or ((this[offset + 1].toUInt()) shl 16)
+            or ((this[offset + 2].toUInt()) shl 8)
+            or (this[offset + 3].toUInt())
         )
 }
 
@@ -318,10 +321,11 @@ public inline fun UByteArray.toUInt(offset: Int = 0): UInt {
  */
 /* @InlineOnly */
 public inline fun UByteArray.toUIntLE(offset: Int = 0): UInt {
-    return (((this[offset + 3].toUInt()) shl 24)
-        or ((this[offset + 2].toUInt()) shl 16)
-        or ((this[offset + 1].toUInt()) shl 8)
-        or (this[offset].toUInt())
+    return (
+        ((this[offset + 3].toUInt()) shl 24)
+            or ((this[offset + 2].toUInt()) shl 16)
+            or ((this[offset + 1].toUInt()) shl 8)
+            or (this[offset].toUInt())
         )
 }
 

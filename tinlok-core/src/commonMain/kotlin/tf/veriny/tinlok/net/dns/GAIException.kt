@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -15,5 +15,7 @@ import tf.veriny.tinlok.io.OSException
  * Thrown when an error occurs with the getaddrinfo() system call.
  */
 public class GAIException(
-    public val errno: Int, message: String? = null, cause: Throwable? = null,
+    public val errno: Int,
+    message: String? = null,
+    cause: Throwable? = null,
 ) : OSException(message, cause)

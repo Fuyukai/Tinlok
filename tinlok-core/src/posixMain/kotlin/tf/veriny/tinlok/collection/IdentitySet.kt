@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -54,7 +54,6 @@ public actual class IdentitySet<E> public actual constructor() : MutableSet<E> {
         }
     }
 
-
     // delegates to the actual set
     override val size: Int get() = backing.size
     override fun clear(): Unit = backing.clear()
@@ -96,5 +95,4 @@ public actual class IdentitySet<E> public actual constructor() : MutableSet<E> {
         val wrappers = elements.map { IdentityWrapper(it) }
         return backing.retainAll(wrappers)
     }
-
 }

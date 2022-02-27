@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -85,5 +85,4 @@ public actual constructor(scope: ClosingScope) : SynchronousLock, AtomicSafeClos
         scope.add(cond)
         return cond
     }
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -55,7 +55,6 @@ public actual interface Socket<I : ConnectionInfo> : Closeable {
 
             return WindowsSocket(family, type, proto, sock, ::UdpConnectionInfo)
         }
-
     }
 
     /** The underlying handle for this socket. */
@@ -179,7 +178,11 @@ public actual interface Socket<I : ConnectionInfo> : Closeable {
      */
     @Throws(ClosedException::class, OSException::class)
     public actual fun sendto(
-        buf: ByteArray, size: Int, offset: Int, flags: Int, addr: I,
+        buf: ByteArray,
+        size: Int,
+        offset: Int,
+        flags: Int,
+        addr: I,
     ): BlockingResult
 
     /**

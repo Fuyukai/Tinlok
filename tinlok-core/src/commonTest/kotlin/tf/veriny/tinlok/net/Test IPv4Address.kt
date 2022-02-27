@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -22,7 +22,6 @@ class `Test IPv4Address` {
         // simple incoming parsing
         val addr = IPv4Address.of("39.3.9.0")
         assertEquals(addr.toString(), "39.3.9.0")
-
     }
 
     @OptIn(ExperimentalUnsignedTypes::class)

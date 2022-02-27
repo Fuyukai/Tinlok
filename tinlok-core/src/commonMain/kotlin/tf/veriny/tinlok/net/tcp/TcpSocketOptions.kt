@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -26,7 +26,7 @@ public object TcpSocketOptions {
      */
     public val TCP_NODELAY: BsdSocketOption<Boolean> =
         BooleanSocketOption(
-            bsdOptionValue = 1  /* TCP_NODELAY */,
+            bsdOptionValue = 1 /* TCP_NODELAY */,
             level = IPPROTO_TCP,
             name = "TCP_NODELAY"
         )
@@ -36,7 +36,7 @@ public object TcpSocketOptions {
      */
     public val TCP_QUICKACK: BsdSocketOption<Boolean> =
         BooleanSocketOption(
-            bsdOptionValue = 12  /* TCP_QUICKACK */,
+            bsdOptionValue = 12 /* TCP_QUICKACK */,
             level = IPPROTO_TCP,
             name = "TCP_QUICKACK"
         )

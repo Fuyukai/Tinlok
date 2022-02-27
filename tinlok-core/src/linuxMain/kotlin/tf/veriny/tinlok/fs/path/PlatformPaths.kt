@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -58,7 +58,6 @@ public actual object PlatformPaths {
         return PosixPurePath.fromByteString(of)
     }
 
-
     public actual fun path(of: ByteString): Path {
         return LinuxPath.fromByteString(of)
     }
@@ -82,5 +81,4 @@ public actual object PlatformPaths {
         val bs = ByteString.fromByteArray(template)
         return path(bs)
     }
-
 }

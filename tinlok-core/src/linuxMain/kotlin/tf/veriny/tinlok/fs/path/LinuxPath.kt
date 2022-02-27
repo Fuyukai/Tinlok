@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -50,7 +50,6 @@ public class LinuxPath(rawParts: List<ByteString>) : Path, PosixPurePath(rawPart
     override fun reparent(from: PurePath, to: PurePath): LinuxPath {
         return LinuxPath(super.reparent(from, to).rawComponents)
     }
-
 
     // == path functionality == //
     @OptIn(Unsafe::class)
@@ -208,7 +207,6 @@ public class LinuxPath(rawParts: List<ByteString>) : Path, PosixPurePath(rawPart
                 val type = FileType.fromPosixType(item.d_type)
                 val entry = DirEntry(child, type)
                 block(entry)
-
             }
         } finally {
             Syscall.closedir(dir)

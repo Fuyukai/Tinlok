@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -141,4 +141,3 @@ public actual interface Buffer : Closeable {
     @Throws(UnsupportedOperationException::class)
     public fun <R> address(offset: Long, block: (CPointer<ByteVar>) -> R): R
 }
-

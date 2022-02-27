@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -24,7 +24,9 @@ import tf.veriny.tinlok.net.udp.UdpSocketAddress
  */
 @OptIn(Unsafe::class)
 public fun TcpSocketAddress.Companion.resolve(
-    host: String, port: Int, resolver: AddressResolver = GlobalResolver,
+    host: String,
+    port: Int,
+    resolver: AddressResolver = GlobalResolver,
 ): TcpSocketAddress {
     val connections = resolver.getaddrinfo(
         host = host, service = port,
@@ -42,7 +44,9 @@ public fun TcpSocketAddress.Companion.resolve(
  */
 @OptIn(Unsafe::class)
 public fun UdpSocketAddress.Companion.resolve(
-    host: String, port: Int, resolver: AddressResolver = GlobalResolver,
+    host: String,
+    port: Int,
+    resolver: AddressResolver = GlobalResolver,
 ): UdpSocketAddress {
     val connections = resolver.getaddrinfo(
         host = host, service = port,

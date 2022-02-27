@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -55,7 +55,6 @@ public operator fun Path.div(other: ByteString): Path = resolveChild(other)
  * Replaces the name of this path, returning the new path.
  */
 public fun Path.withName(name: String): Path = withName(name.toByteString())
-
 
 // TODO: Maybe move this to scandir.
 // == Path I/O extensions == //
@@ -135,7 +134,6 @@ public fun Path.recursiveCopy(to: Path) {
         to.createDirectory(parents = true, existOk = false)
     }
 
-
     for (old in allPaths) {
         val new = old.path.reparent(fromAbsolute, to)
         val linkTarget = old.path.linkTarget()
@@ -196,7 +194,6 @@ public fun Path.copy(to: Path) {
     copyFile(to)
 }
 
-
 /**
  * Helper function that deletes the directory or file at this path. This is recommended
  * over using recursiveDelete or unlink as it will pick the right method appropriately.
@@ -205,7 +202,6 @@ public fun Path.delete() {
     if (isDirectory(followSymlinks = false)) recursiveDelete()
     else unlink()
 }
-
 
 /**
  * Opens a path for file I/O, calling the specified lambda with the opened file. The file will be

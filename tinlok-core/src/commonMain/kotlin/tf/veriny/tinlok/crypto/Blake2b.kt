@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -49,7 +49,8 @@ public operator fun <R> Blake2b.Companion.invoke(
  */
 @OptIn(ExperimentalUnsignedTypes::class)
 public operator fun Blake2b.Companion.invoke(
-    scope: ClosingScope, key: UByteArray = ubyteArrayOf(),
+    scope: ClosingScope,
+    key: UByteArray = ubyteArrayOf(),
 ): Blake2b {
     val hasher = Blake2b(key)
     scope.add(hasher)

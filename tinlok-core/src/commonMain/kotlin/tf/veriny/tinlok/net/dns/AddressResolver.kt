@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -34,7 +34,8 @@ public interface AddressResolver {
      */
     @Unsafe
     public fun getaddrinfo(
-        host: String?, service: Int = 0,
+        host: String?,
+        service: Int = 0,
         family: AddressFamily = AddressFamily.AF_UNSPEC,
         type: SocketType = SocketType.SOCK_STREAM,
         protocol: IPProtocol = IPProtocol.IPPROTO_IP,

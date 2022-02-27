@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -36,7 +36,9 @@ public constructor(
          */
         @Unsafe
         public fun <I : ConnectionInfo> open(
-            family: AddressFamily, type: SocketType, protocol: IPProtocol,
+            family: AddressFamily,
+            type: SocketType,
+            protocol: IPProtocol,
             creator: ConnectionInfoCreator<I>,
         ): LinuxSocket<I> {
             val fd = Syscall.socket(family, type, protocol)
@@ -294,7 +296,11 @@ public constructor(
      */
     @OptIn(Unsafe::class)
     override fun sendto(
-        buf: ByteArray, size: Int, offset: Int, flags: Int, addr: I,
+        buf: ByteArray,
+        size: Int,
+        offset: Int,
+        flags: Int,
+        addr: I,
     ): BlockingResult {
         checkOpen()
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -82,7 +82,7 @@ public object StandardSocketOptions {
      */
     public val SO_SNDBUF: BsdSocketOption<ULong> =
         ULongSocketOption(
-            bsdOptionValue = tf.veriny.tinlok.net.socket.SO_SNDBUF  /* SO_SNDBUF */,
+            bsdOptionValue = tf.veriny.tinlok.net.socket.SO_SNDBUF /* SO_SNDBUF */,
             level = SOL_SOCKET,
             name = "SO_OOBINLINE"
         )
@@ -92,10 +92,8 @@ public object StandardSocketOptions {
      */
     public val SO_RCVBUF: BsdSocketOption<ULong> =
         ULongSocketOption(
-            bsdOptionValue = tf.veriny.tinlok.net.socket.SO_RCVBUF  /* SO_RCVBUF */,
+            bsdOptionValue = tf.veriny.tinlok.net.socket.SO_RCVBUF /* SO_RCVBUF */,
             level = SOL_SOCKET,
             name = "SO_OOBINLINE"
         )
-
-
 }

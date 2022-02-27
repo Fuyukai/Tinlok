@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -7,7 +7,7 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
-@file:Suppress("RedundantVisibilityModifier")  // not true!
+@file:Suppress("RedundantVisibilityModifier") // not true!
 
 package tf.veriny.tinlok.crypto
 
@@ -24,7 +24,9 @@ public const val HASH_SIZE: Int = 64
  */
 @OptIn(ExperimentalUnsignedTypes::class)
 public fun crypto_argon2(
-    password: UByteArray, blocks: Int, iterations: Int,
+    password: UByteArray,
+    blocks: Int,
+    iterations: Int,
     salt: UByteArray,
 ): UByteArray = memScoped {
     val size = blocks * 1024
@@ -55,8 +57,10 @@ public fun crypto_argon2(
  */
 @OptIn(ExperimentalUnsignedTypes::class, Unsafe::class)
 public actual fun passwordHash(
-    password: String, salt: UByteArray?,
-    blocks: Int, iterations: Int,
+    password: String,
+    salt: UByteArray?,
+    blocks: Int,
+    iterations: Int,
 ): Argon2iHash = memScoped {
     require(password.isNotEmpty()) { "Password cannot be empty!" }
     require(blocks >= 8) { "Must use at least 8 memory blocks!" }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -135,15 +135,14 @@ public fun ByteString.hexlify(): String {
 @Suppress("ConvertTwoComparisonsToRangeCheck")
 public fun Char.toIntHex(): Int {
     return if (this >= 'a' && this <= 'f') {
-        code - 87  // 'a' is ordinal 97
+        code - 87 // 'a' is ordinal 97
     } else if (this >= 'A' && this <= 'F') {
-        code - 55  // 'f' is ordinal 65
+        code - 55 // 'f' is ordinal 65
     } else if (this >= '0' && this <= '9') {
-        code - 48  // '0' is ordinal 48
+        code - 48 // '0' is ordinal 48
     } else {
         throw IllegalArgumentException("Not a hexadecimal digit: $this")
     }
-
 }
 
 /**
@@ -194,10 +193,11 @@ public inline fun ByteString.toShortLE(offset: Int = 0): Short {
  */
 /* @InlineOnly */
 public inline fun ByteString.toInt(offset: Int = 0): Int {
-    return (((this[offset].toInt()) shl 24)
-        or ((this[offset + 1].toInt()) shl 16)
-        or ((this[offset + 2].toInt()) shl 8)
-        or (this[offset + 3].toInt())
+    return (
+        ((this[offset].toInt()) shl 24)
+            or ((this[offset + 1].toInt()) shl 16)
+            or ((this[offset + 2].toInt()) shl 8)
+            or (this[offset + 3].toInt())
         )
 }
 
@@ -206,10 +206,11 @@ public inline fun ByteString.toInt(offset: Int = 0): Int {
  */
 /* @InlineOnly */
 public inline fun ByteString.toIntLE(offset: Int = 0): Int {
-    return (((this[offset + 3].toInt()) shl 24)
-        or ((this[offset + 2].toInt()) shl 16)
-        or ((this[offset + 1].toInt()) shl 8)
-        or (this[offset].toInt())
+    return (
+        ((this[offset + 3].toInt()) shl 24)
+            or ((this[offset + 2].toInt()) shl 16)
+            or ((this[offset + 1].toInt()) shl 8)
+            or (this[offset].toInt())
         )
 }
 
@@ -218,14 +219,15 @@ public inline fun ByteString.toIntLE(offset: Int = 0): Int {
  */
 /* @InlineOnly */
 public inline fun ByteString.toLong(offset: Int = 0): Long {
-    return (((this[offset].toLong()) shl 56)
-        or ((this[offset + 1].toLong()) shl 48)
-        or ((this[offset + 2].toLong()) shl 40)
-        or ((this[offset + 3].toLong()) shl 32)
-        or ((this[offset + 4].toLong()) shl 24)
-        or ((this[offset + 5].toLong()) shl 16)
-        or ((this[offset + 6].toLong()) shl 8)
-        or (this[offset + 7].toLong())
+    return (
+        ((this[offset].toLong()) shl 56)
+            or ((this[offset + 1].toLong()) shl 48)
+            or ((this[offset + 2].toLong()) shl 40)
+            or ((this[offset + 3].toLong()) shl 32)
+            or ((this[offset + 4].toLong()) shl 24)
+            or ((this[offset + 5].toLong()) shl 16)
+            or ((this[offset + 6].toLong()) shl 8)
+            or (this[offset + 7].toLong())
         )
 }
 
@@ -234,14 +236,15 @@ public inline fun ByteString.toLong(offset: Int = 0): Long {
  */
 /* @InlineOnly */
 public inline fun ByteString.toLongLE(offset: Int = 0): Long {
-    return (((this[offset + 7].toLong()) shl 56)
-        or ((this[offset + 6].toLong()) shl 48)
-        or ((this[offset + 5].toLong()) shl 40)
-        or ((this[offset + 4].toLong()) shl 32)
-        or ((this[offset + 3].toLong()) shl 24)
-        or ((this[offset + 2].toLong()) shl 16)
-        or ((this[offset + 1].toLong()) shl 8)
-        or (this[0].toLong())
+    return (
+        ((this[offset + 7].toLong()) shl 56)
+            or ((this[offset + 6].toLong()) shl 48)
+            or ((this[offset + 5].toLong()) shl 40)
+            or ((this[offset + 4].toLong()) shl 32)
+            or ((this[offset + 3].toLong()) shl 24)
+            or ((this[offset + 2].toLong()) shl 16)
+            or ((this[offset + 1].toLong()) shl 8)
+            or (this[0].toLong())
         )
 }
 
@@ -252,14 +255,15 @@ public inline fun ByteString.toLongLE(offset: Int = 0): Long {
 /* @InlineOnly */
 @OptIn(ExperimentalUnsignedTypes::class)
 public inline fun ByteString.toULong(offset: Int = 0): ULong {
-    return (((this[offset].toULong()) shl 56)
-        or ((this[offset + 1].toULong()) shl 48)
-        or ((this[offset + 2].toULong()) shl 40)
-        or ((this[offset + 3].toULong()) shl 32)
-        or ((this[offset + 4].toULong()) shl 24)
-        or ((this[offset + 5].toULong()) shl 16)
-        or ((this[offset + 6].toULong()) shl 8)
-        or (this[offset + 7].toULong())
+    return (
+        ((this[offset].toULong()) shl 56)
+            or ((this[offset + 1].toULong()) shl 48)
+            or ((this[offset + 2].toULong()) shl 40)
+            or ((this[offset + 3].toULong()) shl 32)
+            or ((this[offset + 4].toULong()) shl 24)
+            or ((this[offset + 5].toULong()) shl 16)
+            or ((this[offset + 6].toULong()) shl 8)
+            or (this[offset + 7].toULong())
         )
 }
 
@@ -270,14 +274,15 @@ public inline fun ByteString.toULong(offset: Int = 0): ULong {
 /* @InlineOnly */
 @OptIn(ExperimentalUnsignedTypes::class)
 public inline fun ByteString.toULongLE(offset: Int = 0): ULong {
-    return (((this[offset + 7].toULong()) shl 56)
-        or ((this[offset + 6].toULong()) shl 48)
-        or ((this[offset + 5].toULong()) shl 40)
-        or ((this[offset + 4].toULong()) shl 32)
-        or ((this[offset + 3].toULong()) shl 24)
-        or ((this[offset + 2].toULong()) shl 16)
-        or ((this[offset + 1].toULong()) shl 8)
-        or (this[offset].toULong())
+    return (
+        ((this[offset + 7].toULong()) shl 56)
+            or ((this[offset + 6].toULong()) shl 48)
+            or ((this[offset + 5].toULong()) shl 40)
+            or ((this[offset + 4].toULong()) shl 32)
+            or ((this[offset + 3].toULong()) shl 24)
+            or ((this[offset + 2].toULong()) shl 16)
+            or ((this[offset + 1].toULong()) shl 8)
+            or (this[offset].toULong())
         )
 }
 

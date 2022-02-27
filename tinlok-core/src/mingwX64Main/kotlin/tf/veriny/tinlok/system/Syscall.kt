@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -117,7 +117,7 @@ public actual object Syscall {
 
         val result = FormatMessageW(
             flags, null, code.toUInt(),
-            0,  // default language according to MSDN
+            0, // default language according to MSDN
             ptr.ptr.reinterpret(), 0, null
         )
 
@@ -156,7 +156,7 @@ public actual object Syscall {
 
             else -> WindowsException(
                 winerror = code,
-                message = "[WinError ${code}] ${FormatMessage(code)}"
+                message = "[WinError $code] ${FormatMessage(code)}"
             )
         }
     }
@@ -235,12 +235,12 @@ public actual object Syscall {
         val bytesReturned = alloc<UIntVar>()
 
         val res = DeviceIoControl(
-            handle,                                 // symlink file
-            FSCTL_GET_REPARSE_POINT,                // get reparse details
-            null, 0,            // empty input buffer
-            buffer.reinterpret(), size.toUInt(),    // output REPARSE_DATA_BUFFER
-            bytesReturned.ptr,                      // self-explanatory
-            null                         // we don't do overlapped I/O (yet)
+            handle, // symlink file
+            FSCTL_GET_REPARSE_POINT, // get reparse details
+            null, 0, // empty input buffer
+            buffer.reinterpret(), size.toUInt(), // output REPARSE_DATA_BUFFER
+            bytesReturned.ptr, // self-explanatory
+            null // we don't do overlapped I/O (yet)
         )
 
         if (res != TRUE) {
@@ -338,7 +338,7 @@ public actual object Syscall {
             FILE_SHARE_VALID_FLAGS, // allow all sharing since we only care about the target
             null,
             OPEN_EXISTING,
-            openFlag,  // open as directory if needed
+            openFlag, // open as directory if needed
             null,
         )
 
@@ -504,7 +504,7 @@ public actual object Syscall {
         val attrs = context.struct.dwFileAttributes.toInt()
         val type = when {
             (attrs.and(FILE_ATTRIBUTE_DIRECTORY)) != 0 -> FileType.DIRECTORY
-            (attrs.and(FILE_ATTRIBUTE_REPARSE_POINT)) != 0 -> FileType.SYMLINK  // TODO: Not true~!
+            (attrs.and(FILE_ATTRIBUTE_REPARSE_POINT)) != 0 -> FileType.SYMLINK // TODO: Not true~!
             else -> FileType.REGULAR_FILE
         }
 
@@ -631,7 +631,9 @@ public actual object Syscall {
      */
     @Unsafe
     public fun ReadFile(
-        handle: HANDLE, address: CPointer<ByteVar>, size: Int,
+        handle: HANDLE,
+        address: CPointer<ByteVar>,
+        size: Int,
     ): BlockingResult = memScoped {
         val readCnt = alloc<UIntVar>()
 
@@ -656,8 +658,10 @@ public actual object Syscall {
      */
     @Unsafe
     public fun ReadFile(
-        handle: HANDLE, buf: ByteArray,
-        count: Int = buf.size, offset: Int = 0,
+        handle: HANDLE,
+        buf: ByteArray,
+        count: Int = buf.size,
+        offset: Int = 0,
     ): BlockingResult = memScoped {
         require(count + offset <= buf.size) {
             "count + offset > buf.sizew"
@@ -682,7 +686,8 @@ public actual object Syscall {
      */
     @Unsafe
     public fun WriteFile(
-        handle: HANDLE, buf: CPointer<ByteVar>,
+        handle: HANDLE,
+        buf: CPointer<ByteVar>,
         count: Int,
     ): BlockingResult = memScoped {
         val writtenCnt = alloc<UIntVar>()
@@ -707,8 +712,10 @@ public actual object Syscall {
      */
     @Unsafe
     public fun WriteFile(
-        handle: HANDLE, buf: ByteArray,
-        count: Int = buf.size, offset: Int = 0,
+        handle: HANDLE,
+        buf: ByteArray,
+        count: Int = buf.size,
+        offset: Int = 0,
     ): BlockingResult = memScoped {
         require(count + offset <= buf.size) {
             "count + offset > buf.sizew"
@@ -726,7 +733,9 @@ public actual object Syscall {
      */
     @Unsafe
     public actual fun __write_file(
-        fd: FILE, address: CPointer<ByteVar>, size: Int,
+        fd: FILE,
+        address: CPointer<ByteVar>,
+        size: Int,
     ): BlockingResult {
         return this.WriteFile(fd.handle, address, size)
     }
@@ -740,7 +749,9 @@ public actual object Syscall {
      */
     @Unsafe
     public actual fun __write_file_with_retry(
-        fd: FILE, address: CPointer<ByteVar>, size: Int,
+        fd: FILE,
+        address: CPointer<ByteVar>,
+        size: Int,
     ): BlockingResult {
         var lastOffset = 0
 
@@ -858,7 +869,7 @@ public actual object Syscall {
             else -> {
                 WindowsException(
                     winerror = code,
-                    message = "[WinError ${code}] ${FormatMessage(code)}"
+                    message = "[WinError $code] ${FormatMessage(code)}"
                 )
             }
         }
@@ -884,7 +895,7 @@ public actual object Syscall {
         }
 
         val struct = alloc.alloc<sockaddr_in6> {
-            sin6_family = AF_INET6.toShort()  // ?
+            sin6_family = AF_INET6.toShort() // ?
             // have to manually write to the array contained within
             sin6_addr.arrayMemberAt<ByteVar>(0L).unsafeClobber(ipRepresentation)
             sin6_port = htons(port.toUShort())
@@ -930,7 +941,9 @@ public actual object Syscall {
      */
     @Unsafe
     public fun <T> setsockopt(
-        sock: SOCKET, option: BsdSocketOption<T>, value: T,
+        sock: SOCKET,
+        option: BsdSocketOption<T>,
+        value: T,
     ): Unit = memScoped {
         val native = option.toNativeStructure(this, value)
         val size = option.nativeSize()
@@ -962,7 +975,6 @@ public actual object Syscall {
 
         option.fromNativeStructure(this, storage)
     }
-
 
     /**
      * Connects a socket to an address.
@@ -1123,7 +1135,10 @@ public actual object Syscall {
      */
     @Unsafe
     public fun recv(
-        sock: SOCKET, address: CPointer<ByteVar>, size: Int, flags: Int,
+        sock: SOCKET,
+        address: CPointer<ByteVar>,
+        size: Int,
+        flags: Int,
     ): BlockingResult {
         val res = platform.windows.recv(sock.toULong(), address, size, flags)
         if (res == SOCKET_ERROR) {
@@ -1141,7 +1156,11 @@ public actual object Syscall {
     @Unsafe
     @Suppress("RemoveRedundantQualifierName")
     public fun recv(
-        sock: SOCKET, buf: ByteArray, size: Int, offset: Int, flags: Int,
+        sock: SOCKET,
+        buf: ByteArray,
+        size: Int,
+        offset: Int,
+        flags: Int,
     ): BlockingResult {
         // TODO: Use WSARecv always?
         require(size + offset <= buf.size) {
@@ -1151,7 +1170,6 @@ public actual object Syscall {
         return buf.usePinned {
             recv(sock, it.addressOf(offset), size, flags)
         }
-
     }
 
     /**
@@ -1162,7 +1180,8 @@ public actual object Syscall {
     public fun <I : ConnectionInfo> recvfrom(
         sock: SOCKET,
         buf: ByteArray,
-        size: Int = buf.size, offset: Int = 0,
+        size: Int = buf.size,
+        offset: Int = 0,
         flags: Int = 0,
 
         /* extra flags for address creation */
@@ -1203,7 +1222,10 @@ public actual object Syscall {
      */
     @Unsafe
     public fun send(
-        sock: SOCKET, address: CPointer<ByteVar>, size: Int, flags: Int,
+        sock: SOCKET,
+        address: CPointer<ByteVar>,
+        size: Int,
+        flags: Int,
     ): BlockingResult {
         val res = platform.posix.send(sock.toULong(), address, size, flags)
         if (res == SOCKET_ERROR) {
@@ -1220,7 +1242,11 @@ public actual object Syscall {
      */
     @Unsafe
     public fun send(
-        sock: SOCKET, buf: ByteArray, size: Int, offset: Int, flags: Int,
+        sock: SOCKET,
+        buf: ByteArray,
+        size: Int,
+        offset: Int,
+        flags: Int,
     ): BlockingResult {
         require(size + offset <= buf.size) {
             "offset ($offset) + size ($size) > buf.size (${buf.size})"
@@ -1241,7 +1267,10 @@ public actual object Syscall {
      */
     @Unsafe
     public fun __write_socket_with_retry(
-        socket: SOCKET, address: CPointer<ByteVar>, size: Int, flags: Int,
+        socket: SOCKET,
+        address: CPointer<ByteVar>,
+        size: Int,
+        flags: Int,
     ): BlockingResult {
         var lastOffset = 0
 
@@ -1271,7 +1300,11 @@ public actual object Syscall {
      */
     @Unsafe
     public fun <I> sendto(
-        sock: SOCKET, buffer: ByteArray, size: Int, offset: Int, flags: Int,
+        sock: SOCKET,
+        buffer: ByteArray,
+        size: Int,
+        offset: Int,
+        flags: Int,
         address: I,
     ): BlockingResult = memScoped {
         val struct: sockaddr
@@ -1333,8 +1366,12 @@ public actual object Syscall {
      */
     @Unsafe
     public actual fun getaddrinfo(
-        node: String?, service: String?,
-        family: Int, type: Int, protocol: Int, flags: Int,
+        node: String?,
+        service: String?,
+        family: Int,
+        type: Int,
+        protocol: Int,
+        flags: Int,
     ): List<AddrInfo> = memScoped {
         // copied from linuxMain
         val hints = alloc<ADDRINFOW>()
@@ -1371,7 +1408,6 @@ public actual object Syscall {
                 continue
             }
 
-
             val sockaddr = addrinfo.ai_addr!!.readBytesFast(addrinfo.ai_addrlen.toInt())
             val kAddrinfo = AddrInfo(
                 addr = sockaddr,
@@ -1390,7 +1426,6 @@ public actual object Syscall {
 
         return items
     }
-
 
     // == Generic stuff == //
     /**

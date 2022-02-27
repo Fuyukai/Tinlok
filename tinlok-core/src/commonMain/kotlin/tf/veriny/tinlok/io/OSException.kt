@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -18,7 +18,8 @@ import tf.veriny.tinlok.util.ByteString
  * Thrown when a platform call returns an unhandleable error.
  */
 public open class OSException(
-    message: String? = null, cause: Throwable? = null,
+    message: String? = null,
+    cause: Throwable? = null,
 ) : Exception(message, cause)
 
 // See: https://www.python.org/dev/peps/pep-3151/
@@ -96,7 +97,8 @@ constructor(
  */
 public open class ConnectionException
 constructor(
-    message: String?, cause: Throwable?,
+    message: String?,
+    cause: Throwable?,
 ) : OSException(message, cause)
 
 /**

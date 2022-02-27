@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -121,4 +121,3 @@ public constructor(public val socket: Socket<I>) : HalfCloseableStream, Closeabl
         socket.shutdown(ShutdownOption.WRITE)
     }
 }
-

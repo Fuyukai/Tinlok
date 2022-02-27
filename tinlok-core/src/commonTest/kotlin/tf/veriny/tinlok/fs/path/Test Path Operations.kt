@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -38,7 +38,7 @@ class `Test Path Operations` {
     }
 
     @Test
-    @Ignore  /* temporary? */
+    @Ignore /* temporary? */
     fun `Test owner`(): Unit = Path.makeTempDirectory("Tinlok-test-") {
         val username = Sys.getUsername()
         assertEquals(it.owner(), username)
@@ -111,8 +111,9 @@ class `Test Path Operations` {
         // continuation indents are possiibly the dumbest form of kotlin formatting
         // big personal fuck you to whoever made those part of the formatting
 
-        val toWrite = b("kandi boy raver he's the one for me and when the " +
-            "music starts to play we'll be dancing to the beat"
+        val toWrite = b(
+            "kandi boy raver he's the one for me and when the " +
+                "music starts to play we'll be dancing to the beat"
         )
 
         first.writeBytes(toWrite, atomic = false)
@@ -163,5 +164,4 @@ class `Test Path Operations` {
         val one = files.find { it.path.name == "one.txt" }
         assertNotNull(one)
     }
-
 }

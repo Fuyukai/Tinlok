@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -121,7 +121,6 @@ public expect interface Buffer : Closeable {
      * array.
      */
     public fun writeFrom(array: ByteArray, size: Int, offset: Int)
-
 }
 
 /**

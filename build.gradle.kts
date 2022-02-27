@@ -16,7 +16,8 @@ import java.nio.file.Path
 
 plugins {
     id("org.jetbrains.kotlin.multiplatform").version("1.6.20-M1").apply(false)
-    /*id("org.jetbrains.dokka").version("1.4.0").apply(true)*/
+    id("com.diffplug.spotless").version("6.0.0").apply(false)
+    id("com.github.ben-manes.versions").version("0.39.0").apply(false)
     id("maven-publish")
 }
 
@@ -64,6 +65,8 @@ subprojects {
     group = "tf.veriny.tinlok"
 
     apply(plugin = "org.jetbrains.kotlin.multiplatform")
+    apply(plugin = "com.diffplug.spotless")
+    apply(plugin = "com.github.ben-manes.versions")
     //apply(plugin = "org.jetbrains.dokka")
 
     // core kotlin configuration
@@ -132,6 +135,19 @@ subprojects {
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompileCommon>().configureEach {
         kotlinOptions {
             freeCompilerArgs = freeCompilerArgs + "-Xcontext-receivers"
+        }
+    }
+
+    configure<com.diffplug.gradle.spotless.SpotlessExtension> {
+        kotlin {
+            ktlint().userData(mapOf(
+                "disabled_rules" to "no-wildcard-imports",
+                "max-line-length" to "100",
+            ))
+
+            target("src/**/kotlin/**")
+            targetExclude("build/generated/**")
+            licenseHeaderFile(rootProject.file("gradle/LICENCE-HEADER"))
         }
     }
 

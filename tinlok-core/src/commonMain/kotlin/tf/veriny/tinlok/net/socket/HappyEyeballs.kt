@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -22,7 +22,8 @@ import tf.veriny.tinlok.net.tcp.TcpSocketAddress
  */
 @Unsafe
 public fun happyEyeballsTcpConnect(
-    address: TcpSocketAddress, timeout: Int = 30_000,
+    address: TcpSocketAddress,
+    timeout: Int = 30_000,
 ): Socket<TcpConnectionInfo> {
     for (info in address) {
         val sock = Socket.tcp(info.family)

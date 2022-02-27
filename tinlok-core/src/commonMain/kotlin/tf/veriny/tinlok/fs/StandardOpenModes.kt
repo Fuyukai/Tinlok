@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -27,7 +27,6 @@ public enum class StandardOpenModes : FileOpenMode {
 
     /** Creates a new file, throwing an error if it already exists. */
     CREATE_NEW,
-
 
     ;
 }

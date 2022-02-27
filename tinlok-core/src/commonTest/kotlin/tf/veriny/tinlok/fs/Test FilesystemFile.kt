@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -9,7 +9,6 @@
 
 package tf.veriny.tinlok.fs
 
-import tf.veriny.tinlok.fs.path.*
 import tf.veriny.tinlok.io.*
 import tf.veriny.tinlok.util.b
 import tf.veriny.tinlok.util.substring
@@ -106,5 +105,4 @@ class `Test FilesystemFile` {
             assertEquals(file.cursor(), 0L)
         }
     }
-
 }

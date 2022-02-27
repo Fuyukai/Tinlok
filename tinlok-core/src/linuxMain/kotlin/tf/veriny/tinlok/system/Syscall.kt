@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -72,7 +72,7 @@ public actual object Syscall {
      * Retry, but for Long.
      */
     @Unsafe
-    @OverloadResolutionByLambdaReturnType  // magic!
+    @OverloadResolutionByLambdaReturnType // magic!
     public inline fun retry(block: () -> Long): Long {
         while (true) {
             val result = block()
@@ -117,7 +117,7 @@ public actual object Syscall {
 
             EINVAL -> IllegalArgumentException()
 
-            else -> OSException(message = "[errno ${errno}] ${strerror(errno)}")
+            else -> OSException(message = "[errno $errno] ${strerror(errno)}")
         }
     }
 
@@ -296,7 +296,6 @@ public actual object Syscall {
         return this.read(fd, address, size)
     }
 
-
     /**
      * Writes up to [size] bytes to the specified file descriptor, returning the number of bytes
      * actually written.
@@ -325,7 +324,10 @@ public actual object Syscall {
      */
     @Unsafe
     public fun write(
-        fd: FD, buf: ByteArray, size: Int = buf.size, offset: Int = 0,
+        fd: FD,
+        buf: ByteArray,
+        size: Int = buf.size,
+        offset: Int = 0,
     ): BlockingResult {
         require(size <= IO_MAX) { "$size is more than IO_MAX" }
         require(buf.size >= size) { "$size is more than buffer size (${buf.size})" }
@@ -345,7 +347,9 @@ public actual object Syscall {
      */
     @Unsafe
     public actual fun __write_file(
-        fd: FILE, address: CPointer<ByteVar>, size: Int,
+        fd: FILE,
+        address: CPointer<ByteVar>,
+        size: Int,
     ): BlockingResult {
         return this.write(fd, address, size)
     }
@@ -358,7 +362,9 @@ public actual object Syscall {
      */
     @Unsafe
     public actual fun __write_file_with_retry(
-        fd: FILE, address: CPointer<ByteVar>, size: Int,
+        fd: FILE,
+        address: CPointer<ByteVar>,
+        size: Int,
     ): BlockingResult {
         var lastOffset = 0
 
@@ -384,7 +390,6 @@ public actual object Syscall {
             // lastOffset of greater means we hit EAGAIN or finished writing fully
             BlockingResult(lastOffset.toLong())
         }
-
     }
 
     /**
@@ -395,7 +400,7 @@ public actual object Syscall {
         var totalWritten = offset.toULong()
         // retry loop to ensure we write ALL of the data
         while (true) {
-            val longValue = cValuesOf(totalWritten.toLong())  // off_t
+            val longValue = cValuesOf(totalWritten.toLong()) // off_t
             val written = platform.linux.sendfile(
                 to, from,
                 longValue,
@@ -690,8 +695,12 @@ public actual object Syscall {
      */
     @Unsafe
     public actual fun getaddrinfo(
-        node: String?, service: String?,
-        family: Int, type: Int, protocol: Int, flags: Int,
+        node: String?,
+        service: String?,
+        family: Int,
+        type: Int,
+        protocol: Int,
+        flags: Int,
     ): List<AddrInfo> = memScoped {
         val hints = alloc<addrinfo>()
         val res = allocPointerTo<addrinfo>()
@@ -768,7 +777,7 @@ public actual object Syscall {
         }
 
         val struct = alloc.alloc<sockaddr_in6> {
-            sin6_family = AF_INET6.toUShort()  // ?
+            sin6_family = AF_INET6.toUShort() // ?
             // have to manually write to the array contained within
             sin6_addr.arrayMemberAt<ByteVar>(0L).unsafeClobber(ipRepresentation)
             sin6_port = htons(port.toUShort())
@@ -911,7 +920,6 @@ public actual object Syscall {
         return res
     }
 
-
     /**
      * Accepts a new connection from the specified socket. The [BlockingResult] returned will
      * contain the file descriptor.
@@ -977,7 +985,10 @@ public actual object Syscall {
      */
     @Unsafe
     public fun recv(
-        fd: FD, buf: CPointer<ByteVar>, size: Int, flags: Int,
+        fd: FD,
+        buf: CPointer<ByteVar>,
+        size: Int,
+        flags: Int,
     ): BlockingResult {
         val read = retry { recv(fd, buf, size.toULong(), flags) }
         if (read.isError) {
@@ -995,7 +1006,8 @@ public actual object Syscall {
     public fun recv(
         fd: FD,
         buffer: ByteArray,
-        size: Int = buffer.size, offset: Int,
+        size: Int = buffer.size,
+        offset: Int,
         flags: Int,
     ): BlockingResult {
         require(size <= IO_MAX) { "$size is more than IO_MAX" }
@@ -1017,7 +1029,10 @@ public actual object Syscall {
      */
     @Unsafe
     public fun __write_socket_with_retry(
-        socket: SOCKET, address: CPointer<ByteVar>, size: Int, flags: Int,
+        socket: SOCKET,
+        address: CPointer<ByteVar>,
+        size: Int,
+        flags: Int,
     ): BlockingResult {
         var lastOffset = 0
 
@@ -1051,7 +1066,8 @@ public actual object Syscall {
     public fun <I : ConnectionInfo> recvfrom(
         fd: FD,
         buffer: ByteArray,
-        size: Int = buffer.size, offset: Int = 0,
+        size: Int = buffer.size,
+        offset: Int = 0,
         flags: Int = 0,
 
         /* extra flags for address creation */
@@ -1112,7 +1128,11 @@ public actual object Syscall {
      */
     @Unsafe
     public fun send(
-        fd: FD, buf: ByteArray, size: Int = buf.size, offset: Int = 0, flags: Int = 0,
+        fd: FD,
+        buf: ByteArray,
+        size: Int = buf.size,
+        offset: Int = 0,
+        flags: Int = 0,
     ): BlockingResult {
         require(size <= IO_MAX) { "$size is more than IO_MAX" }
         require(buf.size >= size) { "$size is more than buffer size (${buf.size})" }
@@ -1130,7 +1150,11 @@ public actual object Syscall {
      */
     @Unsafe
     public fun <I> sendto(
-        fd: FD, buffer: ByteArray, size: Int, offset: Int, flags: Int,
+        fd: FD,
+        buffer: ByteArray,
+        size: Int,
+        offset: Int,
+        flags: Int,
         address: I,
     ): BlockingResult = memScoped {
         val struct: sockaddr

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -13,5 +13,6 @@ package tf.veriny.tinlok.net
  * Thrown when an attempt to connect a socket fails with all possible connections.
  */
 public class AllConnectionsFailedException(
-    public val addr: SocketAddress<*>, cause: Throwable? = null,
+    public val addr: SocketAddress<*>,
+    cause: Throwable? = null,
 ) : Exception("Connecting to $addr failed on all attempts", cause)

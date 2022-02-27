@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -81,8 +81,11 @@ class `Test Reentrant Lock` {
 
             // Check the atomic is still at zero
             val result = atomic.compareAndSwap(0, 1)
-            assertEquals(0, result, "Atomic int was not zero " +
-                "(i.e. was modified by worker)")
+            assertEquals(
+                0, result,
+                "Atomic int was not zero " +
+                    "(i.e. was modified by worker)"
+            )
 
             fut
         }

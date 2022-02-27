@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -8,7 +8,6 @@
  */
 
 package tf.veriny.tinlok.collection
-
 
 /**
  * Defines an ordered hash set that uses object identity rather than ``Any#hashCode`` for objects.

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -24,12 +24,11 @@ public fun baOf(vararg i: Int): ByteString {
     return intArrayOf(*i).map { it.toByte() }.toByteString()
 }
 
-
 /**
  * Tests the IPv6 parser object.
  */
 public class `Test IPv6Parser` {
-    private inline fun assertBadParse(address: String): Unit {
+    private inline fun assertBadParse(address: String) {
         assertFailsWith<IPv6ParseException> { IPv6TextParser.parse(address) }
     }
 
@@ -161,7 +160,6 @@ public class `Test IPv6Parser` {
     /** Ensures an octet with too many digits doesn't parse. */
     @Test
     public fun `Test too many hex digits`() = assertBadParse("01234::")
-
 }
 
 /**

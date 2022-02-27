@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -21,6 +21,8 @@ package tf.veriny.tinlok.crypto
  */
 @OptIn(ExperimentalUnsignedTypes::class)
 public expect fun passwordHash(
-    password: String, salt: UByteArray? = null,
-    blocks: Int = 100_000, iterations: Int = 3,
+    password: String,
+    salt: UByteArray? = null,
+    blocks: Int = 100_000,
+    iterations: Int = 3,
 ): Argon2iHash

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -108,7 +108,7 @@ public class `Test Socket` {
         var clientRemote: Socket<TcpConnectionInfo>? = null
         for (try_ in 0..1000) {
             clientRemote = server.accept()
-            @Suppress("SENSELESS_COMPARISON")  // IntelliJ lies!
+            @Suppress("SENSELESS_COMPARISON") // IntelliJ lies!
             if (clientRemote != null) break
         }
 

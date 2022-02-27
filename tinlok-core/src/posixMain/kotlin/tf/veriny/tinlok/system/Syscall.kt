@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -61,7 +61,9 @@ public expect object Syscall {
      */
     @Unsafe
     public fun __write_file_with_retry(
-        fd: FILE, address: CPointer<ByteVar>, size: Int,
+        fd: FILE,
+        address: CPointer<ByteVar>,
+        size: Int,
     ): BlockingResult
 
     /**
@@ -69,7 +71,11 @@ public expect object Syscall {
      */
     @Unsafe
     public fun getaddrinfo(
-        node: String?, service: String?,
-        family: Int, type: Int, protocol: Int, flags: Int,
+        node: String?,
+        service: String?,
+        family: Int,
+        type: Int,
+        protocol: Int,
+        flags: Int,
     ): List<AddrInfo>
 }

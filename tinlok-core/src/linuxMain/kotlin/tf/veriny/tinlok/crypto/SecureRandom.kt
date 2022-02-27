@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -26,5 +26,4 @@ public actual object SecureRandom : RandomShared() {
     override fun readBytesImpl(buf: ByteArray) {
         Syscall.read(fd, buf, buf.size)
     }
-
 }

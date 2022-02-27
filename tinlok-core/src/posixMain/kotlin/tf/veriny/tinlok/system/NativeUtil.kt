@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -68,7 +68,6 @@ public fun COpaquePointer.readBytesFast(count: Int): ByteArray {
     }
     return buf
 }
-
 
 /**
  * Overwrites the memory pointed to with a [ByteArray].

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -47,7 +47,6 @@ class `Test Posix Path` {
 
         val root = PosixPurePath.fromString("/")
         assertEquals(root.parent, root)
-
     }
 
     /**
@@ -73,7 +72,6 @@ class `Test Posix Path` {
         val joinedSystemd = etc / systemd
         assertTrue(joinedSystemd.isAbsolute)
         assertEquals(joinedSystemd, etcSystemd)
-
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -16,5 +16,7 @@ import tf.veriny.tinlok.io.OSException
  */
 public class WindowsException
 public constructor(
-    public val winerror: Int, message: String, cause: Throwable? = null,
+    public val winerror: Int,
+    message: String,
+    cause: Throwable? = null,
 ) : OSException(message, cause)

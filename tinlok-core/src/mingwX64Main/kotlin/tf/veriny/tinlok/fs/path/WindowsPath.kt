@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -177,7 +177,9 @@ public class WindowsPath(
      */
     @OptIn(Unsafe::class)
     override fun createDirectory(
-        parents: Boolean, existOk: Boolean, vararg permissions: FilePermission,
+        parents: Boolean,
+        existOk: Boolean,
+        vararg permissions: FilePermission,
     ) {
         if (parents) {
             for (parent in allParents().reversed()) {
@@ -281,8 +283,12 @@ public class WindowsPath(
         val openModes = modes.toSet()
 
         val accessFlag = when {
-            openModes.containsAll(listOf(StandardOpenModes.READ,
-                StandardOpenModes.WRITE)) -> (GENERIC_READ.toInt().or(GENERIC_WRITE))
+            openModes.containsAll(
+                listOf(
+                    StandardOpenModes.READ,
+                    StandardOpenModes.WRITE
+                )
+            ) -> (GENERIC_READ.toInt().or(GENERIC_WRITE))
             openModes.contains(StandardOpenModes.READ) -> GENERIC_READ.toInt()
             openModes.contains(StandardOpenModes.WRITE) -> GENERIC_WRITE
             openModes.contains(StandardOpenModes.APPEND) -> GENERIC_WRITE

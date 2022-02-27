@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -22,7 +22,11 @@ import tf.veriny.tinlok.system.toIpPort
 public actual object GlobalResolver : AddressResolver {
     @Unsafe
     override fun getaddrinfo(
-        host: String?, service: Int, family: AddressFamily, type: SocketType, protocol: IPProtocol,
+        host: String?,
+        service: Int,
+        family: AddressFamily,
+        type: SocketType,
+        protocol: IPProtocol,
         flags: Int,
     ): List<ConnectionInfo> {
         val result = Syscall.getaddrinfo(
@@ -47,7 +51,7 @@ public actual object GlobalResolver : AddressResolver {
                 SocketType.SOCK_DGRAM -> {
                     UdpConnectionInfo(ip, port)
                 }
-                else -> continue  // raw sockets
+                else -> continue // raw sockets
             }
             addresses.add(finalAddr)
         }

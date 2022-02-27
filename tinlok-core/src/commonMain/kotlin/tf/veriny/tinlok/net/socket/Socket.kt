@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -106,7 +106,10 @@ public expect interface Socket<I : ConnectionInfo> : Closeable {
      */
     @Throws(ClosedException::class, OSException::class)
     public fun recv(
-        buf: ByteArray, size: Int, offset: Int, flags: Int,
+        buf: ByteArray,
+        size: Int,
+        offset: Int,
+        flags: Int,
     ): BlockingResult
 
     /**
@@ -127,7 +130,10 @@ public expect interface Socket<I : ConnectionInfo> : Closeable {
      */
     @Throws(ClosedException::class, OSException::class)
     public fun recvfrom(
-        buf: ByteArray, size: Int, offset: Int, flags: Int,
+        buf: ByteArray,
+        size: Int,
+        offset: Int,
+        flags: Int,
     ): RecvFrom<I>?
 
     /**
@@ -165,7 +171,10 @@ public expect interface Socket<I : ConnectionInfo> : Closeable {
      */
     @Throws(ClosedException::class, OSException::class)
     public fun sendto(
-        buf: ByteArray, size: Int, offset: Int, flags: Int,
+        buf: ByteArray,
+        size: Int,
+        offset: Int,
+        flags: Int,
         addr: I,
     ): BlockingResult
 

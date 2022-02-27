@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -90,5 +90,4 @@ public actual object PlatformPaths {
 
         throw Exception("Unable to create a unique temporary directory")
     }
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -13,7 +13,7 @@ package tf.veriny.tinlok.io.async
  * Represents any asynchronous stream that operates in both directions (it is both readable and
  * writeable).
  */
-public interface AsyncBidirectionalStream
-    : AsyncReadableStream,
-      AsyncWriteableStream,
-      AsyncReadWrite
+public interface AsyncBidirectionalStream :
+    AsyncReadableStream,
+    AsyncWriteableStream,
+    AsyncReadWrite

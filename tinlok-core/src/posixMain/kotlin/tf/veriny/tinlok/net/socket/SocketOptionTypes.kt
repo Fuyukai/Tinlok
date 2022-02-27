@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -28,7 +28,8 @@ public actual class BooleanSocketOption actual constructor(
 
     @Unsafe
     override fun toNativeStructure(
-        allocator: NativePlacement, value: Boolean,
+        allocator: NativePlacement,
+        value: Boolean,
     ): CPointer<IntVar> {
         // we just allocate an int (lol)
         // somebody may be able to correct this in the future.
@@ -40,7 +41,8 @@ public actual class BooleanSocketOption actual constructor(
 
     @Unsafe
     override fun fromNativeStructure(
-        allocator: NativePlacement, structure: CPointer<*>,
+        allocator: NativePlacement,
+        structure: CPointer<*>,
     ): Boolean {
         // THIS CORRUPTS MEMORY IF THIS CAST FAILS
         // DO NOT PASS THIS FUNCTION THINGS IT DOESN'T EXPECT!
@@ -69,7 +71,8 @@ public actual class ULongSocketOption actual constructor(
 
     @Unsafe
     override fun toNativeStructure(
-        allocator: NativePlacement, value: ULong,
+        allocator: NativePlacement,
+        value: ULong,
     ): CPointer<ULongVar> {
         val long = allocator.alloc<ULongVar>()
         long.value = value
@@ -78,7 +81,8 @@ public actual class ULongSocketOption actual constructor(
 
     @Unsafe
     override fun fromNativeStructure(
-        allocator: NativePlacement, structure: CPointer<*>,
+        allocator: NativePlacement,
+        structure: CPointer<*>,
     ): ULong {
         // THIS EQUALLY CORRUPTS MEMORY!!!!
         return (structure as CPointer<ULongVar>).pointed.value

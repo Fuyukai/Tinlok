@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -241,5 +241,4 @@ actual constructor(private val ba: ByteArray) : Buffer {
      * This method is idempotent; subsequent calls will have no effects.
      */
     override fun close() {}
-
 }

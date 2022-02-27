@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2021 Lura Skye Revuwution.
+ * Copyright (C) 2020-2022 Lura Skye.
  *
  * This file is part of Tinlok.
  *
@@ -7,7 +7,6 @@
  * Version 3 or later, or the Mozilla Public License 2.0.
  */
 
-// TEMPORARY
 @file:Suppress("ClassName")
 
 package tf.veriny.tinlok.util
