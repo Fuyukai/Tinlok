@@ -14,7 +14,10 @@ package tf.veriny.tinlok.crypto
 import external.monocypher.*
 import kotlinx.cinterop.*
 import tf.veriny.tinlok.Unsafe
-import tf.veriny.tinlok.util.*
+import tf.veriny.tinlok.util.AtomicSafeCloseable
+import tf.veriny.tinlok.util.ByteString
+import tf.veriny.tinlok.util.Closeable
+import tf.veriny.tinlok.util.ClosedException
 
 /**
  * A class that takes in data and will eventually produce a hash using the Blake2b algorithm.

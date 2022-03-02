@@ -14,7 +14,10 @@ import kotlinx.cinterop.arrayMemberAt
 import kotlinx.cinterop.reinterpret
 import platform.posix.*
 import tf.veriny.tinlok.Unsafe
-import tf.veriny.tinlok.net.*
+import tf.veriny.tinlok.net.AddressFamily
+import tf.veriny.tinlok.net.IPAddress
+import tf.veriny.tinlok.net.IPv4Address
+import tf.veriny.tinlok.net.IPv6Address
 import tf.veriny.tinlok.system.readBytesFast
 
 /**

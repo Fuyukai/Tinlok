@@ -10,7 +10,10 @@
 package tf.veriny.tinlok.fs.path
 
 import tf.veriny.tinlok.Unsafe
-import tf.veriny.tinlok.fs.*
+import tf.veriny.tinlok.fs.DirEntry
+import tf.veriny.tinlok.fs.FileOpenMode
+import tf.veriny.tinlok.fs.FilePermission
+import tf.veriny.tinlok.fs.SynchronousFile
 import tf.veriny.tinlok.io.FileNotFoundException
 import tf.veriny.tinlok.util.ByteString
 

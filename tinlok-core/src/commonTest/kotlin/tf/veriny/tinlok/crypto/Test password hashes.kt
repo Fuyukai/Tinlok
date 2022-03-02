@@ -10,7 +10,10 @@
 package tf.veriny.tinlok.crypto
 
 import kotlin.random.nextUBytes
-import kotlin.test.*
+import kotlin.test.Test
+import kotlin.test.assertFails
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 /**
  * Ensures password hashes verify properly.

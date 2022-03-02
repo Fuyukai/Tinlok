@@ -13,7 +13,10 @@ import kotlinx.cinterop.Arena
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.ptr
 import platform.posix.*
-import tf.veriny.tinlok.util.*
+import tf.veriny.tinlok.util.AtomicBoolean
+import tf.veriny.tinlok.util.AtomicSafeCloseable
+import tf.veriny.tinlok.util.Closeable
+import tf.veriny.tinlok.util.ClosedException
 
 /**
  * A condition variable that can be used for a worker thread to suspend execution until signalled

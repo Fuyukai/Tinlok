@@ -11,7 +11,10 @@
 
 package tf.veriny.tinlok.util
 
-import kotlin.test.*
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFails
+import kotlin.test.assertTrue
 
 /**
  * Tests [ByteString] functionality.

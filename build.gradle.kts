@@ -15,7 +15,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import java.nio.file.Path
 
 plugins {
-    id("org.jetbrains.kotlin.multiplatform").version("1.6.20-M1").apply(false)
+    id("org.jetbrains.kotlin.multiplatform").version("1.6.20-RC").apply(false)
     id("com.diffplug.spotless").version("6.0.0").apply(false)
     id("com.github.ben-manes.versions").version("0.39.0").apply(false)
     id("maven-publish")
@@ -124,8 +124,7 @@ subprojects {
 
             all {
                 languageSettings.apply {
-
-                    enableLanguageFeature("InlineClasses")
+                    enableLanguageFeature("ContextReceivers")
                     optIn("kotlin.RequiresOptIn")
                 }
             }

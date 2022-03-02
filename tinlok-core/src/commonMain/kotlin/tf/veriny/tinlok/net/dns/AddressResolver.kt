@@ -10,7 +10,10 @@
 package tf.veriny.tinlok.net.dns
 
 import tf.veriny.tinlok.Unsafe
-import tf.veriny.tinlok.net.*
+import tf.veriny.tinlok.net.AddressFamily
+import tf.veriny.tinlok.net.ConnectionInfo
+import tf.veriny.tinlok.net.IPProtocol
+import tf.veriny.tinlok.net.SocketType
 
 /**
  * Interface for address resolvers. This defines a portable getaddrinfo()-like high level function.

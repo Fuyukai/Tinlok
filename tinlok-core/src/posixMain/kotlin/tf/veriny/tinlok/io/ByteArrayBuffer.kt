@@ -9,7 +9,10 @@
 
 package tf.veriny.tinlok.io
 
-import kotlinx.cinterop.*
+import kotlinx.cinterop.ByteVar
+import kotlinx.cinterop.CPointer
+import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.usePinned
 import tf.veriny.tinlok.Unsafe
 import tf.veriny.tinlok.util.*
 import kotlin.experimental.and

@@ -9,7 +9,10 @@
 
 package tf.veriny.tinlok.system
 
-import kotlinx.cinterop.*
+import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.pointed
+import kotlinx.cinterop.reinterpret
+import kotlinx.cinterop.usePinned
 import platform.posix.sockaddr
 import tf.veriny.tinlok.Unsafe
 import tf.veriny.tinlok.net.IPAddress

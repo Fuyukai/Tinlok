@@ -14,7 +14,10 @@ package tf.veriny.tinlok.net
 import tf.veriny.tinlok.Unsafe
 import tf.veriny.tinlok.util.ByteString
 import tf.veriny.tinlok.util.toByteString
-import kotlin.test.*
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
 
 /**
  * Creates a new [ByteString] from the specified [i] ints. This is better than byteArrayOf as it

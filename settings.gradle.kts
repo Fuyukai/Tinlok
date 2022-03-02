@@ -15,6 +15,7 @@ pluginManagement {
 }
 
 rootProject.name = "tinlok"
+
 // core
 include("tinlok-core")
 

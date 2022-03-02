@@ -9,7 +9,10 @@
 
 package tf.veriny.tinlok.fs.path
 
-import platform.windows.*
+import platform.windows.GENERIC_READ
+import platform.windows.GENERIC_WRITE
+import platform.windows.OPEN_ALWAYS
+import platform.windows.OPEN_EXISTING
 import tf.veriny.tinlok.Unsafe
 import tf.veriny.tinlok.fs.*
 import tf.veriny.tinlok.io.FileNotFoundException

@@ -11,7 +11,10 @@
 
 package tf.veriny.tinlok.crypto
 
-import tf.veriny.tinlok.util.*
+import tf.veriny.tinlok.util.ByteString
+import tf.veriny.tinlok.util.Closeable
+import tf.veriny.tinlok.util.ClosingScope
+import tf.veriny.tinlok.util.use
 
 /**
  * A class that takes in data and will eventually produce a hash using the Blake2b algorithm.

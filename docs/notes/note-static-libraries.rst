@@ -23,24 +23,6 @@ Monocypher bindings are available using the ``tinlok-static-monocypher`` library
         implementation("tf.veriny.tinlok:tinlok-static-monocypher:TINLOK-VERSION")
     }
 
-OpenSSL
--------
-
-`OpenSSL <https://www.openssl.org/>`_, ***version 3.0-alpha9***, licenced under the Apache 2.0
-licence. Used for TLS support.
-
-.. warning::
-
-    Tinlok distributes the 3.0 version of OpenSSL, NOT the 1.1.1 version, as the original licence is
-    not (L)GPL compatible. You cannot replace this or link against an older licenced version.
-
-OpenSSL bindings are available using the ``tinlok-static-openssl`` library, like so:
-
-.. code-block:: kotlin
-
-    dependencies {
-        implementation("tf.veriny.tinlok:tinlok-static-openssl:TINLOK-VERSION")
-    }
 
 libuuid
 -------

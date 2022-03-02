@@ -12,7 +12,10 @@ package tf.veriny.tinlok.net.socket
 import tf.veriny.tinlok.Unsafe
 import tf.veriny.tinlok.io.Buffer
 import tf.veriny.tinlok.io.OSException
-import tf.veriny.tinlok.net.*
+import tf.veriny.tinlok.net.AddressFamily
+import tf.veriny.tinlok.net.ConnectionInfo
+import tf.veriny.tinlok.net.IPProtocol
+import tf.veriny.tinlok.net.SocketType
 import tf.veriny.tinlok.net.tcp.TcpConnectionInfo
 import tf.veriny.tinlok.net.udp.UdpConnectionInfo
 import tf.veriny.tinlok.system.BlockingResult

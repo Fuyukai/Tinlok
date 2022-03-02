@@ -13,10 +13,19 @@ import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
 import platform.posix.O_NONBLOCK
 import tf.veriny.tinlok.Unsafe
-import tf.veriny.tinlok.io.*
+import tf.veriny.tinlok.io.Buffer
+import tf.veriny.tinlok.io.OSException
+import tf.veriny.tinlok.io.checkCapacityRead
+import tf.veriny.tinlok.io.checkCapacityWrite
 import tf.veriny.tinlok.net.*
-import tf.veriny.tinlok.system.*
-import tf.veriny.tinlok.util.*
+import tf.veriny.tinlok.system.BlockingResult
+import tf.veriny.tinlok.system.FD
+import tf.veriny.tinlok.system.FcntlParam
+import tf.veriny.tinlok.system.Syscall
+import tf.veriny.tinlok.util.AtomicBoolean
+import tf.veriny.tinlok.util.ClosedException
+import tf.veriny.tinlok.util.EasyFdCloseable
+import tf.veriny.tinlok.util.flagged
 
 /**
  * The Linux-specific implementation of the [Socket] interface.

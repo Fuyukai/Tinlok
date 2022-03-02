@@ -9,7 +9,10 @@
 
 package tf.veriny.tinlok.concurrent
 
-import kotlinx.cinterop.*
+import kotlinx.cinterop.Arena
+import kotlinx.cinterop.alloc
+import kotlinx.cinterop.convert
+import kotlinx.cinterop.ptr
 import platform.posix.*
 import tf.veriny.tinlok.system.Syscall
 import tf.veriny.tinlok.util.AtomicBoolean

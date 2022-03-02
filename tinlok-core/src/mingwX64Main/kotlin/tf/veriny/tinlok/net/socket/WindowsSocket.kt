@@ -13,7 +13,10 @@ import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
 import platform.windows.FIONBIO
 import tf.veriny.tinlok.Unsafe
-import tf.veriny.tinlok.io.*
+import tf.veriny.tinlok.io.Buffer
+import tf.veriny.tinlok.io.checkCapacityRead
+import tf.veriny.tinlok.io.checkCapacityWrite
+import tf.veriny.tinlok.io.remaining
 import tf.veriny.tinlok.net.*
 import tf.veriny.tinlok.system.BlockingResult
 import tf.veriny.tinlok.system.SOCKET

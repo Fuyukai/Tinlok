@@ -10,7 +10,10 @@
 package tf.veriny.tinlok.fs.path
 
 import tf.veriny.tinlok.Sys
-import kotlin.test.*
+import kotlin.test.Ignore
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 /**
  * Tests the special path functions.

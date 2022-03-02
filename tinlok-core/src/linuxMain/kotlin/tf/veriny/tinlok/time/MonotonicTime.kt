@@ -12,7 +12,10 @@ package tf.veriny.tinlok.time
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.ptr
-import platform.posix.*
+import platform.posix.CLOCK_MONOTONIC
+import platform.posix.clock_gettime
+import platform.posix.errno
+import platform.posix.timespec
 import tf.veriny.tinlok.system.Syscall
 
 /**

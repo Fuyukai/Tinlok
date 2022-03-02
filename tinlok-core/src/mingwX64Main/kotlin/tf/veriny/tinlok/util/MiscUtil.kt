@@ -16,7 +16,10 @@ import platform.posix.sockaddr_storage
 import platform.windows.ntohs
 import platform.windows.sockaddr_in6
 import tf.veriny.tinlok.Unsafe
-import tf.veriny.tinlok.net.*
+import tf.veriny.tinlok.net.AddressFamily
+import tf.veriny.tinlok.net.IPAddress
+import tf.veriny.tinlok.net.IPv4Address
+import tf.veriny.tinlok.net.IPv6Address
 import tf.veriny.tinlok.system.readBytesFast
 
 /**
