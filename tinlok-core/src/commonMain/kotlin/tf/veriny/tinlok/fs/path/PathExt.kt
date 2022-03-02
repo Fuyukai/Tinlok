@@ -258,6 +258,7 @@ public fun Path.writeBytes(bs: ByteString, atomic: Boolean = true) {
 
         tempName.open(StandardOpenModes.WRITE, StandardOpenModes.CREATE) {
             it.writeAll(bs)
+            it.sync()
         }
 
         tempName.move(realPath)

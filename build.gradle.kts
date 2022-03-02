@@ -131,9 +131,9 @@ subprojects {
         }
     }
 
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompileCommon>().configureEach {
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
         kotlinOptions {
-            freeCompilerArgs = freeCompilerArgs + "-Xcontext-receivers"
+            freeCompilerArgs = freeCompilerArgs + "-Xgc=cms"
         }
     }
 

@@ -45,11 +45,19 @@ public expect object Syscall {
     /**
      * Sets the current absolute cursor for a file.
      */
+    @Unsafe
     public fun __set_file_cursor(fd: FILE, point: Long)
+
+    /**
+     * Flushes data to the filesystem.
+     */
+    @Unsafe
+    public fun __fsync(fd: FILE, full: Boolean)
 
     /**
      * Closes a file.
      */
+    @Unsafe
     public fun __close_file(fd: FILE)
 
     // requires scary pointer arithmetic!

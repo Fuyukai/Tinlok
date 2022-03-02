@@ -852,6 +852,25 @@ public actual object Syscall {
         }
     }
 
+    /**
+     * Flushes in-memory file buffers for this file to disc.
+     */
+    @Unsafe
+    public fun FlushFileBuffers(fd: FILE) {
+        val result = FlushFileBuffers(fd.handle)
+        if (result != TRUE) {
+            throwErrno()
+        }
+    }
+
+    /**
+     * Flushes data to the filesystem.
+     */
+    @Unsafe
+    public actual fun __fsync(fd: FILE, full: Boolean) {
+        FlushFileBuffers(fd)
+    }
+
     // == Networking == //
     /**
      * Throws an appropriate WinSock error for the specified [code].

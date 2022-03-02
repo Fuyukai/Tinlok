@@ -9,6 +9,7 @@
 
 package tf.veriny.tinlok.fs
 
+import tf.veriny.tinlok.fs.path.*
 import tf.veriny.tinlok.io.*
 import tf.veriny.tinlok.util.b
 import tf.veriny.tinlok.util.substring

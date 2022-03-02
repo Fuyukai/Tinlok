@@ -355,6 +355,42 @@ public actual object Syscall {
     }
 
     /**
+     * Performs an fsync() on a file.
+     */
+    @Unsafe
+    public fun fsync(fd: FD) {
+        val result = retry { platform.posix.fsync(fd) }
+
+        if (result.isError) {
+            throwErrno(errno)
+        }
+    }
+
+    /**
+     * Performs an fdatasync() on a file.
+     */
+    @Unsafe
+    public fun fdatasync(fd: FD) {
+        val result = retry { platform.posix.fdatasync(fd) }
+
+        if (result.isError) {
+            throwErrno(errno)
+        }
+    }
+
+    /**
+     * Flushes data to the filesystem.
+     */
+    @Unsafe
+    public actual fun __fsync(fd: FILE, full: Boolean) {
+        if (full) {
+            fsync(fd)
+        } else {
+            fdatasync(fd)
+        }
+    }
+
+    /**
      * Writes [size] bytes from [address] to the file [fd], returning the number of bytes written.
      *
      * This method will attempt to retry until the full [size] bytes are written. Use a

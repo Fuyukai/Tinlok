@@ -23,4 +23,10 @@ public interface SynchronousFile : BidirectionalStream, Seekable {
 
     /** The path of this file. */
     public val path: Path
+
+    /**
+     * Synchronises the filesystem for this file. If ``full``, then all metadata will be flushed;
+     * otherwise, only metadata needed for subsequent data retrieval will be flushed.
+     */
+    public fun sync(full: Boolean = false)
 }

@@ -32,6 +32,7 @@ public class SynchronousFilesystemFile(
     /** If this file is still open. */
     override val isOpen: AtomicBoolean get() = _isOpen
 
+
     /**
      * Closes this file.
      *
@@ -151,5 +152,15 @@ public class SynchronousFilesystemFile(
             buffer.cursor += result
             result.toInt()
         }
+    }
+
+
+    /**
+     * Synchronises the filesystem for this file. If ``full``, then all metadata will be flushed;
+     * otherwise, only metadata needed for subsequent data retrieval will be flushed.
+     */
+    @OptIn(Unsafe::class)
+    override fun sync(full: Boolean) {
+        Syscall.__fsync(handle, full)
     }
 }
